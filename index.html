@@ -1520,19 +1520,27 @@ function renderSP(){
 // ══════════════════════════════════════════════════════
 // INIT — Auth state listener
 // ══════════════════════════════════════════════════════
+let _initDone = false;
+async function initAfterLogin(user){
+  if(_initDone)return;
+  _initDone=true;
+  currentUser=user;
+  const ao=document.getElementById('auth-overlay');
+  if(ao)ao.style.display='none';
+  const ue=document.getElementById('tb-user-email');
+  if(ue)ue.textContent=currentUser.email;
+  await sbLoadData();
+  applyTheme();applyFX();
+  renderDesktopIcons();
+  updateTaskbar();
+  if(!windows['dash'])openApp('dash');
+}
+
 sb.auth.onAuthStateChange(async (event, session) => {
   if(session?.user){
-    currentUser=session.user;
-    const ao=document.getElementById('auth-overlay');
-    if(ao)ao.style.display='none';
-    const ue=document.getElementById('tb-user-email');
-    if(ue)ue.textContent=currentUser.email;
-    await sbLoadData();
-    applyTheme();applyFX();
-    renderDesktopIcons();
-    updateTaskbar();
-    setTimeout(()=>{renderDesktopIcons();updateTaskbar();if(!windows['dash'])openApp('dash');},300);
+    await initAfterLogin(session.user);
   } else {
+    _initDone=false;
     currentUser=null;
     Object.keys(windows).forEach(id=>closeApp(id));
     const ao=document.getElementById('auth-overlay');
@@ -1548,18 +1556,7 @@ sb.auth.onAuthStateChange(async (event, session) => {
 window.addEventListener('load', async () => {
   try {
     const { data: { session } } = await sb.auth.getSession();
-    if(session?.user && !currentUser){
-      currentUser=session.user;
-      const ao=document.getElementById('auth-overlay');
-      if(ao)ao.style.display='none';
-      const ue=document.getElementById('tb-user-email');
-      if(ue)ue.textContent=currentUser.email;
-      await sbLoadData();
-      applyTheme();applyFX();
-      renderDesktopIcons();
-      updateTaskbar();
-      setTimeout(()=>{renderDesktopIcons();updateTaskbar();if(!windows['dash'])openApp('dash');},300);
-    }
+    if(session?.user) await initAfterLogin(session.user);
   } catch(e){}
 });
 
