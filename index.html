@@ -6,7 +6,7 @@
 <title>FOOTBALL VAULT</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -359,11 +359,7 @@ select option{background:#0a0f0b}
 // ══════════════════════════════════════════════════════
 const SUPABASE_URL = 'https://dqqmtzztwetayqyehqkk.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxcW10enp0d2V0YXlxeWVocWtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDU4MTIsImV4cCI6MjA5Njc4MTgxMn0.66cRmWRuuXEJH3roQklHprppJKW9A2xM7Sk0_4VoKoI';
-
-// Obsługa różnych nazw eksportu UMD
-const _supa = window.supabase || window.Supabase || window.supabaseJs;
-if(!_supa){ document.body.innerHTML='<div style="color:red;padding:40px;font-size:20px">Błąd: biblioteka Supabase nie załadowała się. Odśwież stronę (F5).</div>'; throw new Error('Supabase not loaded'); }
-const sb = _supa.createClient(SUPABASE_URL, SUPABASE_ANON);
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 let currentUser = null;
 
@@ -1536,11 +1532,14 @@ function renderSP(){
 // ══════════════════════════════════════════════════════
 // INIT — Auth state listener
 // ══════════════════════════════════════════════════════
-// Jedyna funkcja inicjalizacji — wywolywana zawsze po zalogowaniu
 async function initAfterLogin(user){
+  // Ten sam user, okna już otwarte — tylko sync w tle
   if(currentUser && currentUser.id === user.id && Object.keys(windows).length > 0){
     currentUser = user;
-    await sbLoadData(); saveLocalCache(); rerenderOpen(); updateTaskbar();
+    // WAŻNE: setTimeout żeby uciec z onAuthStateChange locka
+    setTimeout(async () => {
+      await sbLoadData(); saveLocalCache(); rerenderOpen(); updateTaskbar();
+    }, 0);
     return;
   }
   currentUser = user;
@@ -1550,8 +1549,11 @@ async function initAfterLogin(user){
   if(ue) ue.textContent = currentUser.email;
   applyTheme(); applyFX(); renderDesktopIcons(); updateTaskbar();
   if(!windows['dash']) openApp('dash');
-  await sbLoadData(); saveLocalCache();
-  applyTheme(); applyFX(); renderDesktopIcons(); updateTaskbar();
+  // WAŻNE: setTimeout żeby uciec z onAuthStateChange locka przed odpytaniem Supabase
+  setTimeout(async () => {
+    await sbLoadData(); saveLocalCache();
+    applyTheme(); applyFX(); rerenderOpen(); updateTaskbar();
+  }, 0);
 }
 
 function doLogout(){
@@ -1567,22 +1569,15 @@ function doLogout(){
   if(di) di.innerHTML = '';
 }
 
-sb.auth.onAuthStateChange(async (event, session) => {
+// WAŻNE: onAuthStateChange NIE może mieć await na operacjach Supabase
+// (deadlock na _acquireLock) — dlatego initAfterLogin używa setTimeout
+sb.auth.onAuthStateChange((event, session) => {
   if(session?.user){
-    await initAfterLogin(session.user);
+    initAfterLogin(session.user);
   } else if(event === 'SIGNED_OUT'){
     doLogout();
   }
 });
-
-// Fallback — getSession() na wypadek gdy onAuthStateChange nie odpali
-setTimeout(async () => {
-  if(currentUser) return;
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-    if(session?.user) await initAfterLogin(session.user);
-  } catch(e) { console.error('getSession fallback error:', e); }
-}, 500);
 
 document.addEventListener('keydown', e => {
   if(e.key !== 'Enter') return;
