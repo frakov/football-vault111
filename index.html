@@ -282,11 +282,11 @@ select option{background:#0a0f0b}
     <!-- LOGIN -->
     <div id="form-login">
       <div class="auth-field">
-        <label>Email</label>
+        <label for="login-email">Email</label>
         <input type="email" id="login-email" placeholder="twoj@email.com" autocomplete="email">
       </div>
       <div class="auth-field">
-        <label>Hasło</label>
+        <label for="login-pass">Hasło</label>
         <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
       </div>
       <button class="auth-btn" onclick="doLogin()">Zaloguj się →</button>
@@ -295,11 +295,11 @@ select option{background:#0a0f0b}
     <!-- REGISTER -->
     <div id="form-register" style="display:none">
       <div class="auth-field">
-        <label>Email</label>
+        <label for="reg-email">Email</label>
         <input type="email" id="reg-email" placeholder="twoj@email.com" autocomplete="email">
       </div>
       <div class="auth-field">
-        <label>Hasło (min. 6 znaków)</label>
+        <label for="reg-pass">Hasło (min. 6 znaków)</label>
         <input type="password" id="reg-pass" placeholder="••••••••" autocomplete="new-password">
       </div>
       <button class="auth-btn" onclick="doRegister()">Utwórz konto →</button>
@@ -309,7 +309,7 @@ select option{background:#0a0f0b}
     <!-- RESET -->
     <div id="form-reset" style="display:none">
       <div class="auth-field">
-        <label>Email</label>
+        <label for="reset-email">Email</label>
         <input type="email" id="reset-email" placeholder="twoj@email.com">
       </div>
       <button class="auth-btn" onclick="doReset()">Wyślij link resetujący →</button>
