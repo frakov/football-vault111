@@ -460,14 +460,15 @@ async function sbSaveShirt(shirt){
     status:shirt.status, photos:shirt.photos||[], value_history:shirt.valueHistory||[],
     market_listed:shirt.marketListed||false
   };
-  if(shirt.id && typeof shirt.id !== 'number' || (typeof shirt.id === 'number' && shirt.id > 1e12)){
-    // old local ID — insert new
-    const {data,error}=await sb.from('shirts').insert(row).select().single();
+  // UUID = istniejacy rekord w Supabase, brak/liczba = nowy rekord
+  const isUUID = shirt.id && typeof shirt.id === 'string' && shirt.id.includes('-');
+  if(isUUID){
+    row.id=shirt.id;
+    const {data,error}=await sb.from('shirts').upsert(row).select().single();
     if(error){toast('Błąd zapisu: '+error.message);return null;}
     return data.id;
   } else {
-    row.id=shirt.id;
-    const {data,error}=await sb.from('shirts').upsert(row).select().single();
+    const {data,error}=await sb.from('shirts').insert(row).select().single();
     if(error){toast('Błąd zapisu: '+error.message);return null;}
     return data.id;
   }
