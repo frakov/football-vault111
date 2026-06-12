@@ -1521,9 +1521,12 @@ function renderSP(){
 // INIT — Auth state listener
 // ══════════════════════════════════════════════════════
 let _initDone = false;
+let _loggedOut = false;
+
 async function initAfterLogin(user){
   if(_initDone)return;
   _initDone=true;
+  _loggedOut=false;
   currentUser=user;
   const ao=document.getElementById('auth-overlay');
   if(ao)ao.style.display='none';
@@ -1536,31 +1539,38 @@ async function initAfterLogin(user){
   if(!windows['dash'])openApp('dash');
 }
 
-sb.auth.onAuthStateChange(async (event, session) => {
-  console.log('[AUTH]', event, !!session?.user, '_initDone:', _initDone);
-  if(session?.user){
-    await initAfterLogin(session.user);
-  } else {
-    // Ignoruj INITIAL_SESSION bez usera jesli juz zalogowani
-    if(event === 'INITIAL_SESSION' && _initDone) return;
-    _initDone=false;
-    currentUser=null;
-    Object.keys(windows).forEach(id=>closeApp(id));
-    const ao=document.getElementById('auth-overlay');
-    if(ao)ao.style.display='flex';
-    const ue=document.getElementById('tb-user-email');
-    if(ue)ue.textContent='—';
-    const di=document.getElementById('desk-icons');
-    if(di)di.innerHTML='';
-  }
-});
+function doLogout(){
+  _initDone=false;
+  _loggedOut=true;
+  currentUser=null;
+  Object.keys(windows).forEach(id=>closeApp(id));
+  const ao=document.getElementById('auth-overlay');
+  if(ao)ao.style.display='flex';
+  const ue=document.getElementById('tb-user-email');
+  if(ue)ue.textContent='—';
+  const di=document.getElementById('desk-icons');
+  if(di)di.innerHTML='';
+}
 
-// Fallback: handle F5 refresh when Supabase session already exists
+// Uzywamy getSession() jako glownego zrodla prawdy przy starcie
 window.addEventListener('load', async () => {
   try {
     const { data: { session } } = await sb.auth.getSession();
-    if(session?.user) await initAfterLogin(session.user);
+    if(session?.user){
+      await initAfterLogin(session.user);
+    }
   } catch(e){}
+});
+
+// onAuthStateChange tylko do wylogowania i nowego logowania
+sb.auth.onAuthStateChange(async (event, session) => {
+  if(event === 'SIGNED_IN' && session?.user){
+    if(!_initDone) await initAfterLogin(session.user);
+  } else if(event === 'SIGNED_OUT'){
+    doLogout();
+  } else if(event === 'TOKEN_REFRESHED' && session?.user){
+    currentUser=session.user;
+  }
 });
 
 // Keyboard enter on auth forms
