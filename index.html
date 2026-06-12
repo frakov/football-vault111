@@ -1567,21 +1567,19 @@ function doLogout(){
   if(di)di.innerHTML='';
 }
 
-// Przy kazdym F5 — getSession() jest synchroniczne z cache, nie czeka na siec
-window.addEventListener('DOMContentLoaded', async () => {
-  try {
-    const { data: { session } } = await sb.auth.getSession();
-    if(session?.user){
-      await initAfterLogin(session.user);
-    }
-  } catch(e){ console.error('init error', e); }
-});
+// Flaga żeby nie inicjalizować dwa razy
+let _initDone = false;
 
-// onAuthStateChange — tylko nowe logowanie i wylogowanie
+// onAuthStateChange — obsługuje wszystko: F5, logowanie, wylogowanie
 sb.auth.onAuthStateChange(async (event, session) => {
-  if(event === 'SIGNED_IN' && session?.user && !currentUser){
+  if(session?.user && !_initDone){
+    _initDone = true;
     await initAfterLogin(session.user);
-  } else if(event === 'SIGNED_OUT'){
+  } else if(session?.user && _initDone && event === 'SIGNED_IN'){
+    // już zalogowany, tylko odśwież dane
+    currentUser = session.user;
+  } else if(!session?.user && (event === 'SIGNED_OUT' || event === 'USER_DELETED')){
+    _initDone = false;
     doLogout();
   }
 });
