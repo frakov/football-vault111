@@ -406,7 +406,7 @@ async function doReset(){
 
 async function doSignOut(){
   await sb.auth.signOut();
-  // doLogout zostanie wywołany przez onAuthStateChange → SIGNED_OUT
+  // doLogout wywoła się przez onAuthStateChange SIGNED_OUT
 }
 
 // ══════════════════════════════════════════════════════
@@ -1223,7 +1223,6 @@ function buildShirtForm(s){
     <div class="form-label">${T('f_photos')} (${editPhotos.length}/8)</div>
     <div class="photo-grid" id="photo-grid-e">${buildPhotoGrid()}</div>
     <input type="file" id="ph-upload" accept="image/*" multiple style="display:none" onchange="handlePhotos(this)">
-    <label for="ph-upload" id="ph-upload-label" style="display:none"></label>
   </div>
   <div class="div"></div>
   <div class="fx-c gap8" style="justify-content:flex-end">
@@ -1536,7 +1535,7 @@ function renderSP(){
 // ══════════════════════════════════════════════════════
 // Jedyna funkcja inicjalizacji — wywolywana zawsze po zalogowaniu
 async function initAfterLogin(user){
-  // Jeśli ten sam user już zalogowany i okna są otwarte — tylko odśwież dane w tle
+  // Ten sam user, okna już otwarte (np. token refresh) — tylko sync w tle
   if(currentUser && currentUser.id === user.id && Object.keys(windows).length > 0){
     currentUser = user;
     await sbLoadData();
@@ -1545,57 +1544,61 @@ async function initAfterLogin(user){
     updateTaskbar();
     return;
   }
-  currentUser=user;
-  const ao=document.getElementById('auth-overlay');
-  if(ao)ao.style.display='none';
-  const ue=document.getElementById('tb-user-email');
-  if(ue)ue.textContent=currentUser.email;
-  // Renderuj natychmiast z cache (localStorage) — nie czeka na Supabase
-  applyTheme();
-  applyFX();
-  renderDesktopIcons();
-  updateTaskbar();
-  if(!windows['dash'])openApp('dash');
+  currentUser = user;
+  const ao = document.getElementById('auth-overlay');
+  if(ao) ao.style.display = 'none';
+  const ue = document.getElementById('tb-user-email');
+  if(ue) ue.textContent = currentUser.email;
+  // Renderuj natychmiast z cache
+  applyTheme(); applyFX(); renderDesktopIcons(); updateTaskbar();
+  if(!windows['dash']) openApp('dash');
   // Synchronizuj z Supabase w tle
   await sbLoadData();
   saveLocalCache();
-  applyTheme();
-  applyFX();
-  renderDesktopIcons();
-  updateTaskbar();
+  applyTheme(); applyFX(); renderDesktopIcons(); updateTaskbar();
 }
 
 function doLogout(){
-  currentUser=null;
+  currentUser = null;
   localStorage.removeItem('fvault_cache');
-  db=JSON.parse(JSON.stringify(DEF));
-  Object.keys(windows).forEach(id=>closeApp(id));
-  const ao=document.getElementById('auth-overlay');
-  if(ao)ao.style.display='flex';
-  const ue=document.getElementById('tb-user-email');
-  if(ue)ue.textContent='—';
-  const di=document.getElementById('desk-icons');
-  if(di)di.innerHTML='';
+  db = JSON.parse(JSON.stringify(DEF));
+  Object.keys(windows).forEach(id => closeApp(id));
+  const ao = document.getElementById('auth-overlay');
+  if(ao) ao.style.display = 'flex';
+  const ue = document.getElementById('tb-user-email');
+  if(ue) ue.textContent = '—';
+  const di = document.getElementById('desk-icons');
+  if(di) di.innerHTML = '';
 }
 
-// onAuthStateChange — obsługuje wszystko: F5, logowanie, wylogowanie
+// onAuthStateChange — obsługuje F5, logowanie, wylogowanie
 sb.auth.onAuthStateChange(async (event, session) => {
-  if(session?.user && (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')){
+  if(session?.user){
     await initAfterLogin(session.user);
-  } else if(!session?.user && event === 'SIGNED_OUT'){
+  } else if(event === 'SIGNED_OUT'){
     doLogout();
   }
 });
 
+// FALLBACK: onAuthStateChange czasem nie odpala INITIAL_SESSION na Vercel
+// getSession() jako gwarancja że sesja zostanie odczytana
+setTimeout(async () => {
+  if(currentUser) return; // już zalogowany przez onAuthStateChange
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if(session?.user) await initAfterLogin(session.user);
+  } catch(e) {}
+}, 800);
+
 // Keyboard enter on auth forms
-document.addEventListener('keydown',e=>{
-  if(e.key!=='Enter')return;
-  const lo=document.getElementById('form-login');
-  const re=document.getElementById('form-register');
-  const rs=document.getElementById('form-reset');
-  if(lo&&lo.style.display!=='none')doLogin();
-  else if(re&&re.style.display!=='none')doRegister();
-  else if(rs&&rs.style.display!=='none')doReset();
+document.addEventListener('keydown', e => {
+  if(e.key !== 'Enter') return;
+  const lo = document.getElementById('form-login');
+  const re = document.getElementById('form-register');
+  const rs = document.getElementById('form-reset');
+  if(lo && lo.style.display !== 'none') doLogin();
+  else if(re && re.style.display !== 'none') doRegister();
+  else if(rs && rs.style.display !== 'none') doReset();
 });
 </script>
 </body>
