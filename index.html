@@ -1537,9 +1537,12 @@ async function initAfterLogin(user){
 }
 
 sb.auth.onAuthStateChange(async (event, session) => {
+  console.log('[AUTH]', event, !!session?.user, '_initDone:', _initDone);
   if(session?.user){
     await initAfterLogin(session.user);
   } else {
+    // Ignoruj INITIAL_SESSION bez usera jesli juz zalogowani
+    if(event === 'INITIAL_SESSION' && _initDone) return;
     _initDone=false;
     currentUser=null;
     Object.keys(windows).forEach(id=>closeApp(id));
