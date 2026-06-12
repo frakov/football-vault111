@@ -1520,28 +1520,22 @@ function renderSP(){
 // ══════════════════════════════════════════════════════
 // INIT — Auth state listener
 // ══════════════════════════════════════════════════════
-let _initDone = false;
-let _loggedOut = false;
-
+// Jedyna funkcja inicjalizacji — wywolywana zawsze po zalogowaniu
 async function initAfterLogin(user){
-  if(_initDone)return;
-  _initDone=true;
-  _loggedOut=false;
   currentUser=user;
   const ao=document.getElementById('auth-overlay');
   if(ao)ao.style.display='none';
   const ue=document.getElementById('tb-user-email');
   if(ue)ue.textContent=currentUser.email;
   await sbLoadData();
-  applyTheme();applyFX();
+  applyTheme();
+  applyFX();
   renderDesktopIcons();
   updateTaskbar();
   if(!windows['dash'])openApp('dash');
 }
 
 function doLogout(){
-  _initDone=false;
-  _loggedOut=true;
   currentUser=null;
   Object.keys(windows).forEach(id=>closeApp(id));
   const ao=document.getElementById('auth-overlay');
@@ -1552,24 +1546,22 @@ function doLogout(){
   if(di)di.innerHTML='';
 }
 
-// Uzywamy getSession() jako glownego zrodla prawdy przy starcie
-window.addEventListener('load', async () => {
+// Przy kazdym F5 — getSession() jest synchroniczne z cache, nie czeka na siec
+window.addEventListener('DOMContentLoaded', async () => {
   try {
     const { data: { session } } = await sb.auth.getSession();
     if(session?.user){
       await initAfterLogin(session.user);
     }
-  } catch(e){}
+  } catch(e){ console.error('init error', e); }
 });
 
-// onAuthStateChange tylko do wylogowania i nowego logowania
+// onAuthStateChange — tylko nowe logowanie i wylogowanie
 sb.auth.onAuthStateChange(async (event, session) => {
-  if(event === 'SIGNED_IN' && session?.user){
-    if(!_initDone) await initAfterLogin(session.user);
+  if(event === 'SIGNED_IN' && session?.user && !currentUser){
+    await initAfterLogin(session.user);
   } else if(event === 'SIGNED_OUT'){
     doLogout();
-  } else if(event === 'TOKEN_REFRESHED' && session?.user){
-    currentUser=session.user;
   }
 });
 
