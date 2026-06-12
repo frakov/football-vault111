@@ -1528,15 +1528,10 @@ sb.auth.onAuthStateChange(async (event, session) => {
     const ue=document.getElementById('tb-user-email');
     if(ue)ue.textContent=currentUser.email;
     await sbLoadData();
-    applyTheme();
-    applyFX();
+    applyTheme();applyFX();
     renderDesktopIcons();
     updateTaskbar();
-    // Small delay to ensure icons are rendered before opening dash
-    setTimeout(()=>{
-      renderDesktopIcons();
-      openApp('dash');
-    }, 250);
+    setTimeout(()=>{renderDesktopIcons();updateTaskbar();if(!windows['dash'])openApp('dash');},300);
   } else {
     currentUser=null;
     Object.keys(windows).forEach(id=>closeApp(id));
@@ -1544,7 +1539,28 @@ sb.auth.onAuthStateChange(async (event, session) => {
     if(ao)ao.style.display='flex';
     const ue=document.getElementById('tb-user-email');
     if(ue)ue.textContent='—';
+    const di=document.getElementById('desk-icons');
+    if(di)di.innerHTML='';
   }
+});
+
+// Fallback: handle F5 refresh when Supabase session already exists
+window.addEventListener('load', async () => {
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if(session?.user && !currentUser){
+      currentUser=session.user;
+      const ao=document.getElementById('auth-overlay');
+      if(ao)ao.style.display='none';
+      const ue=document.getElementById('tb-user-email');
+      if(ue)ue.textContent=currentUser.email;
+      await sbLoadData();
+      applyTheme();applyFX();
+      renderDesktopIcons();
+      updateTaskbar();
+      setTimeout(()=>{renderDesktopIcons();updateTaskbar();if(!windows['dash'])openApp('dash');},300);
+    }
+  } catch(e){}
 });
 
 // Keyboard enter on auth forms
