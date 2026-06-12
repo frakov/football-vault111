@@ -6,7 +6,7 @@
 <title>FOOTBALL VAULT</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -359,7 +359,11 @@ select option{background:#0a0f0b}
 // ══════════════════════════════════════════════════════
 const SUPABASE_URL = 'https://dqqmtzztwetayqyehqkk.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRxcW10enp0d2V0YXlxeWVocWtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDU4MTIsImV4cCI6MjA5Njc4MTgxMn0.66cRmWRuuXEJH3roQklHprppJKW9A2xM7Sk0_4VoKoI';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// Obsługa różnych nazw eksportu UMD
+const _supa = window.supabase || window.Supabase || window.supabaseJs;
+if(!_supa){ document.body.innerHTML='<div style="color:red;padding:40px;font-size:20px">Błąd: biblioteka Supabase nie załadowała się. Odśwież stronę (F5).</div>'; throw new Error('Supabase not loaded'); }
+const sb = _supa.createClient(SUPABASE_URL, SUPABASE_ANON);
 
 let currentUser = null;
 
@@ -406,7 +410,6 @@ async function doReset(){
 
 async function doSignOut(){
   await sb.auth.signOut();
-  // doLogout wywoła się przez onAuthStateChange SIGNED_OUT
 }
 
 // ══════════════════════════════════════════════════════
@@ -1535,13 +1538,9 @@ function renderSP(){
 // ══════════════════════════════════════════════════════
 // Jedyna funkcja inicjalizacji — wywolywana zawsze po zalogowaniu
 async function initAfterLogin(user){
-  // Ten sam user, okna już otwarte (np. token refresh) — tylko sync w tle
   if(currentUser && currentUser.id === user.id && Object.keys(windows).length > 0){
     currentUser = user;
-    await sbLoadData();
-    saveLocalCache();
-    rerenderOpen();
-    updateTaskbar();
+    await sbLoadData(); saveLocalCache(); rerenderOpen(); updateTaskbar();
     return;
   }
   currentUser = user;
@@ -1549,12 +1548,9 @@ async function initAfterLogin(user){
   if(ao) ao.style.display = 'none';
   const ue = document.getElementById('tb-user-email');
   if(ue) ue.textContent = currentUser.email;
-  // Renderuj natychmiast z cache
   applyTheme(); applyFX(); renderDesktopIcons(); updateTaskbar();
   if(!windows['dash']) openApp('dash');
-  // Synchronizuj z Supabase w tle
-  await sbLoadData();
-  saveLocalCache();
+  await sbLoadData(); saveLocalCache();
   applyTheme(); applyFX(); renderDesktopIcons(); updateTaskbar();
 }
 
@@ -1571,7 +1567,6 @@ function doLogout(){
   if(di) di.innerHTML = '';
 }
 
-// onAuthStateChange — obsługuje F5, logowanie, wylogowanie
 sb.auth.onAuthStateChange(async (event, session) => {
   if(session?.user){
     await initAfterLogin(session.user);
@@ -1580,17 +1575,15 @@ sb.auth.onAuthStateChange(async (event, session) => {
   }
 });
 
-// FALLBACK: onAuthStateChange czasem nie odpala INITIAL_SESSION na Vercel
-// getSession() jako gwarancja że sesja zostanie odczytana
+// Fallback — getSession() na wypadek gdy onAuthStateChange nie odpali
 setTimeout(async () => {
-  if(currentUser) return; // już zalogowany przez onAuthStateChange
+  if(currentUser) return;
   try {
     const { data: { session } } = await sb.auth.getSession();
     if(session?.user) await initAfterLogin(session.user);
-  } catch(e) {}
-}, 800);
+  } catch(e) { console.error('getSession fallback error:', e); }
+}, 500);
 
-// Keyboard enter on auth forms
 document.addEventListener('keydown', e => {
   if(e.key !== 'Enter') return;
   const lo = document.getElementById('form-login');
