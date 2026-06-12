@@ -21,6 +21,7 @@ html,body{height:100%;overflow:hidden;user-select:none}
 body{font-family:'Barlow',system-ui,sans-serif;background:var(--bg);color:var(--t1);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 70% 60% at 15% 0%,rgba(16,185,129,.2) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 85% 10%,rgba(5,150,105,.14) 0%,transparent 55%),radial-gradient(ellipse 55% 55% at 50% 100%,rgba(6,78,59,.18) 0%,transparent 55%),#0a0f0b;pointer-events:none}
 body.use-cursor,body.use-cursor *{cursor:none!important}
+body.use-cursor input[type="file"],body.use-cursor label{cursor:default!important}
 body.no-cursor *{cursor:default!important}
 input,textarea,button,select{font-family:'Barlow',sans-serif}
 input,textarea{background:transparent!important;border:none!important;outline:none!important;color:var(--t1)!important;width:100%}
@@ -405,7 +406,7 @@ async function doReset(){
 
 async function doSignOut(){
   await sb.auth.signOut();
-  doLogout();
+  // doLogout zostanie wywołany przez onAuthStateChange → SIGNED_OUT
 }
 
 // ══════════════════════════════════════════════════════
@@ -1222,6 +1223,7 @@ function buildShirtForm(s){
     <div class="form-label">${T('f_photos')} (${editPhotos.length}/8)</div>
     <div class="photo-grid" id="photo-grid-e">${buildPhotoGrid()}</div>
     <input type="file" id="ph-upload" accept="image/*" multiple style="display:none" onchange="handlePhotos(this)">
+    <label for="ph-upload" id="ph-upload-label" style="display:none"></label>
   </div>
   <div class="div"></div>
   <div class="fx-c gap8" style="justify-content:flex-end">
@@ -1237,7 +1239,7 @@ function toggleCustom(wrId,val,trigger,emptyTrigger=false){
 }
 function buildPhotoGrid(){
   return editPhotos.map((p,i)=>`<div class="photo-thumb"><img src="${p}" onclick="document.getElementById('lb-img').src='${p}';document.getElementById('lightbox').classList.add('open')"><div class="photo-del" onclick="rmPhoto(${i})">✕</div></div>`).join('')
-    +(editPhotos.length<8?`<div class="photo-thumb add-photo" onclick="document.getElementById('ph-upload').click()">+</div>`:'');
+    +(editPhotos.length<8?`<label for="ph-upload" class="photo-thumb add-photo" style="cursor:pointer">+</label>`:'');
 }
 function rmPhoto(i){editPhotos.splice(i,1);editPhotoFiles.splice&&editPhotoFiles.splice(i,1);const g=document.getElementById('photo-grid-e');if(g)g.innerHTML=buildPhotoGrid();}
 
@@ -1534,6 +1536,15 @@ function renderSP(){
 // ══════════════════════════════════════════════════════
 // Jedyna funkcja inicjalizacji — wywolywana zawsze po zalogowaniu
 async function initAfterLogin(user){
+  // Jeśli ten sam user już zalogowany i okna są otwarte — tylko odśwież dane w tle
+  if(currentUser && currentUser.id === user.id && Object.keys(windows).length > 0){
+    currentUser = user;
+    await sbLoadData();
+    saveLocalCache();
+    rerenderOpen();
+    updateTaskbar();
+    return;
+  }
   currentUser=user;
   const ao=document.getElementById('auth-overlay');
   if(ao)ao.style.display='none';
@@ -1567,19 +1578,11 @@ function doLogout(){
   if(di)di.innerHTML='';
 }
 
-// Flaga żeby nie inicjalizować dwa razy
-let _initDone = false;
-
 // onAuthStateChange — obsługuje wszystko: F5, logowanie, wylogowanie
 sb.auth.onAuthStateChange(async (event, session) => {
-  if(session?.user && !_initDone){
-    _initDone = true;
+  if(session?.user && (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED')){
     await initAfterLogin(session.user);
-  } else if(session?.user && _initDone && event === 'SIGNED_IN'){
-    // już zalogowany, tylko odśwież dane
-    currentUser = session.user;
-  } else if(!session?.user && (event === 'SIGNED_OUT' || event === 'USER_DELETED')){
-    _initDone = false;
+  } else if(!session?.user && event === 'SIGNED_OUT'){
     doLogout();
   }
 });
