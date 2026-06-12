@@ -405,11 +405,7 @@ async function doReset(){
 
 async function doSignOut(){
   await sb.auth.signOut();
-  currentUser=null;
-  db=JSON.parse(JSON.stringify(DEF));
-  Object.keys(windows).forEach(id=>closeApp(id));
-  document.getElementById('auth-overlay').style.display='flex';
-  document.getElementById('tb-user-email').textContent='—';
+  doLogout();
 }
 
 // ══════════════════════════════════════════════════════
