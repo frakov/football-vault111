@@ -445,6 +445,7 @@ async function sbLoadData(){
 }
 
 async function sbSaveSettings(){
+  saveLocalCache();
   if(!currentUser)return;
   await sb.from('user_settings').upsert({
     user_id:currentUser.id,lang:db.lang,currency:db.currency,fx:db.fx,
@@ -619,7 +620,21 @@ const DEF={lang:'pl',currency:'PLN',fx:{scanlines:false,sound:false,cursor:true}
   theme:'#10b981',themeRgb:'16,185,129',bgPreset:'pitch',bgCustom:null,
   rates:{EUR:4.30,GBP:5.10,USD:4.00},shirts:[],collectionHistory:[],
   profile:{name:'',bio:'',public:false,nick:''}};
-let db=JSON.parse(JSON.stringify(DEF));
+
+// Laduj z localStorage jako szybki cache (dziala natychmiast po F5)
+function loadLocalCache(){
+  try{
+    const raw=localStorage.getItem('fvault_cache');
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return null;
+}
+function saveLocalCache(){
+  try{ localStorage.setItem('fvault_cache', JSON.stringify(db)); }catch(e){}
+}
+
+const _cached = loadLocalCache();
+let db = _cached ? _cached : JSON.parse(JSON.stringify(DEF));
 
 function qsave(){sbSaveSettings();updateTaskbar();}
 function save(){qsave();rerenderOpen();}
@@ -1527,16 +1542,25 @@ async function initAfterLogin(user){
   if(ao)ao.style.display='none';
   const ue=document.getElementById('tb-user-email');
   if(ue)ue.textContent=currentUser.email;
-  await sbLoadData();
+  // Renderuj natychmiast z cache (localStorage) — nie czeka na Supabase
   applyTheme();
   applyFX();
   renderDesktopIcons();
   updateTaskbar();
   if(!windows['dash'])openApp('dash');
+  // Synchronizuj z Supabase w tle
+  await sbLoadData();
+  saveLocalCache();
+  applyTheme();
+  applyFX();
+  renderDesktopIcons();
+  updateTaskbar();
 }
 
 function doLogout(){
   currentUser=null;
+  localStorage.removeItem('fvault_cache');
+  db=JSON.parse(JSON.stringify(DEF));
   Object.keys(windows).forEach(id=>closeApp(id));
   const ao=document.getElementById('auth-overlay');
   if(ao)ao.style.display='flex';
