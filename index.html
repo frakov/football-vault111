@@ -768,7 +768,16 @@ function closeApp(id){if(!windows[id])return;windows[id].el.remove();delete wind
 function minimizeApp(id){if(!windows[id])return;windows[id].minimized=true;windows[id].el.classList.add('minimized');if(activeWin===id)activeWin=null;renderTB();}
 function maximizeApp(id){if(!windows[id])return;const w=windows[id];if(w.maximized){const p=w.prevState;w.el.style.left=p.x+'px';w.el.style.top=p.y+'px';w.el.style.width=p.w+'px';w.el.style.height=p.h+'px';w.maximized=false;}else{w.prevState={x:w.el.offsetLeft,y:w.el.offsetTop,w:w.el.offsetWidth,h:w.el.offsetHeight};w.el.style.cssText+=';left:0;top:0;width:100vw;height:calc(100vh - 50px)';w.maximized=true;}}
 function focusWin(id){if(!windows[id])return;if(activeWin&&windows[activeWin])windows[activeWin].el.classList.remove('focused');activeWin=id;windows[id].el.classList.add('focused');windows[id].el.style.zIndex=++zC;renderTB();}
-function rerenderOpen(){Object.keys(windows).forEach(id=>{const b=document.getElementById('body-'+id);if(b)b.innerHTML=buildContent(id);});updateTaskbar();applyFX();}
+function rerenderOpen(){
+  Object.keys(windows).forEach(id=>{
+    // NIE przebudowuj czatu — zniszczyłoby input w trakcie pisania
+    if(id==='chat')return;
+    const b=document.getElementById('body-'+id);
+    if(b)b.innerHTML=buildContent(id);
+    if(_postOpen[id]&&id!=='chat')_postOpen[id]();
+  });
+  updateTaskbar();applyFX();
+}
 function makeDrag(id){const bar=document.getElementById('bar-'+id),win=document.getElementById('win-'+id);let dr=false,ox=0,oy=0;bar.addEventListener('mousedown',e=>{if(e.target.classList.contains('wbtn'))return;dr=true;ox=e.clientX-win.offsetLeft;oy=e.clientY-win.offsetTop;e.preventDefault();});document.addEventListener('mousemove',e=>{if(!dr)return;win.style.left=(e.clientX-ox)+'px';win.style.top=Math.max(0,e.clientY-oy)+'px';});document.addEventListener('mouseup',()=>{dr=false;});}
 function makeResize(id){const rsz=document.getElementById('rsz-'+id),win=document.getElementById('win-'+id);let re=false,ox=0,oy=0,ow=0,oh=0;rsz.addEventListener('mousedown',e=>{re=true;ox=e.clientX;oy=e.clientY;ow=win.offsetWidth;oh=win.offsetHeight;e.preventDefault();e.stopPropagation();});document.addEventListener('mousemove',e=>{if(!re)return;win.style.width=Math.max(340,ow+(e.clientX-ox))+'px';win.style.height=Math.max(200,oh+(e.clientY-oy))+'px';});document.addEventListener('mouseup',()=>{re=false;});}
 function renderTB(){const el=document.getElementById('tb-apps');el.innerHTML=APPS.map(app=>{const w=windows[app.id];if(!w)return '';const isF=activeWin===app.id&&!w.minimized;return `<div class="tb-app ${isF?'active':''} ${w.minimized?'minimized':''}" onclick="tbClick('${app.id}')">${isF?'<div class="tb-app-dot"></div>':''}<div style="width:14px;height:14px;flex-shrink:0;color:#fff;background:${app.grad};border-radius:5px;padding:1px">${WICO[app.icon]||''}</div><span style="overflow:hidden;text-overflow:ellipsis">${appLabel(app)}</span></div>`;}).join('');}
@@ -1893,9 +1902,12 @@ async function selectConv(convId,nick){
   // Oznacz aktywną konwersację
   document.querySelectorAll('.conv-item').forEach(el=>el.classList.remove('active'));
   document.querySelector(`.conv-item[onclick*="${convId}"]`)?.classList.add('active');
-  // Realtime dla tej konwersacji
-  const ch=sb.channel('conv-'+convId)
+  // Usuń poprzednie subskrypcje dla tej konwersacji żeby nie duplikować
+  const chName='conv-'+convId;
+  try{await sb.removeChannel(sb.channel(chName));}catch(e){}
+  const ch=sb.channel(chName)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`conversation_id=eq.${convId}`},()=>{
+      // Tylko odśwież listę wiadomości — nie dotykaj reszty DOM
       loadChatMessages(convId);
     }).subscribe();
   _rtSubs.push(ch);
