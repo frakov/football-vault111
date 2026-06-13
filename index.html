@@ -1003,7 +1003,7 @@ function renderMarketItems(items){
             <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--a),#065f46);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;font-family:'Bebas Neue',sans-serif">${(i.seller_nick||'?')[0].toUpperCase()}</div>
             ${i.seller_nick||'—'}
           </div>
-          ${isOwn?`<button class="btn btn-d" style="padding:4px 10px;font-size:10px" onclick="removeListing('${i.id}')">✕ ${T('mkt_remove')}</button>`:`<button class="btn btn-mkt" style="padding:4px 10px;font-size:10px" onclick="contactSeller('${i.seller_nick||''}','${i.club||''}')">📩 ${T('mkt_contact')}</button>`}
+          ${isOwn?`<button class="btn btn-d" style="padding:4px 10px;font-size:10px" onclick="removeListing('${i.id}')">✕ ${T('mkt_remove')}</button>`:`<button class="btn btn-mkt" style="padding:4px 10px;font-size:10px" onclick="contactSeller('${i.user_id||''}','${i.seller_nick||''}')">💬 ${T('mkt_contact')}</button>`}
         </div>
         ${i.notes?`<div style="font-size:10px;color:var(--t2);margin-top:8px;padding-top:8px;border-top:1px solid rgba(139,92,246,.08)">${i.notes}</div>`:''}
       </div>
@@ -1029,10 +1029,16 @@ function renderMarketProfiles(profiles){
   </div>`;
 }
 
-function contactSeller(nick,club){
-  const msg=db.lang==='pl'?`Hej ${nick}! Jestem zainteresowany/a koszulką: ${club}. Czy jest jeszcze dostępna?`:`Hey ${nick}! I'm interested in the jersey: ${club}. Is it still available?`;
-  navigator.clipboard.writeText(msg).catch(()=>{const el=document.createElement('textarea');el.value=msg;document.body.appendChild(el);el.select();document.execCommand('copy');el.remove();});
-  toast(db.lang==='pl'?'Wiadomość skopiowana!':'Message copied!');}
+async function contactSeller(userId,nick){
+  if(!userId){toast('Nie można otworzyć czatu — brak ID sprzedającego');return;}
+  if(userId===currentUser?.id){toast('To Twoje ogłoszenie');return;}
+  toast('Otwieranie czatu...');
+  const convId=await getOrCreateConv(userId);
+  if(!convId){toast('Błąd otwierania czatu');return;}
+  activeConvId=convId;
+  openApp('chat');
+  setTimeout(()=>initChatView().then(()=>selectConv(convId,nick||'Sprzedający')),200);
+}
 
 async function removeListing(listingId){
   await sbRemoveFromMarket(listingId);
