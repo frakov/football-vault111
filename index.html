@@ -764,7 +764,7 @@ function openApp(id){
   focusWin(id);renderTB();beep(500,.06);
   if(_postOpen[id])_postOpen[id]();
 }
-function closeApp(id){if(!windows[id])return;windows[id].el.remove();delete windows[id];if(activeWin===id)activeWin=null;renderTB();}
+function closeApp(id){if(!windows[id])return;if(id==='chat')stopChatPolling();windows[id].el.remove();delete windows[id];if(activeWin===id)activeWin=null;renderTB();}
 function minimizeApp(id){if(!windows[id])return;windows[id].minimized=true;windows[id].el.classList.add('minimized');if(activeWin===id)activeWin=null;renderTB();}
 function maximizeApp(id){if(!windows[id])return;const w=windows[id];if(w.maximized){const p=w.prevState;w.el.style.left=p.x+'px';w.el.style.top=p.y+'px';w.el.style.width=p.w+'px';w.el.style.height=p.h+'px';w.maximized=false;}else{w.prevState={x:w.el.offsetLeft,y:w.el.offsetTop,w:w.el.offsetWidth,h:w.el.offsetHeight};w.el.style.cssText+=';left:0;top:0;width:100vw;height:calc(100vh - 50px)';w.maximized=true;}}
 function focusWin(id){if(!windows[id])return;if(activeWin&&windows[activeWin])windows[activeWin].el.classList.remove('focused');activeWin=id;windows[id].el.classList.add('focused');windows[id].el.style.zIndex=++zC;renderTB();}
@@ -1784,7 +1784,40 @@ async function openChatWith(userId){
   activeConvId=convId;
   openApp('chat');
 }
-async function loadChatMessages(convId){
+// ── CHAT POLLING ──
+let _chatPollInterval=null;
+let _lastMsgCount=0;
+
+function startChatPolling(convId){
+  stopChatPolling();
+  _lastMsgCount=0;
+  _chatPollInterval=setInterval(async()=>{
+    const el=document.getElementById('chat-messages-'+convId);
+    if(!el){stopChatPolling();return;}
+    const{data}=await sb.from('messages').select('id').eq('conversation_id',convId);
+    if(!data||data.length===_lastMsgCount)return;
+    _lastMsgCount=data.length;
+    // Zapamiętaj fokus i scroll PRZED aktualizacją
+    const inp=document.getElementById('chat-input-'+convId);
+    const hadFocus=document.activeElement===inp;
+    const cursorPos=inp?inp.selectionStart:0;
+    const cursorPosEnd=inp?inp.selectionEnd:0;
+    const atBottom=el.scrollHeight-el.scrollTop-el.clientHeight<80;
+    // Załaduj i wyświetl wiadomości
+    await loadChatMessages(convId);
+    // Przywróć fokus i pozycję kursora
+    if(hadFocus&&inp){
+      inp.focus();
+      try{inp.setSelectionRange(cursorPos,cursorPosEnd);}catch(e){}
+    }
+    if(atBottom){const el2=document.getElementById('chat-messages-'+convId);if(el2)el2.scrollTop=el2.scrollHeight;}
+  },2000);
+}
+
+function stopChatPolling(){
+  if(_chatPollInterval){clearInterval(_chatPollInterval);_chatPollInterval=null;}
+  _lastMsgCount=0;
+}
   const el=document.getElementById('chat-messages-'+convId);
   if(!el)return;
   const{data,error}=await sb.from('messages').select('*').eq('conversation_id',convId).order('created_at',{ascending:true}).limit(100);
@@ -1897,26 +1930,20 @@ async function initChatView(){
 
 async function selectConv(convId,nick){
   activeConvId=convId;
+  stopChatPolling();
   const main=document.getElementById('chat-main');
   if(main)main.innerHTML=buildChatWindow(convId);
   const header=document.getElementById('chat-header-nick');
   if(header)header.textContent=nick||'—';
   const avatar=document.querySelector('#chat-main .chat-avatar');
   if(avatar)avatar.textContent=(nick||'?')[0].toUpperCase();
-  // Załaduj wiadomości po tym jak DOM jest gotowy
-  setTimeout(()=>loadChatMessages(convId),50);
-  // Oznacz aktywną konwersację
+  // Załaduj wiadomości i zacznij polling
+  setTimeout(()=>{
+    loadChatMessages(convId);
+    startChatPolling(convId);
+  },50);
   document.querySelectorAll('.conv-item').forEach(el=>el.classList.remove('active'));
   document.querySelector(`.conv-item[onclick*="${convId}"]`)?.classList.add('active');
-  // Usuń poprzednie subskrypcje dla tej konwersacji żeby nie duplikować
-  const chName='conv-'+convId;
-  try{await sb.removeChannel(sb.channel(chName));}catch(e){}
-  const ch=sb.channel(chName)
-    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`conversation_id=eq.${convId}`},()=>{
-      // Tylko odśwież listę wiadomości — nie dotykaj reszty DOM
-      loadChatMessages(convId);
-    }).subscribe();
-  _rtSubs.push(ch);
 }
 
 // ══════════════════════════════════════════════════════
