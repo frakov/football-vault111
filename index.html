@@ -1628,8 +1628,14 @@ function doLogout(){
 sb.auth.onAuthStateChange((event, session) => {
   if(session?.user){
     if(currentUser && currentUser.id===session.user.id && Object.keys(windows).length>0){
+      // Token refresh — tylko aktualizuj dane w tle, NIE przebudowuj DOM
       currentUser=session.user;
-      setTimeout(async()=>{await sbLoadData();saveLocalCache();rerenderOpen();updateTaskbar();initRealtimeSubscriptions();},0);
+      setTimeout(async()=>{
+        await sbLoadData();
+        saveLocalCache();
+        updateTaskbar();
+        // rerenderOpen() CELOWO POMINIĘTE — niszczyłoby czat i inne aktywne okna
+      },0);
     } else {
       setTimeout(()=>initAfterLogin(session.user),0);
     }
