@@ -1787,6 +1787,11 @@ async function openChatWith(userId){
 async function loadChatMessages(convId){
   const el=document.getElementById('chat-messages-'+convId);
   if(!el)return;
+  // Zapamiętaj fokus PRZED aktualizacją
+  const inp=document.getElementById('chat-input-'+convId);
+  const hadFocus=document.activeElement===inp;
+  const curVal=inp?inp.value:'';
+  const atBottom=el.scrollHeight-el.scrollTop-el.clientHeight<80;
   const{data,error}=await sb.from('messages').select('*').eq('conversation_id',convId).order('created_at',{ascending:true}).limit(100);
   if(error){console.error('loadChatMessages error:',error);return;}
   const msgs=data||[];
@@ -1794,7 +1799,6 @@ async function loadChatMessages(convId){
     el.innerHTML=`<div class="empty-state" style="padding:30px"><div class="empty-icon">💬</div><div class="empty-text" style="font-size:9px">BRAK WIADOMOŚCI — NAPISZ PIERWSZĄ!</div></div>`;
     return;
   }
-  // Get unique sender IDs to fetch nicks
   const senderIds=[...new Set(msgs.map(m=>m.sender_id))];
   const{data:profiles}=await sb.from('profiles').select('user_id,nick').in('user_id',senderIds);
   const nickMap={};(profiles||[]).forEach(p=>nickMap[p.user_id]=p.nick||'?');
@@ -1811,7 +1815,12 @@ async function loadChatMessages(convId){
       </div>
     </div>`;
   }).join('');
-  el.scrollTop=el.scrollHeight;
+  if(atBottom)el.scrollTop=el.scrollHeight;
+  // Przywróć fokus i wartość inputa po aktualizacji DOM
+  if(hadFocus&&inp){
+    inp.value=curVal;
+    inp.focus();
+  }
 }
 
 function bChat(){
