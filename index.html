@@ -21,7 +21,6 @@ html,body{height:100%;overflow:hidden;user-select:none}
 body{font-family:'Barlow',system-ui,sans-serif;background:var(--bg);color:var(--t1);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 70% 60% at 15% 0%,rgba(16,185,129,.2) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 85% 10%,rgba(5,150,105,.14) 0%,transparent 55%),radial-gradient(ellipse 55% 55% at 50% 100%,rgba(6,78,59,.18) 0%,transparent 55%),#0a0f0b;pointer-events:none}
 body.use-cursor,body.use-cursor *{cursor:none!important}
-body.use-cursor input[type="file"],body.use-cursor label{cursor:default!important}
 body.no-cursor *{cursor:default!important}
 input,textarea,button,select{font-family:'Barlow',sans-serif}
 input,textarea{background:transparent!important;border:none!important;outline:none!important;color:var(--t1)!important;width:100%}
@@ -264,6 +263,27 @@ textarea{resize:none}
 @keyframes vi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 select option{background:#0a0f0b}
 .loading-pulse{animation:pulse 1.5s ease-in-out infinite;opacity:.4}
+/* NOTIFICATIONS PANEL */
+#notif-panel{position:fixed;bottom:58px;right:56px;width:340px;max-height:520px;background:rgba(10,14,11,.97);border:1px solid rgba(16,185,129,.15);border-radius:20px;box-shadow:0 8px 32px rgba(0,0,0,.5),0 32px 80px rgba(0,0,0,.6);backdrop-filter:blur(48px);z-index:9001;display:none;flex-direction:column;overflow:hidden;animation:spIn .2s var(--e1) both}
+#notif-panel.open{display:flex}
+.notif-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;border-bottom:1px solid rgba(16,185,129,.08)}
+.notif-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.08em}
+#notif-list{overflow-y:auto;flex:1}
+.notif-item{display:flex;align-items:flex-start;gap:10px;padding:12px 16px;border-bottom:1px solid rgba(16,185,129,.05);cursor:inherit;transition:background .14s}
+.notif-item:hover{background:rgba(16,185,129,.04)}
+.notif-item.unread{background:rgba(16,185,129,.03)}
+.notif-ico{font-size:18px;flex-shrink:0;margin-top:1px}
+/* CHAT CSS */
+.chat-msg{display:flex;align-items:flex-end;gap:8px;margin-bottom:2px}
+.chat-msg.me{flex-direction:row-reverse}
+.chat-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--a),#065f46);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#fff;flex-shrink:0}
+.chat-bubble{max-width:70%;padding:8px 12px;border-radius:14px;font-size:12px;line-height:1.5;word-break:break-word}
+.chat-bubble.mine{background:rgba(16,185,129,.2);border:1px solid rgba(16,185,129,.25);color:var(--t1);border-bottom-right-radius:4px}
+.chat-bubble.theirs{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--t1);border-bottom-left-radius:4px}
+.chat-time{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t3);margin-top:3px;text-align:right}
+.conv-item{display:flex;align-items:center;gap:10px;padding:10px 8px;border-radius:10px;cursor:inherit;transition:background .14s;margin-bottom:2px}
+.conv-item:hover,.conv-item.active{background:rgba(59,130,246,.08)}
+
 </style>
 </head>
 <body class="use-cursor">
@@ -341,14 +361,19 @@ select option{background:#0a0f0b}
       <div id="tb-clock-time">--:--:--</div>
       <div id="tb-clock-date">--- --.--.----</div>
     </div>
-    <button id="tb-settings-btn" onclick="toggleSettings()" style="width:34px;height:34px;border-radius:10px;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.1);display:flex;align-items:center;justify-content:center;cursor:inherit;margin-left:10px;flex-shrink:0;transition:all .14s;color:var(--t2)">
+    <button id="tb-settings-btn" onclick="toggleSettings()" style="width:34px;height:34px;border-radius:10px;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.1);display:flex;align-items:center;justify-content:center;cursor:inherit;margin-left:10px;flex-shrink:0;transition:all .14s;color:var(--t2);position:relative">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    </button>
+    <button onclick="toggleNotifPanel()" style="width:34px;height:34px;border-radius:10px;background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.1);display:flex;align-items:center;justify-content:center;cursor:inherit;margin-left:4px;flex-shrink:0;transition:all .14s;color:var(--t2);position:relative">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <div id="tb-notif-badge" style="display:none;position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;border-radius:8px;background:var(--red);color:#fff;font-size:8px;font-weight:700;font-family:'JetBrains Mono',monospace;align-items:center;justify-content:center;padding:0 3px">0</div>
     </button>
     <button onclick="doSignOut()" style="width:34px;height:34px;border-radius:10px;background:rgba(244,33,46,.07);border:1px solid rgba(244,33,46,.12);display:flex;align-items:center;justify-content:center;cursor:inherit;margin-left:4px;flex-shrink:0;transition:all .14s;color:rgba(244,33,46,.6)" title="Wyloguj">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
     </button>
   </div>
 </div>
+<div id="notif-panel"><div class="notif-header"><div class="notif-title">POWIADOMIENIA</div><button class="sp-close" onclick="toggleNotifPanel()">✕</button></div><div id="notif-list"></div></div>
 <div id="settings-panel"><div class="sp-header"><div class="sp-title">USTAWIENIA</div><button class="sp-close" onclick="toggleSettings()">✕</button></div><div class="sp-body" id="sp-body"></div></div>
 <div id="modal-overlay" onclick="if(event.target===this)closeModal()"><div id="modal-box"><div class="modal-header"><div class="modal-title" id="modal-title">KOSZULKA</div><button class="sp-close" onclick="closeModal()">✕</button></div><div class="modal-body" id="modal-body"></div></div></div>
 <div id="lightbox" onclick="this.classList.remove('open')"><img id="lb-img" src="" alt=""></div>
@@ -402,10 +427,6 @@ async function doReset(){
   const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin});
   if(error)setAuthErr('reset-err',error.message);
   else setAuthOk('reset-ok','Link wysłany! Sprawdź email.');
-}
-
-async function doSignOut(){
-  await sb.auth.signOut();
 }
 
 // ══════════════════════════════════════════════════════
@@ -708,6 +729,9 @@ const APPS=[
   {id:'collection',lpl:'Kolekcja',   len:'Collection', icon:'shirt', grad:'linear-gradient(145deg,#3b82f6,#1e40af)'},
   {id:'forsale',  lpl:'Na Sprzedaż', len:'For Sale',   icon:'tag',   grad:'linear-gradient(145deg,#f59e0b,#92400e)'},
   {id:'market',   lpl:'Marketplace', len:'Marketplace',icon:'mkt',   grad:'linear-gradient(145deg,#8b5cf6,#4c1d95)'},
+  {id:'auctions', lpl:'Licytacje',   len:'Auctions',   icon:'auc',   grad:'linear-gradient(145deg,#ef4444,#7f1d1d)'},
+  {id:'chat',     lpl:'Czat',        len:'Chat',       icon:'chat',  grad:'linear-gradient(145deg,#3b82f6,#1e3a8a)'},
+  {id:'wishlist', lpl:'Wishlist',    len:'Wishlist',   icon:'wish',  grad:'linear-gradient(145deg,#ec4899,#9d174d)'},
   {id:'profile',  lpl:'Profil',      len:'Profile',    icon:'user',  grad:'linear-gradient(145deg,#6b7280,#374151)'},
 ];
 const WICO={
@@ -715,10 +739,14 @@ const WICO={
   shirt:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg>`,
   tag:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>`,
   mkt:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg>`,
+  auc:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M14.5 10.5l-8 8a2.12 2.12 0 01-3-3l8-8"/><path d="M15.5 5.5l3 3"/><path d="M20 9l-9 9"/><path d="M7 4l3 3"/></svg>`,
+  chat:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>`,
+  wish:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>`,
   user:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+  bell:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>`,
 };
 let windows={},zC=100,activeWin=null;
-function defSize(id){return {dash:{w:900,h:540},collection:{w:980,h:600},forsale:{w:900,h:560},market:{w:940,h:600},profile:{w:740,h:520}}[id]||{w:820,h:520};}
+function defSize(id){return {dash:{w:900,h:540},collection:{w:980,h:600},forsale:{w:900,h:560},market:{w:940,h:600},auctions:{w:980,h:640},chat:{w:860,h:580},wishlist:{w:900,h:560},profile:{w:740,h:520}}[id]||{w:820,h:520};}
 function appLabel(app){return db.lang==='en'?app.len:app.lpl;}
 
 function openApp(id){
@@ -734,7 +762,7 @@ function openApp(id){
   windows[id]={el:win,minimized:false,maximized:false,prevState:null};
   makeDrag(id);makeResize(id);win.addEventListener('mousedown',()=>focusWin(id));
   focusWin(id);renderTB();beep(500,.06);
-  if(id==='market')setTimeout(()=>loadMarketplace(),50);
+  if(_postOpen[id])_postOpen[id]();
 }
 function closeApp(id){if(!windows[id])return;windows[id].el.remove();delete windows[id];if(activeWin===id)activeWin=null;renderTB();}
 function minimizeApp(id){if(!windows[id])return;windows[id].minimized=true;windows[id].el.classList.add('minimized');if(activeWin===id)activeWin=null;renderTB();}
@@ -750,7 +778,15 @@ function renderDesktopIcons(){const el=document.getElementById('desk-icons');el.
 // ══════════════════════════════════════════════════════
 // CONTENT BUILDER
 // ══════════════════════════════════════════════════════
-function buildContent(id){switch(id){case 'dash':return bDash();case 'collection':return bCollection();case 'forsale':return bForSale();case 'market':return bMarket();case 'profile':return bProfile();default:return '';}}
+function buildContent(id){switch(id){case 'dash':return bDash();case 'collection':return bCollection();case 'forsale':return bForSale();case 'market':return bMarket();case 'auctions':return bAuctions();case 'chat':return bChat();case 'wishlist':return bWishlist();case 'profile':return bProfile();default:return '';}}
+
+// Post-open hooks for async content
+const _postOpen={
+  market:()=>setTimeout(()=>loadMarketplace(),50),
+  auctions:()=>setTimeout(()=>initAuctionsView(),50),
+  chat:()=>setTimeout(()=>initChatView(),50),
+  wishlist:()=>setTimeout(()=>initWishlistView(),50),
+};
 
 // ── HELPERS ──
 function statusLabel(s){return {collection:T('status_collection'),forsale:T('status_forsale'),listed:T('status_listed')}[s]||s;}
@@ -1237,7 +1273,7 @@ function toggleCustom(wrId,val,trigger,emptyTrigger=false){
 }
 function buildPhotoGrid(){
   return editPhotos.map((p,i)=>`<div class="photo-thumb"><img src="${p}" onclick="document.getElementById('lb-img').src='${p}';document.getElementById('lightbox').classList.add('open')"><div class="photo-del" onclick="rmPhoto(${i})">✕</div></div>`).join('')
-    +(editPhotos.length<8?`<label for="ph-upload" class="photo-thumb add-photo" style="cursor:pointer">+</label>`:'');
+    +(editPhotos.length<8?`<div class="photo-thumb add-photo" onclick="document.getElementById('ph-upload').click()">+</div>`:'');
 }
 function rmPhoto(i){editPhotos.splice(i,1);editPhotoFiles.splice&&editPhotoFiles.splice(i,1);const g=document.getElementById('photo-grid-e');if(g)g.innerHTML=buildPhotoGrid();}
 
@@ -1532,62 +1568,818 @@ function renderSP(){
 // ══════════════════════════════════════════════════════
 // INIT — Auth state listener
 // ══════════════════════════════════════════════════════
+// Jedyna funkcja inicjalizacji — wywolywana zawsze po zalogowaniu
 async function initAfterLogin(user){
-  // Ten sam user, okna już otwarte — tylko sync w tle
-  if(currentUser && currentUser.id === user.id && Object.keys(windows).length > 0){
-    currentUser = user;
-    // WAŻNE: setTimeout żeby uciec z onAuthStateChange locka
-    setTimeout(async () => {
-      await sbLoadData(); saveLocalCache(); rerenderOpen(); updateTaskbar();
-    }, 0);
-    return;
-  }
-  currentUser = user;
-  const ao = document.getElementById('auth-overlay');
-  if(ao) ao.style.display = 'none';
-  const ue = document.getElementById('tb-user-email');
-  if(ue) ue.textContent = currentUser.email;
-  applyTheme(); applyFX(); renderDesktopIcons(); updateTaskbar();
-  if(!windows['dash']) openApp('dash');
-  // WAŻNE: setTimeout żeby uciec z onAuthStateChange locka przed odpytaniem Supabase
-  setTimeout(async () => {
-    await sbLoadData(); saveLocalCache();
-    applyTheme(); applyFX(); rerenderOpen(); updateTaskbar();
-  }, 0);
+  currentUser=user;
+  const ao=document.getElementById('auth-overlay');
+  if(ao)ao.style.display='none';
+  const ue=document.getElementById('tb-user-email');
+  if(ue)ue.textContent=currentUser.email;
+  applyTheme();applyFX();renderDesktopIcons();updateTaskbar();
+  if(!windows['dash'])openApp('dash');
+  // setTimeout — ucieczka z onAuthStateChange locka (deadlock fix)
+  setTimeout(async()=>{
+    await sbLoadData();
+    saveLocalCache();
+    applyTheme();applyFX();renderDesktopIcons();updateTaskbar();
+    initRealtimeSubscriptions();
+    const{data}=await sb.from('notifications').select('id').eq('user_id',currentUser.id).eq('read',false);
+    unreadNotifs=(data||[]).length;
+    updateNotifBadge();
+  },0);
+}
+
+async function doSignOut(){
+  _rtSubs.forEach(s=>{try{sb.removeChannel(s);}catch(e){}});
+  _rtSubs=[];
+  await sb.auth.signOut();
 }
 
 function doLogout(){
-  currentUser = null;
+  currentUser=null;
   localStorage.removeItem('fvault_cache');
-  db = JSON.parse(JSON.stringify(DEF));
-  Object.keys(windows).forEach(id => closeApp(id));
-  const ao = document.getElementById('auth-overlay');
-  if(ao) ao.style.display = 'flex';
-  const ue = document.getElementById('tb-user-email');
-  if(ue) ue.textContent = '—';
-  const di = document.getElementById('desk-icons');
-  if(di) di.innerHTML = '';
+  db=JSON.parse(JSON.stringify(DEF));
+  Object.keys(windows).forEach(id=>closeApp(id));
+  unreadNotifs=0;updateNotifBadge();
+  const ao=document.getElementById('auth-overlay');
+  if(ao)ao.style.display='flex';
+  const ue=document.getElementById('tb-user-email');
+  if(ue)ue.textContent='—';
+  const di=document.getElementById('desk-icons');
+  if(di)di.innerHTML='';
 }
 
-// WAŻNE: onAuthStateChange NIE może mieć await na operacjach Supabase
-// (deadlock na _acquireLock) — dlatego initAfterLogin używa setTimeout
+// ── AUTH STATE — bez _initDone (deadlock fix) ──
 sb.auth.onAuthStateChange((event, session) => {
   if(session?.user){
-    initAfterLogin(session.user);
-  } else if(event === 'SIGNED_OUT'){
+    if(currentUser && currentUser.id===session.user.id && Object.keys(windows).length>0){
+      currentUser=session.user;
+      setTimeout(async()=>{await sbLoadData();saveLocalCache();rerenderOpen();updateTaskbar();initRealtimeSubscriptions();},0);
+    } else {
+      setTimeout(()=>initAfterLogin(session.user),0);
+    }
+  } else if(event==='SIGNED_OUT'){
     doLogout();
   }
 });
 
-document.addEventListener('keydown', e => {
-  if(e.key !== 'Enter') return;
-  const lo = document.getElementById('form-login');
-  const re = document.getElementById('form-register');
-  const rs = document.getElementById('form-reset');
-  if(lo && lo.style.display !== 'none') doLogin();
-  else if(re && re.style.display !== 'none') doRegister();
-  else if(rs && rs.style.display !== 'none') doReset();
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return;
+  const lo=document.getElementById('form-login');
+  const re=document.getElementById('form-register');
+  const rs=document.getElementById('form-reset');
+  if(lo&&lo.style.display!=='none')doLogin();
+  else if(re&&re.style.display!=='none')doRegister();
+  else if(rs&&rs.style.display!=='none')doReset();
 });
+
+// ══════════════════════════════════════════════════════
+// REALTIME SUBSCRIPTIONS
+// ══════════════════════════════════════════════════════
+let _rtSubs=[];
+function initRealtimeSubscriptions(){
+  _rtSubs.forEach(s=>{try{sb.removeChannel(s);}catch(e){}});
+  _rtSubs=[];
+  if(!currentUser)return;
+  // Notifications
+  const notifCh=sb.channel('notifications-'+currentUser.id)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'notifications',filter:`user_id=eq.${currentUser.id}`},payload=>{
+      if(payload.new)handleNewNotification(payload.new);
+    }).subscribe();
+  _rtSubs.push(notifCh);
+  // Messages
+  const msgCh=sb.channel('messages-'+currentUser.id)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},payload=>{
+      if(payload.new)handleNewMessage(payload.new);
+    }).subscribe();
+  _rtSubs.push(msgCh);
+  // Auctions - bids
+  const bidCh=sb.channel('bids-global')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'bids'},payload=>{
+      if(payload.new)handleNewBid(payload.new);
+    }).subscribe();
+  _rtSubs.push(bidCh);
+}
+
+// ══════════════════════════════════════════════════════
+// NOTIFICATIONS SYSTEM
+// ══════════════════════════════════════════════════════
+let unreadNotifs=0;
+async function loadNotifications(){
+  if(!currentUser)return[];
+  const{data}=await sb.from('notifications').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(50);
+  return data||[];
+}
+async function createNotification(userId,type,title,body,link=''){
+  if(!userId)return;
+  await sb.from('notifications').insert({user_id:userId,type,title,body,link,read:false});
+}
+function handleNewNotification(n){
+  unreadNotifs++;
+  updateNotifBadge();
+  toast('🔔 '+n.title);
+  // refresh notif panel if open
+  const panel=document.getElementById('notif-panel');
+  if(panel&&panel.classList.contains('open'))renderNotifPanel();
+}
+function updateNotifBadge(){
+  const b=document.getElementById('tb-notif-badge');
+  if(b){b.textContent=unreadNotifs>9?'9+':unreadNotifs;b.style.display=unreadNotifs>0?'flex':'none';}
+}
+async function toggleNotifPanel(){
+  const panel=document.getElementById('notif-panel');
+  if(!panel)return;
+  const isOpen=panel.classList.contains('open');
+  panel.classList.toggle('open',!isOpen);
+  if(!isOpen){
+    await renderNotifPanel();
+    // mark all read
+    unreadNotifs=0;updateNotifBadge();
+    await sb.from('notifications').update({read:true}).eq('user_id',currentUser.id).eq('read',false);
+  }
+}
+async function renderNotifPanel(){
+  const el=document.getElementById('notif-list');
+  if(!el)return;
+  el.innerHTML=`<div style="padding:20px;text-align:center;font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t3);letter-spacing:.1em">ŁADOWANIE...</div>`;
+  const notifs=await loadNotifications();
+  if(!notifs.length){el.innerHTML=`<div style="padding:30px;text-align:center;font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t3);letter-spacing:.1em">BRAK POWIADOMIEŃ</div>`;return;}
+  el.innerHTML=notifs.map(n=>`
+  <div class="notif-item ${n.read?'':'unread'}" onclick="notifClick('${n.link||''}')">
+    <div class="notif-ico">${{bid:'⚡',outbid:'🔴',won:'🏆',msg:'💬',wishlist:'❤️',verified:'✅',watcher:'👁️',sale:'🏷️'}[n.type]||'🔔'}</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:12px;font-weight:600;color:var(--t1);margin-bottom:2px">${n.title||''}</div>
+      <div style="font-size:10px;color:var(--t2);line-height:1.4">${n.body||''}</div>
+      <div style="font-size:8px;font-family:'JetBrains Mono',monospace;color:var(--t3);margin-top:4px">${n.created_at?new Date(n.created_at).toLocaleString('pl-PL'):''}</div>
+    </div>
+    ${!n.read?`<div style="width:7px;height:7px;border-radius:50%;background:var(--a);flex-shrink:0;box-shadow:0 0 6px rgba(16,185,129,.7)"></div>`:''}
+  </div>`).join('');
+}
+function notifClick(link){
+  if(!link)return;
+  if(link.startsWith('auction:'))openAuctionById(link.split(':')[1]);
+  else if(link.startsWith('chat:'))openChatWith(link.split(':')[1]);
+  else if(link.startsWith('market'))openApp('market');
+}
+
+// ══════════════════════════════════════════════════════
+// CHAT SYSTEM
+// ══════════════════════════════════════════════════════
+let activeConvId=null;
+async function loadConversations(){
+  if(!currentUser)return[];
+  const{data}=await sb.from('conversations').select('*,messages(content,created_at,sender_id)').or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`).order('updated_at',{ascending:false});
+  return data||[];
+}
+async function getOrCreateConv(otherUserId){
+  if(!currentUser||!otherUserId)return null;
+  // Check existing
+  const{data:existing}=await sb.from('conversations').select('*').or(`and(user1_id.eq.${currentUser.id},user2_id.eq.${otherUserId}),and(user1_id.eq.${otherUserId},user2_id.eq.${currentUser.id})`).maybeSingle();
+  if(existing)return existing.id;
+  const{data:newConv}=await sb.from('conversations').insert({user1_id:currentUser.id,user2_id:otherUserId,updated_at:new Date().toISOString()}).select().single();
+  return newConv?.id||null;
+}
+async function sendMessage(convId,content,imageUrl=null){
+  if(!currentUser||!convId||!content.trim())return;
+  await sb.from('messages').insert({conversation_id:convId,sender_id:currentUser.id,content:content.trim(),image_url:imageUrl,read:false});
+  await sb.from('conversations').update({updated_at:new Date().toISOString(),last_message:content.trim()}).eq('id',convId);
+}
+function handleNewMessage(msg){
+  if(msg.sender_id===currentUser?.id)return;
+  // Update chat window if open
+  const chatBody=document.getElementById('chat-messages-'+activeConvId);
+  if(chatBody&&msg.conversation_id===activeConvId){
+    loadChatMessages(activeConvId);
+  } else {
+    // badge
+    const badge=document.getElementById('tb-chat-badge');
+    if(badge){const c=parseInt(badge.textContent||0)+1;badge.textContent=c>9?'9+':c;badge.style.display='flex';}
+    toast('💬 Nowa wiadomość');
+  }
+}
+async function openChatWith(userId){
+  const convId=await getOrCreateConv(userId);
+  if(!convId)return;
+  activeConvId=convId;
+  openApp('chat');
+}
+async function loadChatMessages(convId){
+  const el=document.getElementById('chat-messages-'+convId);
+  if(!el)return;
+  const{data}=await sb.from('messages').select('*,profiles!sender_id(nick)').eq('conversation_id',convId).order('created_at',{ascending:true}).limit(100);
+  const msgs=data||[];
+  el.innerHTML=msgs.map(m=>{
+    const isMe=m.sender_id===currentUser?.id;
+    return `<div class="chat-msg ${isMe?'me':'them'}">
+      ${!isMe?`<div class="chat-avatar">${(m.profiles?.nick||'?')[0].toUpperCase()}</div>`:''}
+      <div class="chat-bubble ${isMe?'mine':'theirs'}">
+        ${m.image_url?`<img src="${m.image_url}" style="max-width:200px;border-radius:8px;display:block;margin-bottom:4px">`:''}
+        <div>${m.content||''}</div>
+        <div class="chat-time">${m.created_at?new Date(m.created_at).toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'}):''}</div>
+      </div>
+    </div>`;
+  }).join('');
+  el.scrollTop=el.scrollHeight;
+}
+
+function bChat(){
+  return `
+  <div class="fx-b mb12 s1">
+    <div><div class="ph-sub" style="border-color:rgba(59,130,246,.3);background:rgba(59,130,246,.08);color:#60a5fa"><span style="width:5px;height:5px;border-radius:50%;background:#60a5fa;animation:pulse 3s ease-in-out infinite"></span><span>WIADOMOŚCI</span></div><div class="ph-title">CZAT</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:260px 1fr;gap:0;height:calc(100% - 90px);border:1px solid rgba(59,130,246,.12);border-radius:14px;overflow:hidden">
+    <div style="border-right:1px solid rgba(59,130,246,.1);display:flex;flex-direction:column">
+      <div style="padding:12px;border-bottom:1px solid rgba(59,130,246,.08)">
+        <div class="field" style="padding:6px 12px"><input type="text" placeholder="🔍 Szukaj..." style="font-size:11px"></div>
+      </div>
+      <div id="conv-list" style="flex:1;overflow-y:auto;padding:8px">${buildConvList()}</div>
+    </div>
+    <div style="display:flex;flex-direction:column" id="chat-main">
+      ${activeConvId?buildChatWindow(activeConvId):`<div class="empty-state"><div class="empty-icon">💬</div><div class="empty-text">WYBIERZ KONWERSACJĘ</div></div>`}
+    </div>
+  </div>`;
+}
+
+function buildConvList(){
+  return `<div id="conv-list-inner"><div style="padding:20px;text-align:center;font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t3);letter-spacing:.1em">ŁADOWANIE...</div></div>`;
+}
+
+function buildChatWindow(convId){
+  return `
+  <div style="padding:12px 16px;border-bottom:1px solid rgba(59,130,246,.08);display:flex;align-items:center;gap:10px">
+    <div class="chat-avatar" style="width:32px;height:32px;font-size:14px">?</div>
+    <div id="chat-header-nick" style="font-weight:700;font-size:13px">—</div>
+  </div>
+  <div id="chat-messages-${convId}" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px"></div>
+  <div style="padding:12px;border-top:1px solid rgba(59,130,246,.08);display:flex;gap:8px;align-items:center">
+    <label for="chat-img-upload" style="cursor:pointer;color:var(--t2);font-size:18px;transition:color .15s;flex-shrink:0" title="Wyślij zdjęcie">📎</label>
+    <input type="file" id="chat-img-upload" accept="image/*" style="display:none" onchange="sendChatImage(this,'${convId}')">
+    <div class="field" style="flex:1;padding:8px 12px"><input type="text" id="chat-input-${convId}" placeholder="Napisz wiadomość..." style="font-size:13px" onkeydown="if(event.key==='Enter')sendChatMsg('${convId}')"></div>
+    <button class="btn btn-p" style="padding:8px 16px" onclick="sendChatMsg('${convId}')">Wyślij</button>
+  </div>`;
+}
+
+async function sendChatMsg(convId){
+  const inp=document.getElementById('chat-input-'+convId);
+  if(!inp||!inp.value.trim())return;
+  const content=inp.value.trim();
+  inp.value='';
+  await sendMessage(convId,content);
+  await loadChatMessages(convId);
+}
+
+async function sendChatImage(inp,convId){
+  const file=inp.files[0];if(!file)return;
+  const ext=file.name.split('.').pop()||'jpg';
+  const path=`chat/${currentUser.id}/${Date.now()}.${ext}`;
+  const{data,error}=await sb.storage.from('shirt-photos').upload(path,file,{upsert:true});
+  if(error){toast('Błąd uploadu zdjęcia');return;}
+  const{data:{publicUrl}}=sb.storage.from('shirt-photos').getPublicUrl(path);
+  await sendMessage(convId,'',publicUrl);
+  await loadChatMessages(convId);
+  inp.value='';
+}
+
+async function initChatView(){
+  const convs=await loadConversations();
+  const inner=document.getElementById('conv-list-inner');
+  if(!inner)return;
+  if(!convs.length){inner.innerHTML=`<div style="padding:20px;text-align:center;font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t3);letter-spacing:.1em">BRAK KONWERSACJI</div>`;return;}
+  // Get partner profiles
+  const partnerIds=convs.map(c=>c.user1_id===currentUser.id?c.user2_id:c.user1_id);
+  const{data:profiles}=await sb.from('profiles').select('user_id,nick').in('user_id',partnerIds);
+  const profileMap={};(profiles||[]).forEach(p=>profileMap[p.user_id]=p.nick);
+  inner.innerHTML=convs.map(c=>{
+    const pid=c.user1_id===currentUser.id?c.user2_id:c.user1_id;
+    const nick=profileMap[pid]||'Użytkownik';
+    const isActive=activeConvId===c.id;
+    return `<div class="conv-item ${isActive?'active':''}" onclick="selectConv('${c.id}','${nick}')">
+      <div class="chat-avatar" style="width:36px;height:36px;font-size:15px;flex-shrink:0">${nick[0].toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;color:var(--t1)">${nick}</div>
+        <div style="font-size:10px;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.last_message||'...'}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function selectConv(convId,nick){
+  activeConvId=convId;
+  const main=document.getElementById('chat-main');
+  if(main)main.innerHTML=buildChatWindow(convId);
+  const header=document.getElementById('chat-header-nick');
+  if(header)header.textContent=nick;
+  const avatar=document.querySelector('#chat-main .chat-avatar');
+  if(avatar)avatar.textContent=nick[0].toUpperCase();
+  await loadChatMessages(convId);
+  // Update conv list active state
+  document.querySelectorAll('.conv-item').forEach(el=>el.classList.remove('active'));
+  // Subscribe realtime for this conv
+  const ch=sb.channel('conv-'+convId)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`conversation_id=eq.${convId}`},()=>{
+      loadChatMessages(convId);
+    }).subscribe();
+  _rtSubs.push(ch);
+}
+
+// ══════════════════════════════════════════════════════
+// WISHLIST
+// ══════════════════════════════════════════════════════
+async function loadWishlist(){
+  if(!currentUser)return[];
+  const{data}=await sb.from('wishlist').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+  return data||[];
+}
+async function addToWishlist(item){
+  if(!currentUser)return;
+  await sb.from('wishlist').insert({user_id:currentUser.id,...item});
+  toast('Dodano do Wishlisty! ❤️');
+}
+async function removeFromWishlist(id){
+  await sb.from('wishlist').delete().eq('id',id).eq('user_id',currentUser.id);
+}
+async function checkWishlistMatches(listing){
+  if(!listing)return;
+  const{data:wishes}=await sb.from('wishlist').select('*').neq('user_id',currentUser?.id||'');
+  if(!wishes)return;
+  wishes.forEach(async w=>{
+    const clubMatch=!w.club||listing.club?.toLowerCase().includes(w.club.toLowerCase());
+    const sizeMatch=!w.size||(listing.size||'')===w.size;
+    const maxBudget=!w.max_price||(listing.price_pln||0)<=w.max_price;
+    if(clubMatch&&sizeMatch&&maxBudget){
+      await createNotification(w.user_id,'wishlist',`Koszulka z Wishlisty!`,`${listing.club} ${listing.season||''} — ${listing.price_pln||'?'} PLN`,'market');
+    }
+  });
+}
+
+function bWishlist(){
+  return `
+  <div class="fx-b mb12 s1">
+    <div><div class="ph-sub" style="border-color:rgba(236,72,153,.3);background:rgba(236,72,153,.08);color:#f472b6"><span style="width:5px;height:5px;border-radius:50%;background:#f472b6;animation:pulse 3s ease-in-out infinite"></span><span>WISHLIST</span></div><div class="ph-title">SZUKANE</div></div>
+    <button class="btn btn-p" onclick="openAddWishlistItem()" style="background:linear-gradient(135deg,#ec4899,#9d174d)">+ Dodaj</button>
+  </div>
+  <div id="wishlist-grid" class="g3 s2"><div class="empty-state"><div class="empty-icon loading-pulse" style="font-size:28px">⏳</div></div></div>
+  <div class="s3" id="wishlist-matches" style="margin-top:20px"></div>`;
+}
+
+async function initWishlistView(){
+  const items=await loadWishlist();
+  const grid=document.getElementById('wishlist-grid');
+  if(!grid)return;
+  if(!items.length){grid.innerHTML=`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">❤️</div><div class="empty-text">WISHLIST JEST PUSTA — DODAJ KOSZULKĘ KTÓREJ SZUKASZ</div></div></div>`;return;}
+  grid.innerHTML=items.map(w=>`
+  <div class="card" style="border-color:rgba(236,72,153,.15)">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.05em;color:var(--t1)">${w.club||'Dowolny klub'}</div>
+      <button class="xbtn" onclick="removeFromWishlist('${w.id}');initWishlistView()">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px">
+      ${w.season?`<div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--t2)">📅 ${w.season}</div>`:''}
+      ${w.size?`<div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--t2)">📏 Rozmiar: ${w.size}</div>`:''}
+      ${w.max_price?`<div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--a)">💰 Max: ${w.max_price} PLN</div>`:''}
+      ${w.kind?`<div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--t2)">👕 ${kindLabel(w.kind)}</div>`:''}
+      ${w.notes?`<div style="font-size:10px;color:var(--t2);margin-top:4px">${w.notes}</div>`:''}
+    </div>
+    <div style="display:flex;align-items:center;gap:6px;padding-top:8px;border-top:1px solid rgba(236,72,153,.08)">
+      <div style="width:6px;height:6px;border-radius:50%;background:#ec4899;box-shadow:0 0 6px rgba(236,72,153,.6)"></div>
+      <span style="font-size:8px;font-family:'JetBrains Mono',monospace;color:rgba(236,72,153,.7);letter-spacing:.1em">${w.public?'PUBLICZNA':'PRYWATNA'}</span>
+    </div>
+  </div>`).join('');
+  // Check marketplace matches
+  const{data:listings}=await sb.from('market_listings').select('*');
+  const matches=(listings||[]).filter(l=>items.some(w=>{
+    const cm=!w.club||l.club?.toLowerCase().includes(w.club.toLowerCase());
+    const sm=!w.size||l.size===w.size;
+    const pm=!w.max_price||l.price_pln<=w.max_price;
+    return cm&&sm&&pm;
+  }));
+  const matchEl=document.getElementById('wishlist-matches');
+  if(matchEl&&matches.length){
+    matchEl.innerHTML=`<div class="fx-b mb12"><div class="clabel" style="color:#ec4899">DOPASOWANIA NA MARKETPLACE (${matches.length})</div></div>
+    <div class="g3">${matches.map(l=>`
+    <div class="mkt-card" style="border-color:rgba(236,72,153,.2);background:rgba(236,72,153,.04)">
+      <div class="shirt-photo">${l.photo?`<img src="${l.photo}" style="width:100%;height:100%;object-fit:cover">`:`<div class="shirt-photo-placeholder">👕</div>`}
+        <div style="position:absolute;top:8px;left:8px;background:rgba(236,72,153,.9);border-radius:6px;padding:2px 8px;font-family:'JetBrains Mono',monospace;font-size:8px;color:#fff">MATCH ❤️</div>
+      </div>
+      <div class="shirt-card-body">
+        <div class="shirt-card-club">${l.club||'—'}</div>
+        <div class="shirt-card-season">${[l.season,l.kind,l.size].filter(Boolean).join(' · ')}</div>
+        <div class="shirt-card-price" style="color:#ec4899">${l.price_pln?l.price_pln+' PLN':'—'}</div>
+        <button class="btn w100" style="margin-top:8px;background:rgba(236,72,153,.15);border:1px solid rgba(236,72,153,.3);color:#f472b6;font-size:10px;padding:6px" onclick="openApp('market')">Zobacz na Marketplace →</button>
+      </div>
+    </div>`).join('')}</div>`;
+  }
+}
+
+function openAddWishlistItem(){
+  document.getElementById('modal-title').textContent='Dodaj do Wishlisty';
+  document.getElementById('modal-body').innerHTML=`
+  <div class="g2">
+    <div>
+      <div class="form-group"><div class="form-label">Klub / Reprezentacja</div><input class="form-input" id="wl-club" placeholder="np. FC Barcelona"></div>
+      <div class="form-group"><div class="form-label">Sezon</div><input class="form-input" id="wl-season" placeholder="2024/25"></div>
+      <div class="form-group"><div class="form-label">Rodzaj</div>
+        <select class="form-select" id="wl-kind">
+          <option value="">Dowolny</option>
+          <option value="home">Domowa</option><option value="away">Wyjazdowa</option>
+          <option value="third">Trzecia</option><option value="special">Specjalna</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <div class="form-group"><div class="form-label">Rozmiar</div>
+        <select class="form-select" id="wl-size">
+          <option value="">Dowolny</option>${SIZES.map(s=>`<option>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group"><div class="form-label">Maks. cena (PLN)</div><input class="form-input" type="number" id="wl-price" placeholder="np. 300"></div>
+      <div class="form-group"><div class="form-label">Uwagi</div><textarea class="form-input" id="wl-notes" rows="3" placeholder="Dodatkowe wymagania..."></textarea></div>
+      <div class="toggle-row" id="wl-pub-row" onclick="toggleWLPublic()">
+        <div class="tg-label"><span>Publiczna wishlist</span><small>Widoczna na Twoim profilu</small></div>
+        <div class="tg-track" id="tg-wl-pub"><div class="tg-knob"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="div"></div>
+  <div class="fx-c gap8" style="justify-content:flex-end">
+    <button class="btn btn-g" onclick="closeModal()">Anuluj</button>
+    <button class="btn btn-p" style="background:linear-gradient(135deg,#ec4899,#9d174d)" onclick="saveWishlistItem()">Dodaj do Wishlisty ❤️</button>
+  </div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+let _wlPublic=false;
+function toggleWLPublic(){_wlPublic=!_wlPublic;document.getElementById('tg-wl-pub')?.classList.toggle('on',_wlPublic);}
+async function saveWishlistItem(){
+  const item={
+    club:document.getElementById('wl-club')?.value||'',
+    season:document.getElementById('wl-season')?.value||'',
+    kind:document.getElementById('wl-kind')?.value||'',
+    size:document.getElementById('wl-size')?.value||'',
+    max_price:parseFloat(document.getElementById('wl-price')?.value)||null,
+    notes:document.getElementById('wl-notes')?.value||'',
+    public:_wlPublic
+  };
+  await addToWishlist(item);
+  closeModal();
+  if(windows['wishlist'])initWishlistView();
+}
+
+// ══════════════════════════════════════════════════════
+// VERIFICATION SYSTEM
+// ══════════════════════════════════════════════════════
+async function requestVerification(shirtId){
+  if(!currentUser)return;
+  const shirt=(db.shirts||[]).find(s=>String(s.id)===String(shirtId));
+  if(!shirt){toast('Nie znaleziono koszulki');return;}
+  document.getElementById('modal-title').textContent='Wyślij do Weryfikacji';
+  document.getElementById('modal-body').innerHTML=`
+  <div class="card mb14" style="border-color:rgba(52,211,153,.2);background:rgba(52,211,153,.05)">
+    <div style="font-size:12px;font-weight:600;color:#34d399;margin-bottom:6px">✅ Jak działa weryfikacja?</div>
+    <div style="font-size:11px;color:var(--t2);line-height:1.7">Weryfikator sprawdza zdjęcia tagów, style code i autentyczność koszulki. Po weryfikacji pojawi się badge <strong style="color:#34d399">VERIFIED</strong> na Twoim ogłoszeniu.</div>
+  </div>
+  <div class="g2">
+    <div>
+      <div class="form-group"><div class="form-label">Style Code</div><input class="form-input" id="ver-code" value="${shirt.styleCode||''}" placeholder="np. CD4232-011"></div>
+      <div class="form-group"><div class="form-label">Skąd pochodzi koszulka?</div>
+        <select class="form-select" id="ver-source">
+          <option>Sklep oficjalny</option><option>Nike/Adidas Store</option><option>Allegro</option>
+          <option>Vinted</option><option>Grailed</option><option>Klub bezpośrednio</option><option>Inne</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <div class="form-group"><div class="form-label">Dodatkowe informacje</div>
+        <textarea class="form-input" id="ver-notes" rows="5" placeholder="Opisz historię koszulki, gdzie ją kupiłeś, czy masz paragon/fakturę..."></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="div"></div>
+  <div class="fx-c gap8" style="justify-content:flex-end">
+    <button class="btn btn-g" onclick="closeModal()">Anuluj</button>
+    <button class="btn btn-p" style="background:linear-gradient(135deg,#34d399,#065f46)" onclick="submitVerification('${shirtId}')">Wyślij do weryfikacji ✅</button>
+  </div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+async function submitVerification(shirtId){
+  const shirt=(db.shirts||[]).find(s=>String(s.id)===String(shirtId));
+  await sb.from('verification_requests').upsert({
+    shirt_id:shirtId,user_id:currentUser.id,
+    style_code:document.getElementById('ver-code')?.value||'',
+    source:document.getElementById('ver-source')?.value||'',
+    notes:document.getElementById('ver-notes')?.value||'',
+    status:'pending',photos:shirt?.photos||[]
+  },{onConflict:'shirt_id'});
+  if(shirt){shirt.verificationStatus='pending';await sbSaveShirt(shirt);}
+  closeModal();toast('Wysłano do weryfikacji! ⏳');
+}
+function verBadge(status){
+  const map={pending:`<span style="font-family:'JetBrains Mono',monospace;font-size:7px;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,.15);color:var(--gold);letter-spacing:.08em">⏳ WERYFIKACJA</span>`,
+  verified:`<span style="font-family:'JetBrains Mono',monospace;font-size:7px;padding:2px 7px;border-radius:4px;background:rgba(52,211,153,.15);color:#34d399;letter-spacing:.08em">✅ VERIFIED</span>`,
+  rejected:`<span style="font-family:'JetBrains Mono',monospace;font-size:7px;padding:2px 7px;border-radius:4px;background:rgba(244,33,46,.1);color:var(--red);letter-spacing:.08em">✗ ODRZUCONA</span>`};
+  return map[status]||'';
+}
+
+// ══════════════════════════════════════════════════════
+// AUCTIONS SYSTEM
+// ══════════════════════════════════════════════════════
+let auctionTimers={};
+async function loadAuctions(){
+  const{data}=await sb.from('auctions').select('*,bids(count)').eq('status','active').order('ends_at',{ascending:true});
+  return data||[];
+}
+async function loadAuctionBids(auctionId){
+  const{data}=await sb.from('bids').select('*,profiles(nick)').eq('auction_id',auctionId).order('created_at',{ascending:false}).limit(20);
+  return data||[];
+}
+async function createAuction(shirtId,opts){
+  if(!currentUser)return null;
+  const shirt=(db.shirts||[]).find(s=>String(s.id)===String(shirtId));
+  if(!shirt)return null;
+  const endsAt=new Date(Date.now()+opts.durationMs);
+  const{data,error}=await sb.from('auctions').insert({
+    user_id:currentUser.id,shirt_id:shirtId,
+    club:shirt.club,season:shirt.season,kind:kindLabel(shirt.kind),
+    size:shirt.customSize||shirt.size,condition:shirt.condition,
+    personalization:shirt.personalization,notes:shirt.notes,
+    photo:shirt.photos?.[0]||null,
+    start_price:opts.startPrice,current_price:opts.startPrice,
+    min_bid_increment:opts.minIncrement,buy_now_price:opts.buyNow||null,
+    ends_at:endsAt.toISOString(),extend_seconds:opts.extendSeconds,
+    extend_threshold_seconds:opts.thresholdSeconds,
+    seller_nick:db.profile?.nick||'',status:'active'
+  }).select().single();
+  if(error){toast('Błąd tworzenia licytacji: '+error.message);return null;}
+  return data;
+}
+async function placeBid(auctionId,amount){
+  if(!currentUser){toast('Musisz być zalogowany');return false;}
+  // Fetch current auction
+  const{data:auction}=await sb.from('auctions').select('*').eq('id',auctionId).single();
+  if(!auction){toast('Licytacja nie istnieje');return false;}
+  if(auction.status!=='active'){toast('Licytacja zakończona');return false;}
+  const minBid=(parseFloat(auction.current_price)||0)+(parseFloat(auction.min_bid_increment)||1);
+  if(amount<minBid){toast(`Minimalna oferta: ${minBid.toFixed(2)} PLN`);return false;}
+  if(auction.user_id===currentUser.id){toast('Nie możesz licytować własnej koszulki');return false;}
+  // Check if needs extension
+  const now=new Date();const endsAt=new Date(auction.ends_at);
+  const secsLeft=(endsAt-now)/1000;
+  let newEndsAt=auction.ends_at;
+  if(secsLeft<=auction.extend_threshold_seconds&&auction.extend_seconds>0){
+    newEndsAt=new Date(now.getTime()+auction.extend_seconds*1000).toISOString();
+  }
+  // Notify previous highest bidder
+  if(auction.highest_bidder_id&&auction.highest_bidder_id!==currentUser.id){
+    await createNotification(auction.highest_bidder_id,'outbid','Zostałeś przebity! 🔴',`Twoja oferta na ${auction.club} ${auction.season||''} została przebita. Aktualna cena: ${amount.toFixed(2)} PLN`,`auction:${auctionId}`);
+  }
+  // Insert bid
+  await sb.from('bids').insert({auction_id:auctionId,user_id:currentUser.id,amount,bidder_nick:db.profile?.nick||currentUser.email});
+  // Update auction
+  await sb.from('auctions').update({current_price:amount,highest_bidder_id:currentUser.id,highest_bidder_nick:db.profile?.nick||'',ends_at:newEndsAt}).eq('id',auctionId);
+  // Notify seller
+  await createNotification(auction.user_id,'bid','Nowa oferta! ⚡',`${db.profile?.nick||'Ktoś'} złożył ofertę ${amount.toFixed(2)} PLN na ${auction.club}`,`auction:${auctionId}`);
+  toast('Oferta złożona! ⚡');
+  return true;
+}
+
+async function buyNow(auctionId){
+  const{data:auction}=await sb.from('auctions').select('*').eq('id',auctionId).single();
+  if(!auction||!auction.buy_now_price){return;}
+  if(auction.highest_bidder_id){toast('Są już oferty — nie można użyć Kup Teraz');return;}
+  await sb.from('auctions').update({status:'sold',winner_id:currentUser.id,winner_nick:db.profile?.nick||''}).eq('id',auctionId);
+  await createNotification(auction.user_id,'sale','Koszulka sprzedana! 🏷️',`${db.profile?.nick||'Ktoś'} kupił ${auction.club} za ${auction.buy_now_price} PLN`,`auction:${auctionId}`);
+  toast('Kup Teraz — sukces! Skontaktuj się ze sprzedającym.');
+  if(windows['auctions'])setTimeout(()=>initAuctionsView(),100);
+}
+
+function formatCountdown(endsAt){
+  const diff=new Date(endsAt)-new Date();
+  if(diff<=0)return'KONIEC';
+  const d=Math.floor(diff/86400000),h=Math.floor((diff%86400000)/3600000),m=Math.floor((diff%3600000)/60000),s=Math.floor((diff%60000)/1000);
+  if(d>0)return`${d}d ${h}h ${m}m`;
+  if(h>0)return`${h}h ${m}m ${s}s`;
+  return`${m}m ${s}s`;
+}
+
+function startAuctionTimer(id,endsAt,elId){
+  if(auctionTimers[id])clearInterval(auctionTimers[id]);
+  auctionTimers[id]=setInterval(()=>{
+    const el=document.getElementById(elId);
+    if(!el){clearInterval(auctionTimers[id]);return;}
+    const txt=formatCountdown(endsAt);
+    el.textContent=txt;
+    const diff=new Date(endsAt)-new Date();
+    el.style.color=diff<60000?'var(--red)':diff<300000?'var(--gold)':'var(--a)';
+    if(diff<=0){clearInterval(auctionTimers[id]);el.textContent='ZAKOŃCZONA';el.style.color='var(--t2)';}
+  },1000);
+}
+
+function bAuctions(){
+  return `
+  <div class="fx-b mb12 s1">
+    <div><div class="ph-sub" style="border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:#f87171"><span style="width:5px;height:5px;border-radius:50%;background:#f87171;animation:pulse 1s ease-in-out infinite"></span><span>LICYTACJE LIVE</span></div><div class="ph-title">AUKCJE</div></div>
+    <div class="fx-c gap8">
+      <button class="btn btn-g" onclick="initAuctionsView()">↻ Odśwież</button>
+      <button class="btn" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171" onclick="openCreateAuction()">+ Nowa Licytacja</button>
+    </div>
+  </div>
+  <div id="auctions-grid" class="g3 s2"><div class="empty-state"><div class="empty-icon loading-pulse" style="font-size:28px">⏳</div></div></div>`;
+}
+
+async function initAuctionsView(){
+  const grid=document.getElementById('auctions-grid');if(!grid)return;
+  const auctions=await loadAuctions();
+  if(!auctions.length){
+    grid.innerHTML=`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">🏷️</div><div class="empty-text">BRAK AKTYWNYCH LICYTACJI — BĄDŹ PIERWSZY!</div></div></div>`;
+    return;
+  }
+  grid.innerHTML=auctions.map(a=>{
+    const isOwn=a.user_id===currentUser?.id;
+    const hasKN=a.buy_now_price&&!a.highest_bidder_id;
+    const timerId=`timer-${a.id}`;
+    setTimeout(()=>startAuctionTimer(a.id,a.ends_at,timerId),50);
+    return `<div class="mkt-card" style="border-color:rgba(239,68,68,.2);background:rgba(239,68,68,.03)">
+      <div class="shirt-photo" style="background:rgba(0,0,0,.5)">
+        ${a.photo?`<img src="${a.photo}" style="width:100%;height:100%;object-fit:cover">`:`<div class="shirt-photo-placeholder">👕</div>`}
+        <div style="position:absolute;top:8px;left:8px;background:rgba(239,68,68,.9);border-radius:6px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:8px;color:#fff;display:flex;align-items:center;gap:4px"><span style="width:5px;height:5px;border-radius:50%;background:#fff;animation:pulse 1s ease-in-out infinite"></span>LIVE</div>
+        ${hasKN?`<div style="position:absolute;top:8px;right:8px;background:rgba(16,185,129,.9);border-radius:6px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:8px;color:#fff">KUP TERAZ</div>`:''}
+        <div style="position:absolute;bottom:8px;left:8px;right:8px;background:rgba(0,0,0,.75);border-radius:8px;padding:5px 10px;display:flex;justify-content:space-between;align-items:center">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.6);letter-spacing:.06em">KOŃCZY SIĘ</div>
+          <div id="${timerId}" style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--a);letter-spacing:.05em">${formatCountdown(a.ends_at)}</div>
+        </div>
+      </div>
+      <div class="shirt-card-body">
+        <div class="shirt-card-club">${a.club||'—'}</div>
+        <div class="shirt-card-season">${[a.season,a.kind,a.size].filter(Boolean).join(' · ')}</div>
+        ${a.personalization?`<div style="font-size:10px;color:var(--t2);margin-bottom:4px;font-family:'JetBrains Mono',monospace">${a.personalization}</div>`:''}
+        <div class="fx-b mb8">
+          <div>
+            <div style="font-size:8px;font-family:'JetBrains Mono',monospace;color:var(--t2);letter-spacing:.1em;margin-bottom:2px">AKTUALNA OFERTA</div>
+            <div class="shirt-card-price" style="color:#f87171">${parseFloat(a.current_price||0).toFixed(2)} PLN</div>
+            <div style="font-size:8px;font-family:'JetBrains Mono',monospace;color:var(--t2);margin-top:2px">min. podbicie: +${a.min_bid_increment||1} PLN</div>
+          </div>
+          ${hasKN?`<div style="text-align:right"><div style="font-size:8px;font-family:'JetBrains Mono',monospace;color:#34d399;letter-spacing:.1em;margin-bottom:2px">KUP TERAZ</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#34d399">${parseFloat(a.buy_now_price).toFixed(2)} PLN</div></div>`:''}
+        </div>
+        ${a.highest_bidder_nick?`<div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t2);margin-bottom:8px">🏆 ${a.highest_bidder_nick}</div>`:'<div style="font-size:9px;font-family:\'JetBrains Mono\',monospace;color:var(--t2);margin-bottom:8px">Brak ofert — bądź pierwszy!</div>'}
+        <div class="div" style="margin:6px 0"></div>
+        <div class="fx-c gap6">
+          ${isOwn?
+            `<button class="btn btn-d w100" style="font-size:10px;padding:6px" onclick="cancelAuction('${a.id}')">Anuluj licytację</button>`
+            :`<button class="btn w100" style="font-size:10px;padding:6px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171" onclick="openBidModal('${a.id}',${a.current_price},${a.min_bid_increment})">⚡ Złóż ofertę</button>`}
+          ${hasKN&&!isOwn?`<button class="btn btn-p" style="font-size:10px;padding:6px;flex-shrink:0" onclick="buyNow('${a.id}')">Kup Teraz</button>`:''}
+          <button class="btn btn-g" style="font-size:10px;padding:6px;flex-shrink:0" onclick="openBidHistory('${a.id}')">Historia</button>
+        </div>
+        <div class="fx-b" style="margin-top:8px;padding-top:6px;border-top:1px solid rgba(239,68,68,.06)">
+          <div class="mkt-seller fx-c gap6" style="color:rgba(239,68,68,.7)">
+            <div style="width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#ef4444,#7f1d1d);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-family:'Bebas Neue',sans-serif">${(a.seller_nick||'?')[0].toUpperCase()}</div>
+            ${a.seller_nick||'—'}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  // Realtime for auctions
+  const auctionCh=sb.channel('auctions-live')
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'auctions'},()=>{
+      if(windows['auctions'])initAuctionsView();
+    }).subscribe();
+  _rtSubs.push(auctionCh);
+}
+
+function openBidModal(auctionId,currentPrice,minIncrement){
+  const minBid=(parseFloat(currentPrice)||0)+(parseFloat(minIncrement)||1);
+  document.getElementById('modal-title').textContent='Złóż Ofertę ⚡';
+  document.getElementById('modal-body').innerHTML=`
+  <div class="card mb14" style="border-color:rgba(239,68,68,.2);background:rgba(239,68,68,.05)">
+    <div class="fx-b">
+      <div><div class="clabel" style="font-size:8px">AKTUALNA CENA</div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:#f87171">${parseFloat(currentPrice).toFixed(2)} PLN</div></div>
+      <div style="text-align:right"><div class="clabel" style="font-size:8px">MIN. PODBICIE</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold)">+${parseFloat(minIncrement).toFixed(2)} PLN</div></div>
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="form-label">Twoja oferta (min. ${minBid.toFixed(2)} PLN)</div>
+    <input class="form-input" type="number" id="bid-amount" value="${minBid.toFixed(2)}" min="${minBid}" step="${minIncrement}" style="font-size:20px;font-weight:700;text-align:center">
+  </div>
+  <div class="div"></div>
+  <div class="fx-c gap8" style="justify-content:flex-end">
+    <button class="btn btn-g" onclick="closeModal()">Anuluj</button>
+    <button class="btn" style="background:rgba(239,68,68,.9);color:#fff;box-shadow:0 2px 16px rgba(239,68,68,.4);font-size:13px;padding:10px 24px" onclick="submitBid('${auctionId}',${minBid})">⚡ LICYTUJĘ</button>
+  </div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+async function submitBid(auctionId,minBid){
+  const amount=parseFloat(document.getElementById('bid-amount')?.value);
+  if(isNaN(amount)||amount<minBid){toast(`Minimalna oferta: ${minBid.toFixed(2)} PLN`);return;}
+  const ok=await placeBid(auctionId,amount);
+  if(ok){closeModal();if(windows['auctions'])setTimeout(()=>initAuctionsView(),200);}
+}
+
+async function openBidHistory(auctionId){
+  const bids=await loadAuctionBids(auctionId);
+  document.getElementById('modal-title').textContent='Historia Ofert';
+  document.getElementById('modal-body').innerHTML=`
+  ${bids.length?bids.map((b,i)=>`
+  <div class="vh-row">
+    <div class="fx-c gap8" style="gap:8px">
+      ${i===0?`<span style="font-family:'JetBrains Mono',monospace;font-size:8px;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,.15);color:var(--gold)">🏆 NAJWYŻSZA</span>`:''}
+      <span style="font-size:12px;font-weight:600">${b.profiles?.nick||b.bidder_nick||'—'}</span>
+    </div>
+    <div style="text-align:right">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:${i===0?'#f87171':'var(--t2)'}">${parseFloat(b.amount).toFixed(2)} PLN</div>
+      <div style="font-size:8px;font-family:'JetBrains Mono',monospace;color:var(--t3)">${b.created_at?new Date(b.created_at).toLocaleString('pl-PL'):''}</div>
+    </div>
+  </div>`).join(''):`<div class="empty-state" style="padding:30px"><div class="empty-icon">🔇</div><div class="empty-text">BRAK OFERT</div></div>`}
+  <div class="div"></div>
+  <div style="text-align:right"><button class="btn btn-g" onclick="closeModal()">Zamknij</button></div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+async function cancelAuction(auctionId){
+  if(!confirm('Anulować licytację?'))return;
+  await sb.from('auctions').update({status:'cancelled'}).eq('id',auctionId).eq('user_id',currentUser.id);
+  toast('Licytacja anulowana');
+  if(windows['auctions'])initAuctionsView();
+}
+
+async function openAuctionById(id){
+  openApp('auctions');
+  setTimeout(()=>initAuctionsView(),200);
+}
+
+function openCreateAuction(){
+  const myShirts=(db.shirts||[]).filter(s=>s.status==='forsale'||s.status==='collection');
+  document.getElementById('modal-title').textContent='Nowa Licytacja';
+  document.getElementById('modal-body').innerHTML=`
+  <div class="form-group">
+    <div class="form-label">Koszulka</div>
+    <select class="form-select" id="auc-shirt">
+      <option value="">— Wybierz koszulkę —</option>
+      ${myShirts.map(s=>`<option value="${s.id}">${s.club||'?'} ${s.season||''} ${kindLabel(s.kind)||''}</option>`).join('')}
+    </select>
+  </div>
+  <div class="g2">
+    <div>
+      <div class="form-group"><div class="form-label">Cena wywoławcza (PLN)</div><input class="form-input" type="number" id="auc-start" placeholder="np. 50" min="1"></div>
+      <div class="form-group"><div class="form-label">Minimalne podbicie (PLN)</div><input class="form-input" type="number" id="auc-inc" placeholder="np. 5" value="5" min="1"></div>
+      <div class="form-group"><div class="form-label">Cena Kup Teraz (PLN, opcjonalnie)</div><input class="form-input" type="number" id="auc-buynow" placeholder="pozostaw puste = brak"></div>
+    </div>
+    <div>
+      <div class="form-group"><div class="form-label">Czas trwania</div>
+        <select class="form-select" id="auc-dur">
+          <option value="3600000">1 godzina</option>
+          <option value="21600000">6 godzin</option>
+          <option value="43200000">12 godzin</option>
+          <option value="86400000" selected>24 godziny</option>
+          <option value="259200000">3 dni</option>
+          <option value="604800000">7 dni</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Przedłużenie gdy oferta w ostatnich...</div>
+        <select class="form-select" id="auc-threshold">
+          <option value="30">30 sekundach</option>
+          <option value="60" selected>1 minucie</option>
+          <option value="120">2 minutach</option>
+          <option value="300">5 minutach</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Przedłuż o...</div>
+        <select class="form-select" id="auc-extend">
+          <option value="0">Nie przedłużaj</option>
+          <option value="30">30 sekund</option>
+          <option value="60" selected>1 minutę</option>
+          <option value="120">2 minuty</option>
+          <option value="300">5 minut</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="div"></div>
+  <div class="fx-c gap8" style="justify-content:flex-end">
+    <button class="btn btn-g" onclick="closeModal()">Anuluj</button>
+    <button class="btn" style="background:rgba(239,68,68,.9);color:#fff;box-shadow:0 2px 16px rgba(239,68,68,.4)" onclick="submitCreateAuction()">🔴 Uruchom Licytację</button>
+  </div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+async function submitCreateAuction(){
+  const shirtId=document.getElementById('auc-shirt')?.value;
+  if(!shirtId){toast('Wybierz koszulkę!');return;}
+  const startPrice=parseFloat(document.getElementById('auc-start')?.value);
+  if(!startPrice||startPrice<=0){toast('Wpisz cenę wywoławczą!');return;}
+  const opts={
+    startPrice,
+    minIncrement:parseFloat(document.getElementById('auc-inc')?.value)||5,
+    buyNow:parseFloat(document.getElementById('auc-buynow')?.value)||null,
+    durationMs:parseInt(document.getElementById('auc-dur')?.value)||86400000,
+    thresholdSeconds:parseInt(document.getElementById('auc-threshold')?.value)||60,
+    extendSeconds:parseInt(document.getElementById('auc-extend')?.value)||60,
+  };
+  const auc=await createAuction(shirtId,opts);
+  if(auc){closeModal();toast('Licytacja uruchomiona! 🔴');openApp('auctions');setTimeout(()=>initAuctionsView(),200);}
+}
+
 </script>
 </body>
 </html>
