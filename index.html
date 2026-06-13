@@ -1785,13 +1785,8 @@ async function openChatWith(userId){
   openApp('chat');
 }
 async function loadChatMessages(convId){
-  const el=document.getElementById('chat-messages-'+convId);
+  const el=document.getElementById('chat-messages-area');
   if(!el)return;
-  // Zapamiętaj fokus PRZED aktualizacją
-  const inp=document.getElementById('chat-input-'+convId);
-  const hadFocus=document.activeElement===inp;
-  const curVal=inp?inp.value:'';
-  const atBottom=el.scrollHeight-el.scrollTop-el.clientHeight<80;
   const{data,error}=await sb.from('messages').select('*').eq('conversation_id',convId).order('created_at',{ascending:true}).limit(100);
   if(error){console.error('loadChatMessages error:',error);return;}
   const msgs=data||[];
@@ -1799,6 +1794,7 @@ async function loadChatMessages(convId){
     el.innerHTML=`<div class="empty-state" style="padding:30px"><div class="empty-icon">💬</div><div class="empty-text" style="font-size:9px">BRAK WIADOMOŚCI — NAPISZ PIERWSZĄ!</div></div>`;
     return;
   }
+  const atBottom=el.scrollHeight-el.scrollTop-el.clientHeight<80;
   const senderIds=[...new Set(msgs.map(m=>m.sender_id))];
   const{data:profiles}=await sb.from('profiles').select('user_id,nick').in('user_id',senderIds);
   const nickMap={};(profiles||[]).forEach(p=>nickMap[p.user_id]=p.nick||'?');
@@ -1815,12 +1811,7 @@ async function loadChatMessages(convId){
       </div>
     </div>`;
   }).join('');
-  if(atBottom)el.scrollTop=el.scrollHeight;
-  // Przywróć fokus i wartość inputa po aktualizacji DOM
-  if(hadFocus&&inp){
-    inp.value=curVal;
-    inp.focus();
-  }
+  if(atBottom||msgs.length<5)el.scrollTop=el.scrollHeight;
 }
 
 function bChat(){
@@ -1830,13 +1821,30 @@ function bChat(){
   </div>
   <div style="display:grid;grid-template-columns:260px 1fr;gap:0;height:calc(100% - 90px);border:1px solid rgba(59,130,246,.12);border-radius:14px;overflow:hidden">
     <div style="border-right:1px solid rgba(59,130,246,.1);display:flex;flex-direction:column">
-      <div style="padding:12px;border-bottom:1px solid rgba(59,130,246,.08)">
+      <div style="padding:12px;border-bottom:1px solid rgba(59,130,246,.08);flex-shrink:0">
         <div class="field" style="padding:6px 12px"><input type="text" placeholder="🔍 Szukaj..." style="font-size:11px"></div>
       </div>
-      <div id="conv-list" style="flex:1;overflow-y:auto;padding:8px">${buildConvList()}</div>
+      <div id="conv-list-inner" style="flex:1;overflow-y:auto;padding:8px">
+        <div style="padding:20px;text-align:center;font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t3);letter-spacing:.1em">ŁADOWANIE...</div>
+      </div>
     </div>
-    <div style="display:flex;flex-direction:column" id="chat-main">
-      ${activeConvId?buildChatWindow(activeConvId):`<div class="empty-state"><div class="empty-icon">💬</div><div class="empty-text">WYBIERZ KONWERSACJĘ</div></div>`}
+    <div style="display:flex;flex-direction:column;min-height:0">
+      <!-- NAGŁÓWEK — statyczny -->
+      <div style="padding:10px 16px;border-bottom:1px solid rgba(59,130,246,.08);display:flex;align-items:center;gap:10px;flex-shrink:0">
+        <div id="chat-avatar-main" class="chat-avatar" style="width:32px;height:32px;font-size:14px">?</div>
+        <div id="chat-header-nick" style="font-weight:700;font-size:13px">—</div>
+      </div>
+      <!-- WIADOMOŚCI — podmieniane przez loadChatMessages -->
+      <div id="chat-messages-area" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;min-height:0">
+        <div class="empty-state"><div class="empty-icon">💬</div><div class="empty-text">WYBIERZ KONWERSACJĘ</div></div>
+      </div>
+      <!-- INPUT — statyczny, NIGDY nie jest podmieniane -->
+      <div style="padding:10px 12px;border-top:1px solid rgba(59,130,246,.15);display:flex;gap:8px;align-items:center;flex-shrink:0;background:rgba(0,0,0,.3)">
+        <label for="chat-img-upload" style="cursor:pointer;color:var(--t2);font-size:18px;flex-shrink:0">📎</label>
+        <input type="file" id="chat-img-upload" accept="image/*" style="display:none" onchange="sendChatImageActive(this)">
+        <input type="text" id="chat-input-main" placeholder="Napisz wiadomość..." style="flex:1;background:rgba(59,130,246,.08)!important;border:1px solid rgba(59,130,246,.25)!important;border-radius:10px!important;padding:9px 14px!important;font-size:13px!important;color:var(--t1)!important;outline:none!important;width:auto!important" onkeydown="if(event.key==='Enter'){event.preventDefault();sendChatMsgActive()}">
+        <button class="btn btn-p" style="padding:8px 16px;flex-shrink:0" onclick="sendChatMsgActive()">Wyślij</button>
+      </div>
     </div>
   </div>`;
 }
@@ -1908,26 +1916,48 @@ async function initChatView(){
 
 async function selectConv(convId,nick){
   activeConvId=convId;
-  const main=document.getElementById('chat-main');
-  if(main)main.innerHTML=buildChatWindow(convId);
+  // Aktualizuj tylko nagłówek — NIE przebudowuj całego DOM
   const header=document.getElementById('chat-header-nick');
   if(header)header.textContent=nick||'—';
-  const avatar=document.querySelector('#chat-main .chat-avatar');
+  const avatar=document.getElementById('chat-avatar-main');
   if(avatar)avatar.textContent=(nick||'?')[0].toUpperCase();
-  // Załaduj wiadomości po tym jak DOM jest gotowy
-  setTimeout(()=>loadChatMessages(convId),50);
-  // Oznacz aktywną konwersację
+  // Załaduj wiadomości
+  await loadChatMessages(convId);
+  // Oznacz aktywną konwersację w liście
   document.querySelectorAll('.conv-item').forEach(el=>el.classList.remove('active'));
   document.querySelector(`.conv-item[onclick*="${convId}"]`)?.classList.add('active');
-  // Usuń poprzednie subskrypcje dla tej konwersacji żeby nie duplikować
+  // Realtime
   const chName='conv-'+convId;
-  try{await sb.removeChannel(sb.channel(chName));}catch(e){}
+  try{sb.removeChannel(sb.channel(chName));}catch(e){}
   const ch=sb.channel(chName)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`conversation_id=eq.${convId}`},()=>{
-      // Tylko odśwież listę wiadomości — nie dotykaj reszty DOM
       loadChatMessages(convId);
     }).subscribe();
   _rtSubs.push(ch);
+}
+
+async function sendChatMsgActive(){
+  if(!activeConvId)return;
+  const inp=document.getElementById('chat-input-main');
+  if(!inp||!inp.value.trim())return;
+  const content=inp.value.trim();
+  inp.value='';
+  inp.focus();
+  await sendMessage(activeConvId,content);
+  await loadChatMessages(activeConvId);
+}
+
+async function sendChatImageActive(inp){
+  if(!activeConvId){toast('Wybierz konwersację');return;}
+  const file=inp.files[0];if(!file)return;
+  const ext=file.name.split('.').pop()||'jpg';
+  const path=`chat/${currentUser.id}/${Date.now()}.${ext}`;
+  const{data,error}=await sb.storage.from('shirt-photos').upload(path,file,{upsert:true});
+  if(error){toast('Błąd uploadu');return;}
+  const{data:{publicUrl}}=sb.storage.from('shirt-photos').getPublicUrl(path);
+  await sendMessage(activeConvId,'',publicUrl);
+  await loadChatMessages(activeConvId);
+  inp.value='';
 }
 
 // ══════════════════════════════════════════════════════
