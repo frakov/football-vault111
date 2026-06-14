@@ -21,6 +21,7 @@ html,body{height:100%;overflow:hidden;user-select:none}
 body{font-family:'Barlow',system-ui,sans-serif;background:var(--bg);color:var(--t1);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 70% 60% at 15% 0%,rgba(16,185,129,.2) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 85% 10%,rgba(5,150,105,.14) 0%,transparent 55%),radial-gradient(ellipse 55% 55% at 50% 100%,rgba(6,78,59,.18) 0%,transparent 55%),#0a0f0b;pointer-events:none}
 body.use-cursor,body.use-cursor *{cursor:none!important}
+body.use-cursor input[type="color"],body.use-cursor input[type="range"],body.use-cursor input[type="file"],body.use-cursor label{cursor:default!important}
 body.no-cursor *{cursor:default!important}
 input,textarea,button,select{font-family:'Barlow',sans-serif}
 input,textarea{background:transparent!important;border:none!important;outline:none!important;color:var(--t1)!important;width:100%}
@@ -449,6 +450,15 @@ async function sbLoadData(){
     db.tbColor=settings.tb_color||null;
     db.tbOpacity=settings.tb_opacity||92;
     db.tbBlur=settings.tb_blur!==false;
+  }
+  // Sync nick from profiles table (source of truth)
+  const{data:prof}=await sb.from('profiles').select('nick,bio,public').eq('user_id',currentUser.id).maybeSingle();
+  if(prof){
+    if(!db.profile)db.profile={};
+    if(prof.nick)db.profile.nick=prof.nick;
+    if(prof.bio)db.profile.bio=prof.bio;
+    db.profile.public=prof.public||false;
+  }
   }
   // Load shirts
   const {data:shirts}=await sb.from('shirts').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
@@ -1061,11 +1071,16 @@ function filterMarket(){
 async function loadPublicWishlists(){
   const el=document.getElementById('mkt-section-wishlist');if(!el)return;
   el.innerHTML=`<div class="empty-state"><div class="empty-icon loading-pulse" style="font-size:28px">⏳</div></div>`;
-  const{data}=await sb.from('wishlist').select('*,profiles!user_id(nick)').eq('public',true).order('created_at',{ascending:false});
-  const items=data||[];
-  if(!items.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">❤️</div><div class="empty-text">${db.lang==='pl'?'NIKT NIE SZUKA — BĄDŹ PIERWSZY!':'NOBODY IS LOOKING YET!'}</div></div>`;return;}
-  window._wlMktItems=items;
-  const clubs=[...new Set(items.map(w=>w.club).filter(Boolean))];
+  const{data:items}=await sb.from('wishlist').select('*').eq('public',true).order('created_at',{ascending:false});
+  if(!items||!items.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">❤️</div><div class="empty-text">${db.lang==='pl'?'NIKT NIE SZUKA — BĄDŹ PIERWSZY!':'NOBODY IS LOOKING YET!'}</div></div>`;return;}
+  // Pobierz nicki osobno
+  const userIds=[...new Set(items.map(w=>w.user_id))];
+  const{data:profs}=await sb.from('profiles').select('user_id,nick').in('user_id',userIds);
+  const nickMap={};(profs||[]).forEach(p=>nickMap[p.user_id]=p.nick||'?');
+  // Przypisz nick do każdego itemu
+  const itemsWithNick=items.map(w=>({...w,_nick:nickMap[w.user_id]||'?'}));
+  window._wlMktItems=itemsWithNick;
+  const clubs=[...new Set(itemsWithNick.map(w=>w.club).filter(Boolean))];
   el.innerHTML=`
   <div class="card mb12" style="padding:10px 14px">
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
@@ -1078,7 +1093,7 @@ async function loadPublicWishlists(){
       </select>
     </div>
   </div>
-  <div id="wl-mkt-grid" class="g3">${renderPublicWishlistCards(items)}</div>`;
+  <div id="wl-mkt-grid" class="g3">${renderPublicWishlistCards(itemsWithNick)}</div>`;
 }
 
 function filterPublicWishlist(){
@@ -1086,7 +1101,7 @@ function filterPublicWishlist(){
   const club=document.getElementById('wl-mkt-club')?.value||'';
   const size=document.getElementById('wl-mkt-size')?.value||'';
   let items=[...(window._wlMktItems||[])];
-  if(q)items=items.filter(w=>(w.club||'').toLowerCase().includes(q)||(w.profiles?.nick||'').toLowerCase().includes(q));
+  if(q)items=items.filter(w=>(w.club||'').toLowerCase().includes(q)||(w._nick||'').toLowerCase().includes(q));
   if(club)items=items.filter(w=>w.club===club);
   if(size)items=items.filter(w=>w.size===size);
   const grid=document.getElementById('wl-mkt-grid');
@@ -1096,11 +1111,11 @@ function filterPublicWishlist(){
 function renderPublicWishlistCards(items){
   if(!items.length)return`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">BRAK WYNIKÓW</div></div></div>`;
   return items.map(w=>{
-    const nick=w.profiles?.nick||'?';
+    const nick=w._nick||'?';
     const isOwn=w.user_id===currentUser?.id;
     return `<div class="card" style="border-color:rgba(236,72,153,.15)">
       <div class="fx-b mb8">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--t1)">${w.club||db.lang==='pl'?'Dowolny klub':'Any club'}</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--t1)">${w.club||'Dowolny klub'}</div>
         <span style="font-size:18px">❤️</span>
       </div>
       <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px">
