@@ -451,15 +451,6 @@ async function sbLoadData(){
     db.tbOpacity=settings.tb_opacity||92;
     db.tbBlur=settings.tb_blur!==false;
   }
-  // Sync nick from profiles table (source of truth)
-  const{data:prof}=await sb.from('profiles').select('nick,bio,public').eq('user_id',currentUser.id).maybeSingle();
-  if(prof){
-    if(!db.profile)db.profile={};
-    if(prof.nick)db.profile.nick=prof.nick;
-    if(prof.bio)db.profile.bio=prof.bio;
-    db.profile.public=prof.public||false;
-  }
-  }
   // Load shirts
   const {data:shirts}=await sb.from('shirts').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
   db.shirts=(shirts||[]).map(r=>({
@@ -1071,16 +1062,14 @@ function filterMarket(){
 async function loadPublicWishlists(){
   const el=document.getElementById('mkt-section-wishlist');if(!el)return;
   el.innerHTML=`<div class="empty-state"><div class="empty-icon loading-pulse" style="font-size:28px">⏳</div></div>`;
-  const{data:items}=await sb.from('wishlist').select('*').eq('public',true).order('created_at',{ascending:false});
-  if(!items||!items.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">❤️</div><div class="empty-text">${db.lang==='pl'?'NIKT NIE SZUKA — BĄDŹ PIERWSZY!':'NOBODY IS LOOKING YET!'}</div></div>`;return;}
-  // Pobierz nicki osobno
-  const userIds=[...new Set(items.map(w=>w.user_id))];
-  const{data:profs}=await sb.from('profiles').select('user_id,nick').in('user_id',userIds);
-  const nickMap={};(profs||[]).forEach(p=>nickMap[p.user_id]=p.nick||'?');
-  // Przypisz nick do każdego itemu
-  const itemsWithNick=items.map(w=>({...w,_nick:nickMap[w.user_id]||'?'}));
-  window._wlMktItems=itemsWithNick;
-  const clubs=[...new Set(itemsWithNick.map(w=>w.club).filter(Boolean))];
+  const{data:wlItems}=await sb.from('wishlist').select('*').eq('public',true).order('created_at',{ascending:false});
+  if(!wlItems||!wlItems.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">❤️</div><div class="empty-text">${db.lang==='pl'?'NIKT NIE SZUKA — BĄDŹ PIERWSZY!':'NOBODY IS LOOKING YET!'}</div></div>`;return;}
+  const wlUserIds=[...new Set(wlItems.map(w=>w.user_id))];
+  const{data:wlProfs}=await sb.from('profiles').select('user_id,nick').in('user_id',wlUserIds);
+  const wlNickMap={};(wlProfs||[]).forEach(p=>wlNickMap[p.user_id]=p.nick||'?');
+  const items=wlItems.map(w=>({...w,_nick:wlNickMap[w.user_id]||'?'}));
+  window._wlMktItems=items;
+  const clubs=[...new Set(items.map(w=>w.club).filter(Boolean))];
   el.innerHTML=`
   <div class="card mb12" style="padding:10px 14px">
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
@@ -1093,7 +1082,7 @@ async function loadPublicWishlists(){
       </select>
     </div>
   </div>
-  <div id="wl-mkt-grid" class="g3">${renderPublicWishlistCards(itemsWithNick)}</div>`;
+  <div id="wl-mkt-grid" class="g3">${renderPublicWishlistCards(items)}</div>`;
 }
 
 function filterPublicWishlist(){
@@ -1115,7 +1104,7 @@ function renderPublicWishlistCards(items){
     const isOwn=w.user_id===currentUser?.id;
     return `<div class="card" style="border-color:rgba(236,72,153,.15)">
       <div class="fx-b mb8">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--t1)">${w.club||'Dowolny klub'}</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--t1)">${w.club||db.lang==='pl'?'Dowolny klub':'Any club'}</div>
         <span style="font-size:18px">❤️</span>
       </div>
       <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px">
@@ -1140,7 +1129,7 @@ function renderPublicWishlistCards(items){
 async function loadPublicProfilesSection(){
   const el=document.getElementById('mkt-section-profiles');if(!el)return;
   el.innerHTML=`<div class="empty-state"><div class="empty-icon loading-pulse" style="font-size:28px">⏳</div></div>`;
-  const{data}=await sb.from('profiles').select('*').eq('public',true);
+  const{data}=await sb.from('profiles').select('*').eq('visible',true);
   const profiles=data||[];
   if(!profiles.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">${db.lang==='pl'?'BRAK PUBLICZNYCH PROFILI':'NO PUBLIC PROFILES'}</div></div>`;return;}
   el.innerHTML=`<div class="g3">${profiles.map(p=>`
