@@ -80,7 +80,7 @@ textarea{resize:none}
 /* TASKBAR */
 #taskbar{position:fixed;bottom:0;left:0;right:0;height:50px;background:rgba(10,15,11,.92);border-top:1px solid rgba(16,185,129,.1);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);display:flex;align-items:center;z-index:5000;padding:0 14px}
 #taskbar::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--a-rgb),.4),transparent)}
-.tb-logo{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.14em;color:var(--t1);padding:0 16px 0 4px;margin-right:10px;border-right:1px solid rgba(var(--a-rgb),.2);flex-shrink:0}
+.tb-logo{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.14em;color:var(--t1);padding:0 16px 0 4px;margin-right:10px;border-right:1px solid rgba(16,185,129,.12);flex-shrink:0}
 .tb-logo span{color:var(--a)}
 #tb-apps{display:flex;align-items:center;gap:2px;flex:1;overflow:hidden}
 .tb-app{display:flex;align-items:center;gap:7px;padding:5px 11px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);white-space:nowrap;transition:all .14s;cursor:inherit;border:1px solid transparent;max-width:150px}
@@ -121,7 +121,7 @@ textarea{resize:none}
 .field{background:rgba(0,0,0,.35);border:1px solid rgba(16,185,129,.1)!important;border-radius:10px;padding:9px 12px;transition:border-color .15s,box-shadow .15s}
 .field:focus-within{border-color:rgba(16,185,129,.45)!important;box-shadow:0 0 0 3px rgba(16,185,129,.08)}
 .btn{font-family:'Barlow',sans-serif;font-size:12px;font-weight:700;padding:8px 18px;border-radius:999px;transition:all .15s var(--e2);white-space:nowrap;border:none;cursor:inherit;letter-spacing:.02em}
-.btn-p{background:var(--a);color:var(--on-a);box-shadow:0 2px 12px rgba(var(--a-rgb),.35)}
+.btn-p{background:var(--a);color:var(--on-a,#fff);box-shadow:0 2px 12px rgba(var(--a-rgb),.35)}
 .btn-p:hover{filter:brightness(1.12);box-shadow:0 4px 20px rgba(var(--a-rgb),.5)}
 .btn-g{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12)!important;color:var(--t1)}
 .btn-g:hover{background:rgba(255,255,255,.1)}
@@ -717,14 +717,9 @@ function applyTheme(){
   const rgb=db.themeRgb||'16,185,129';
   r.setProperty('--a',acc);
   r.setProperty('--a-rgb',rgb);
-  // Auto kontrast — jeśli kolor jasny (np. biały) tekst na nim musi być ciemny
   const [rv,gv,bv]=rgb.split(',').map(Number);
   const lum=(rv*299+gv*587+bv*114)/1000;
-  const onAccent=lum>160?'#111':'#fff';
-  r.setProperty('--on-a',onAccent);
-  // Taskbar gradient
-  const tbEl=document.getElementById('taskbar');
-  if(tbEl)tbEl.style.setProperty('--tb-glow',`rgba(${rgb},.15)`);
+  r.setProperty('--on-a',lum>160?'#111':'#fff');
   const p=BGPS.find(x=>x.id===(db.bgPreset||'pitch'))||BGPS[0];
   const w=document.getElementById('wallpaper-el');
   if(w)w.style.background=db.bgCustom||p.bg;
@@ -972,55 +967,58 @@ function saleCard(s){
 }
 
 // ── MARKETPLACE ──
+let _mktAllItems=[];
+let _mktTab='listings';
+
 function bMarket(){
   return `
   <div class="fx-b mb12 s1">
     <div><div class="ph-sub" style="border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.08);color:#a78bfa"><span style="width:5px;height:5px;border-radius:50%;background:#a78bfa;animation:pulse 3s ease-in-out infinite"></span><span>${T('nav_market')}</span></div><div class="ph-title">${T('mkt_title').toUpperCase()}</div></div>
     <div class="fx-c gap8">
-      <button class="btn btn-g" id="mkt-refresh-btn" onclick="loadMarketplace()">${db.lang==='pl'?'↻ Odśwież':'↻ Refresh'}</button>
+      <button class="btn btn-g" onclick="loadMarketplace()">↻ ${db.lang==='pl'?'Odśwież':'Refresh'}</button>
       <button class="btn btn-mkt" onclick="openApp('profile')">${db.lang==='pl'?'Mój Profil':'My Profile'}</button>
     </div>
   </div>
   <div class="tabs mb12">
-    <div class="tab active" id="mkt-tab-listings" onclick="switchMktTab('listings')">🏷️ Ogłoszenia</div>
-    <div class="tab" id="mkt-tab-wishlist" onclick="switchMktTab('wishlist')">❤️ Szukane</div>
-    <div class="tab" id="mkt-tab-profiles" onclick="switchMktTab('profiles')">👥 Profile</div>
+    <div class="tab active" id="mkt-tab-listings" onclick="switchMktTab('listings')">🏷️ ${db.lang==='pl'?'Ogłoszenia':'Listings'}</div>
+    <div class="tab" id="mkt-tab-wishlist" onclick="switchMktTab('wishlist')">❤️ ${db.lang==='pl'?'Szukane':'Wanted'}</div>
+    <div class="tab" id="mkt-tab-profiles" onclick="switchMktTab('profiles')">👥 ${db.lang==='pl'?'Profile':'Profiles'}</div>
   </div>
-  <!-- FILTRY -->
-  <div class="card mb12 s2" style="padding:10px 14px" id="mkt-filters">
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-      <div class="field" style="flex:1;min-width:140px;padding:5px 10px"><input type="text" id="mkt-search" placeholder="🔍 Klub, sezon..." oninput="filterMarket()" style="font-size:11px"></div>
-      <select class="form-select" id="mkt-filter-size" style="width:auto;padding:5px 10px;font-size:11px" onchange="filterMarket()">
-        <option value="">Rozmiar</option>${SIZES.map(s=>`<option>${s}</option>`).join('')}
-      </select>
-      <select class="form-select" id="mkt-filter-kind" style="width:auto;padding:5px 10px;font-size:11px" onchange="filterMarket()">
-        <option value="">Rodzaj</option>
-        <option value="Domowa">Domowa</option><option value="Wyjazdowa">Wyjazdowa</option>
-        <option value="Trzecia">Trzecia</option><option value="Specjalna">Specjalna</option>
-      </select>
-      <select class="form-select" id="mkt-sort" style="width:auto;padding:5px 10px;font-size:11px" onchange="filterMarket()">
-        <option value="new">Najnowsze</option>
-        <option value="cheap">Najtańsze</option>
-        <option value="expensive">Najdroższe</option>
-      </select>
+  <div id="mkt-section-listings">
+    <div class="card mb12 s2" style="padding:10px 14px">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <div class="field" style="flex:1;min-width:140px;padding:5px 10px"><input type="text" id="mkt-search" placeholder="🔍 ${db.lang==='pl'?'Klub, sezon, nick...':'Club, season, nick...'}" oninput="filterMarket()" style="font-size:11px"></div>
+        <select class="form-select" id="mkt-filter-size" style="width:auto;padding:5px 10px;font-size:11px" onchange="filterMarket()">
+          <option value="">${db.lang==='pl'?'Rozmiar':'Size'}</option>${SIZES.map(s=>`<option>${s}</option>`).join('')}
+        </select>
+        <select class="form-select" id="mkt-filter-kind" style="width:auto;padding:5px 10px;font-size:11px" onchange="filterMarket()">
+          <option value="">${db.lang==='pl'?'Rodzaj':'Kit'}</option>
+          <option value="Domowa">${db.lang==='pl'?'Domowa':'Home'}</option>
+          <option value="Wyjazdowa">${db.lang==='pl'?'Wyjazdowa':'Away'}</option>
+          <option value="Trzecia">${db.lang==='pl'?'Trzecia':'Third'}</option>
+          <option value="Specjalna">${db.lang==='pl'?'Specjalna':'Special'}</option>
+        </select>
+        <select class="form-select" id="mkt-sort" style="width:auto;padding:5px 10px;font-size:11px" onchange="filterMarket()">
+          <option value="new">${db.lang==='pl'?'Najnowsze':'Newest'}</option>
+          <option value="cheap">${db.lang==='pl'?'Najtańsze':'Cheapest'}</option>
+          <option value="expensive">${db.lang==='pl'?'Najdroższe':'Most expensive'}</option>
+        </select>
+      </div>
     </div>
+    <div id="mkt-grid" class="g3 s2"><div class="empty-state"><div class="empty-icon loading-pulse" style="font-size:32px">⏳</div></div></div>
   </div>
-  <div id="mkt-grid" class="g3 s2"><div class="empty-state"><div class="empty-icon loading-pulse" style="font-size:32px">⏳</div></div></div>
-  <div id="mkt-wishlist-section" style="display:none"></div>
-  <div id="mkt-profiles-section" style="display:none"></div>`;
+  <div id="mkt-section-wishlist" style="display:none"></div>
+  <div id="mkt-section-profiles" style="display:none"></div>`;
 }
 
-let _mktAllItems=[];
-let _mktTab='listings';
 function switchMktTab(tab){
   _mktTab=tab;
   ['listings','wishlist','profiles'].forEach(t=>{
-    document.getElementById('mkt-tab-'+t)?.classList.toggle('active',t===tab);
+    const btn=document.getElementById('mkt-tab-'+t);
+    const sec=document.getElementById('mkt-section-'+t);
+    if(btn)btn.classList.toggle('active',t===tab);
+    if(sec)sec.style.display=t===tab?'block':'none';
   });
-  document.getElementById('mkt-grid').style.display=tab==='listings'?'':'none';
-  document.getElementById('mkt-filters').style.display=tab==='listings'?'':'none';
-  document.getElementById('mkt-wishlist-section').style.display=tab==='wishlist'?'block':'none';
-  document.getElementById('mkt-profiles-section').style.display=tab==='profiles'?'block':'none';
   if(tab==='wishlist')loadPublicWishlists();
   if(tab==='profiles')loadPublicProfilesSection();
 }
@@ -1031,7 +1029,7 @@ function filterMarket(){
   const kind=document.getElementById('mkt-filter-kind')?.value||'';
   const sort=document.getElementById('mkt-sort')?.value||'new';
   let items=[..._mktAllItems];
-  if(q)items=items.filter(i=>(i.club||'').toLowerCase().includes(q)||(i.season||'').toLowerCase().includes(q)||(i.seller_nick||'').toLowerCase().includes(q)||(i.personalization||'').toLowerCase().includes(q));
+  if(q)items=items.filter(i=>(i.club||'').toLowerCase().includes(q)||(i.season||'').toLowerCase().includes(q)||(i.seller_nick||'').toLowerCase().includes(q));
   if(size)items=items.filter(i=>i.size===size);
   if(kind)items=items.filter(i=>i.kind===kind);
   if(sort==='cheap')items.sort((a,b)=>(a.price_pln||0)-(b.price_pln||0));
@@ -1040,49 +1038,48 @@ function filterMarket(){
 }
 
 async function loadPublicWishlists(){
-  const el=document.getElementById('mkt-wishlist-section');if(!el)return;
+  const el=document.getElementById('mkt-section-wishlist');if(!el)return;
   el.innerHTML=`<div class="empty-state"><div class="empty-icon loading-pulse" style="font-size:28px">⏳</div></div>`;
   const{data}=await sb.from('wishlist').select('*,profiles!user_id(nick)').eq('public',true).order('created_at',{ascending:false});
   const items=data||[];
-  if(!items.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">❤️</div><div class="empty-text">NIKT NIE SZUKA — BĄDŹ PIERWSZY!</div></div>`;return;}
-  // Filtry dla wishlisty
+  if(!items.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">❤️</div><div class="empty-text">${db.lang==='pl'?'NIKT NIE SZUKA — BĄDŹ PIERWSZY!':'NOBODY IS LOOKING YET!'}</div></div>`;return;}
+  window._wlMktItems=items;
   const clubs=[...new Set(items.map(w=>w.club).filter(Boolean))];
   el.innerHTML=`
   <div class="card mb12" style="padding:10px 14px">
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <div class="field" style="flex:1;min-width:140px;padding:5px 10px"><input type="text" id="wl-search" placeholder="🔍 Szukaj..." oninput="filterWishlistMkt()" style="font-size:11px"></div>
-      <select class="form-select" id="wl-filter-club" style="width:auto;padding:5px 10px;font-size:11px" onchange="filterWishlistMkt()">
-        <option value="">Wszystkie kluby</option>${clubs.map(c=>`<option>${c}</option>`).join('')}
+      <div class="field" style="flex:1;min-width:140px;padding:5px 10px"><input type="text" id="wl-mkt-search" placeholder="🔍 ${db.lang==='pl'?'Szukaj...':'Search...'}" oninput="filterPublicWishlist()" style="font-size:11px"></div>
+      <select class="form-select" id="wl-mkt-club" style="width:auto;padding:5px 10px;font-size:11px" onchange="filterPublicWishlist()">
+        <option value="">${db.lang==='pl'?'Wszystkie kluby':'All clubs'}</option>${clubs.map(c=>`<option>${c}</option>`).join('')}
       </select>
-      <select class="form-select" id="wl-filter-size" style="width:auto;padding:5px 10px;font-size:11px" onchange="filterWishlistMkt()">
-        <option value="">Rozmiar</option>${SIZES.map(s=>`<option>${s}</option>`).join('')}
+      <select class="form-select" id="wl-mkt-size" style="width:auto;padding:5px 10px;font-size:11px" onchange="filterPublicWishlist()">
+        <option value="">${db.lang==='pl'?'Rozmiar':'Size'}</option>${SIZES.map(s=>`<option>${s}</option>`).join('')}
       </select>
     </div>
   </div>
-  <div id="wl-mkt-grid" class="g3">${renderWishlistItems(items)}</div>`;
-  window._wlMktItems=items;
+  <div id="wl-mkt-grid" class="g3">${renderPublicWishlistCards(items)}</div>`;
 }
 
-function filterWishlistMkt(){
-  const q=(document.getElementById('wl-search')?.value||'').toLowerCase();
-  const club=document.getElementById('wl-filter-club')?.value||'';
-  const size=document.getElementById('wl-filter-size')?.value||'';
+function filterPublicWishlist(){
+  const q=(document.getElementById('wl-mkt-search')?.value||'').toLowerCase();
+  const club=document.getElementById('wl-mkt-club')?.value||'';
+  const size=document.getElementById('wl-mkt-size')?.value||'';
   let items=[...(window._wlMktItems||[])];
   if(q)items=items.filter(w=>(w.club||'').toLowerCase().includes(q)||(w.profiles?.nick||'').toLowerCase().includes(q));
   if(club)items=items.filter(w=>w.club===club);
   if(size)items=items.filter(w=>w.size===size);
   const grid=document.getElementById('wl-mkt-grid');
-  if(grid)grid.innerHTML=renderWishlistItems(items);
+  if(grid)grid.innerHTML=renderPublicWishlistCards(items);
 }
 
-function renderWishlistItems(items){
+function renderPublicWishlistCards(items){
   if(!items.length)return`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">BRAK WYNIKÓW</div></div></div>`;
   return items.map(w=>{
     const nick=w.profiles?.nick||'?';
     const isOwn=w.user_id===currentUser?.id;
     return `<div class="card" style="border-color:rgba(236,72,153,.15)">
       <div class="fx-b mb8">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--t1)">${w.club||'Dowolny klub'}</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--t1)">${w.club||db.lang==='pl'?'Dowolny klub':'Any club'}</div>
         <span style="font-size:18px">❤️</span>
       </div>
       <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px">
@@ -1095,31 +1092,31 @@ function renderWishlistItems(items){
       <div class="div" style="margin:8px 0"></div>
       <div class="fx-b">
         <div class="fx-c gap6" style="cursor:pointer" onclick="viewProfile('${nick}')">
-          <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--a),#065f46);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--on-a)">${nick[0].toUpperCase()}</div>
+          <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--a),#065f46);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--on-a,#fff)">${nick[0].toUpperCase()}</div>
           <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#f472b6">${nick}</span>
         </div>
-        ${!isOwn?`<button class="btn" style="padding:4px 10px;font-size:10px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#60a5fa" onclick="contactSeller('${w.user_id}','${nick}')">💬 Napisz</button>`:'<span style="font-size:9px;font-family:\'JetBrains Mono\',monospace;color:var(--t3)">TWOJA</span>'}
+        ${!isOwn?`<button class="btn btn-g" style="padding:4px 10px;font-size:10px" onclick="contactSeller('${w.user_id}','${nick}')">💬 Napisz</button>`:`<span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t3)">TWOJA</span>`}
       </div>
     </div>`;
   }).join('');
 }
 
 async function loadPublicProfilesSection(){
-  const el=document.getElementById('mkt-profiles-section');if(!el)return;
+  const el=document.getElementById('mkt-section-profiles');if(!el)return;
   el.innerHTML=`<div class="empty-state"><div class="empty-icon loading-pulse" style="font-size:28px">⏳</div></div>`;
-  const profiles=await sbLoadProfiles();
-  if(!profiles.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">BRAK PUBLICZNYCH PROFILI</div></div>`;return;}
+  const{data}=await sb.from('profiles').select('*').eq('visible',true);
+  const profiles=data||[];
+  if(!profiles.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">${db.lang==='pl'?'BRAK PUBLICZNYCH PROFILI':'NO PUBLIC PROFILES'}</div></div>`;return;}
   el.innerHTML=`<div class="g3">${profiles.map(p=>`
-    <div class="card fx-c gap12" style="cursor:pointer" onclick="viewProfile('${p.nick}')">
+    <div class="card fx-c gap12" style="cursor:pointer" onclick="viewProfile('${p.nick||''}')">
       <div class="profile-avatar" style="width:44px;height:44px;font-size:18px">${(p.nick||'?')[0].toUpperCase()}</div>
       <div style="flex:1;min-width:0">
         <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.04em">${p.nick||'—'}</div>
         ${p.bio?`<div style="font-size:10px;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.bio}</div>`:''}
-        <div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:#a78bfa;margin-top:3px">${(p.shirt_count||0)} koszulek</div>
+        <div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:#a78bfa;margin-top:3px">${p.shirt_count||0} ${db.lang==='pl'?'koszulek':'jerseys'}</div>
       </div>
-      <button class="btn btn-g" style="padding:4px 10px;font-size:10px;flex-shrink:0" onclick="event.stopPropagation();contactSeller('${p.user_id}','${p.nick}')">💬</button>
+      <button class="btn btn-g" style="padding:4px 10px;font-size:10px;flex-shrink:0" onclick="event.stopPropagation();contactSeller('${p.user_id}','${p.nick||''}')">💬</button>
     </div>`).join('')}</div>`;
-}
 }
 
 async function loadMarketplace(){
@@ -1130,7 +1127,7 @@ async function loadMarketplace(){
     _mktAllItems=items;
     renderMarketItems(items);
   }catch(e){
-    grid.innerHTML=`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">BŁĄD ŁADOWANIA</div></div></div>`;
+    grid.innerHTML=`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">${db.lang==='pl'?'BŁĄD ŁADOWANIA':'LOAD ERROR'}</div></div></div>`;
   }
 }
 
@@ -1158,7 +1155,7 @@ function renderMarketItems(items){
         <div class="div" style="margin:8px 0"></div>
         <div class="fx-b">
           <div class="mkt-seller fx-c gap6" style="cursor:pointer" onclick="viewProfile('${i.seller_nick||''}')">
-            <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--a),#065f46);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--on-a)">${(i.seller_nick||'?')[0].toUpperCase()}</div>
+            <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--a),#065f46);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--on-a,#fff);font-family:'Bebas Neue',sans-serif">${(i.seller_nick||'?')[0].toUpperCase()}</div>
             ${i.seller_nick||'—'}
           </div>
           ${isOwn?`<button class="btn btn-d" style="padding:4px 10px;font-size:10px" onclick="removeListing('${i.id}')">✕ ${T('mkt_remove')}</button>`:`<button class="btn btn-mkt" style="padding:4px 10px;font-size:10px" onclick="contactSeller('${i.user_id||''}','${i.seller_nick||''}')">💬 ${T('mkt_contact')}</button>`}
@@ -1168,7 +1165,6 @@ function renderMarketItems(items){
     </div>`;
   }).join('');
 }
-
 
 async function contactSeller(userId,nick){
   if(!userId){toast('Nie można otworzyć czatu — brak ID sprzedającego');return;}
