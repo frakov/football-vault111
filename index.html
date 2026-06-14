@@ -10,7 +10,7 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --a:#10b981;--a-rgb:16,185,129;
+  --a:#10b981;--a-rgb:16,185,129;--on-a:#fff;
   --bg:#0a0f0b;--bg2:#0d1610;--bg3:#111a13;
   --t1:#e7ede9;--t2:#6b8070;--t3:#1e2b22;
   --red:#f4212e;--gold:#f59e0b;--blue:#3b82f6;
@@ -79,8 +79,8 @@ textarea{resize:none}
 .win-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 22px;scrollbar-gutter:stable}
 /* TASKBAR */
 #taskbar{position:fixed;bottom:0;left:0;right:0;height:50px;background:rgba(10,15,11,.92);border-top:1px solid rgba(16,185,129,.1);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);display:flex;align-items:center;z-index:5000;padding:0 14px}
-#taskbar::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(16,185,129,.3),transparent)}
-.tb-logo{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.14em;color:var(--t1);padding:0 16px 0 4px;margin-right:10px;border-right:1px solid rgba(16,185,129,.12);flex-shrink:0}
+#taskbar::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--a-rgb),.4),transparent)}
+.tb-logo{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.14em;color:var(--t1);padding:0 16px 0 4px;margin-right:10px;border-right:1px solid rgba(var(--a-rgb),.2);flex-shrink:0}
 .tb-logo span{color:var(--a)}
 #tb-apps{display:flex;align-items:center;gap:2px;flex:1;overflow:hidden}
 .tb-app{display:flex;align-items:center;gap:7px;padding:5px 11px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);white-space:nowrap;transition:all .14s;cursor:inherit;border:1px solid transparent;max-width:150px}
@@ -94,7 +94,7 @@ textarea{resize:none}
 .tb-net-val{font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--a);letter-spacing:.05em;line-height:1.2}
 .tb-net-sub{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--t2);margin-top:1px}
 #tb-user{display:flex;align-items:center;gap:8px;padding:0 14px;border-right:1px solid rgba(16,185,129,.1)}
-.tb-user-dot{width:7px;height:7px;border-radius:50%;background:var(--a);box-shadow:0 0 6px rgba(16,185,129,.8);flex-shrink:0}
+.tb-user-dot{width:7px;height:7px;border-radius:50%;background:var(--a);box-shadow:0 0 6px rgba(var(--a-rgb),.8);flex-shrink:0}
 .tb-user-email{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.06em;color:var(--t2);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #tb-clock-wrap{padding:0 14px;display:flex;flex-direction:column;align-items:flex-end}
 #tb-clock-time{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--t1);line-height:1.2}
@@ -107,7 +107,7 @@ textarea{resize:none}
 .card{background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.09);border-radius:14px;padding:18px 20px;transition:border-color .2s,background .2s;position:relative;overflow:hidden}
 .card:hover{border-color:rgba(16,185,129,.16);background:rgba(16,185,129,.06)}
 .card.hl{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.08)}
-.card.hl::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,var(--a) 30%,var(--a) 70%,transparent);box-shadow:0 0 10px rgba(16,185,129,.5)}
+.card.hl::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent,var(--a) 30%,var(--a) 70%,transparent);box-shadow:0 0 10px rgba(var(--a-rgb),.5)}
 .clabel{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);margin-bottom:8px;display:block}
 .cval{font-family:'Bebas Neue',sans-serif;font-size:clamp(22px,2.5vw,34px);letter-spacing:.02em;color:var(--t1);line-height:1}
 .cval.a{color:var(--a)}
@@ -121,8 +121,8 @@ textarea{resize:none}
 .field{background:rgba(0,0,0,.35);border:1px solid rgba(16,185,129,.1)!important;border-radius:10px;padding:9px 12px;transition:border-color .15s,box-shadow .15s}
 .field:focus-within{border-color:rgba(16,185,129,.45)!important;box-shadow:0 0 0 3px rgba(16,185,129,.08)}
 .btn{font-family:'Barlow',sans-serif;font-size:12px;font-weight:700;padding:8px 18px;border-radius:999px;transition:all .15s var(--e2);white-space:nowrap;border:none;cursor:inherit;letter-spacing:.02em}
-.btn-p{background:var(--a);color:#fff;box-shadow:0 2px 12px rgba(16,185,129,.35)}
-.btn-p:hover{filter:brightness(1.12);box-shadow:0 4px 20px rgba(16,185,129,.5)}
+.btn-p{background:var(--a);color:var(--on-a);box-shadow:0 2px 12px rgba(var(--a-rgb),.35)}
+.btn-p:hover{filter:brightness(1.12);box-shadow:0 4px 20px rgba(var(--a-rgb),.5)}
 .btn-g{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12)!important;color:var(--t1)}
 .btn-g:hover{background:rgba(255,255,255,.1)}
 .btn-d{background:rgba(244,33,46,.1);border:1px solid rgba(244,33,46,.25)!important;color:var(--red)}
@@ -141,7 +141,7 @@ textarea{resize:none}
 .pnl.pos{color:#34d399;background:rgba(52,211,153,.1)}
 .pnl.neg{color:var(--red);background:rgba(244,33,46,.08)}
 .pbar-track{height:2px;background:rgba(255,255,255,.06);border-radius:1px;margin-top:8px}
-.pbar-fill{height:100%;background:var(--a);border-radius:2px;transition:width .4s var(--e2);box-shadow:0 0 6px rgba(16,185,129,.5)}
+.pbar-fill{height:100%;background:var(--a);border-radius:2px;transition:width .4s var(--e2);box-shadow:0 0 6px rgba(var(--a-rgb),.5)}
 /* STATUS */
 .sh-status{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:999px;font-weight:600}
 .sh-status.collection{color:rgba(255,255,255,.6);background:rgba(255,255,255,.06)}
@@ -711,7 +711,24 @@ const BGPS=[
   {id:'stadium',l:'Stadium',bg:`radial-gradient(ellipse 80% 60% at 50% 0%,rgba(239,68,68,.14) 0%,transparent 55%),radial-gradient(ellipse 60% 60% at 20% 80%,rgba(245,158,11,.1) 0%,transparent 55%),#120a0a`,pv:`linear-gradient(135deg,#281010,#120a0a)`},
   {id:'dark',l:'Obsidian',bg:`#08090c`,pv:`linear-gradient(135deg,#131313,#09090c)`},
 ];
-function applyTheme(){const r=document.documentElement.style;const acc=db.theme||'#10b981';const rgb=db.themeRgb||'16,185,129';r.setProperty('--a',acc);r.setProperty('--a-rgb',rgb);const p=BGPS.find(x=>x.id===(db.bgPreset||'pitch'))||BGPS[0];const w=document.getElementById('wallpaper-el');if(w)w.style.background=db.bgCustom||p.bg;}
+function applyTheme(){
+  const r=document.documentElement.style;
+  const acc=db.theme||'#10b981';
+  const rgb=db.themeRgb||'16,185,129';
+  r.setProperty('--a',acc);
+  r.setProperty('--a-rgb',rgb);
+  // Auto kontrast — jeśli kolor jasny (np. biały) tekst na nim musi być ciemny
+  const [rv,gv,bv]=rgb.split(',').map(Number);
+  const lum=(rv*299+gv*587+bv*114)/1000;
+  const onAccent=lum>160?'#111':'#fff';
+  r.setProperty('--on-a',onAccent);
+  // Taskbar gradient
+  const tbEl=document.getElementById('taskbar');
+  if(tbEl)tbEl.style.setProperty('--tb-glow',`rgba(${rgb},.15)`);
+  const p=BGPS.find(x=>x.id===(db.bgPreset||'pitch'))||BGPS[0];
+  const w=document.getElementById('wallpaper-el');
+  if(w)w.style.background=db.bgCustom||p.bg;
+}
 function setTheme(c,rgb){db.theme=c;db.themeRgb=rgb;applyTheme();qsave();if(settingsOpen)renderSP();}
 function setBGP(id){db.bgPreset=id;db.bgCustom=null;applyTheme();qsave();if(settingsOpen)renderSP();}
 function setBGC(hex){db.bgCustom=hex;db.bgPreset=null;document.getElementById('wallpaper-el').style.background=hex;qsave();}
@@ -964,24 +981,156 @@ function bMarket(){
       <button class="btn btn-mkt" onclick="openApp('profile')">${db.lang==='pl'?'Mój Profil':'My Profile'}</button>
     </div>
   </div>
-  <div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t2);letter-spacing:.08em;margin-bottom:18px;display:flex;align-items:center;gap:8px">
-    <div style="width:8px;height:8px;border-radius:50%;background:#a78bfa;box-shadow:0 0 8px rgba(139,92,246,.6)"></div>
-    ${T('mkt_sub')}
+  <div class="tabs mb12">
+    <div class="tab active" id="mkt-tab-listings" onclick="switchMktTab('listings')">🏷️ Ogłoszenia</div>
+    <div class="tab" id="mkt-tab-wishlist" onclick="switchMktTab('wishlist')">❤️ Szukane</div>
+    <div class="tab" id="mkt-tab-profiles" onclick="switchMktTab('profiles')">👥 Profile</div>
   </div>
-  <div id="mkt-grid" class="g3 s2"><div class="empty-state"><div class="empty-icon loading-pulse" style="font-size:32px">⏳</div><div class="empty-text">${db.lang==='pl'?'ŁADOWANIE...':'LOADING...'}</div></div></div>
-  <div class="s3" id="mkt-profiles-section" style="margin-top:24px"></div>`;
+  <!-- FILTRY -->
+  <div class="card mb12 s2" style="padding:10px 14px" id="mkt-filters">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div class="field" style="flex:1;min-width:140px;padding:5px 10px"><input type="text" id="mkt-search" placeholder="🔍 Klub, sezon..." oninput="filterMarket()" style="font-size:11px"></div>
+      <select class="form-select" id="mkt-filter-size" style="width:auto;padding:5px 10px;font-size:11px" onchange="filterMarket()">
+        <option value="">Rozmiar</option>${SIZES.map(s=>`<option>${s}</option>`).join('')}
+      </select>
+      <select class="form-select" id="mkt-filter-kind" style="width:auto;padding:5px 10px;font-size:11px" onchange="filterMarket()">
+        <option value="">Rodzaj</option>
+        <option value="Domowa">Domowa</option><option value="Wyjazdowa">Wyjazdowa</option>
+        <option value="Trzecia">Trzecia</option><option value="Specjalna">Specjalna</option>
+      </select>
+      <select class="form-select" id="mkt-sort" style="width:auto;padding:5px 10px;font-size:11px" onchange="filterMarket()">
+        <option value="new">Najnowsze</option>
+        <option value="cheap">Najtańsze</option>
+        <option value="expensive">Najdroższe</option>
+      </select>
+    </div>
+  </div>
+  <div id="mkt-grid" class="g3 s2"><div class="empty-state"><div class="empty-icon loading-pulse" style="font-size:32px">⏳</div></div></div>
+  <div id="mkt-wishlist-section" style="display:none"></div>
+  <div id="mkt-profiles-section" style="display:none"></div>`;
+}
+
+let _mktAllItems=[];
+let _mktTab='listings';
+function switchMktTab(tab){
+  _mktTab=tab;
+  ['listings','wishlist','profiles'].forEach(t=>{
+    document.getElementById('mkt-tab-'+t)?.classList.toggle('active',t===tab);
+  });
+  document.getElementById('mkt-grid').style.display=tab==='listings'?'':'none';
+  document.getElementById('mkt-filters').style.display=tab==='listings'?'':'none';
+  document.getElementById('mkt-wishlist-section').style.display=tab==='wishlist'?'block':'none';
+  document.getElementById('mkt-profiles-section').style.display=tab==='profiles'?'block':'none';
+  if(tab==='wishlist')loadPublicWishlists();
+  if(tab==='profiles')loadPublicProfilesSection();
+}
+
+function filterMarket(){
+  const q=(document.getElementById('mkt-search')?.value||'').toLowerCase();
+  const size=document.getElementById('mkt-filter-size')?.value||'';
+  const kind=document.getElementById('mkt-filter-kind')?.value||'';
+  const sort=document.getElementById('mkt-sort')?.value||'new';
+  let items=[..._mktAllItems];
+  if(q)items=items.filter(i=>(i.club||'').toLowerCase().includes(q)||(i.season||'').toLowerCase().includes(q)||(i.seller_nick||'').toLowerCase().includes(q)||(i.personalization||'').toLowerCase().includes(q));
+  if(size)items=items.filter(i=>i.size===size);
+  if(kind)items=items.filter(i=>i.kind===kind);
+  if(sort==='cheap')items.sort((a,b)=>(a.price_pln||0)-(b.price_pln||0));
+  else if(sort==='expensive')items.sort((a,b)=>(b.price_pln||0)-(a.price_pln||0));
+  renderMarketItems(items);
+}
+
+async function loadPublicWishlists(){
+  const el=document.getElementById('mkt-wishlist-section');if(!el)return;
+  el.innerHTML=`<div class="empty-state"><div class="empty-icon loading-pulse" style="font-size:28px">⏳</div></div>`;
+  const{data}=await sb.from('wishlist').select('*,profiles!user_id(nick)').eq('public',true).order('created_at',{ascending:false});
+  const items=data||[];
+  if(!items.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">❤️</div><div class="empty-text">NIKT NIE SZUKA — BĄDŹ PIERWSZY!</div></div>`;return;}
+  // Filtry dla wishlisty
+  const clubs=[...new Set(items.map(w=>w.club).filter(Boolean))];
+  el.innerHTML=`
+  <div class="card mb12" style="padding:10px 14px">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <div class="field" style="flex:1;min-width:140px;padding:5px 10px"><input type="text" id="wl-search" placeholder="🔍 Szukaj..." oninput="filterWishlistMkt()" style="font-size:11px"></div>
+      <select class="form-select" id="wl-filter-club" style="width:auto;padding:5px 10px;font-size:11px" onchange="filterWishlistMkt()">
+        <option value="">Wszystkie kluby</option>${clubs.map(c=>`<option>${c}</option>`).join('')}
+      </select>
+      <select class="form-select" id="wl-filter-size" style="width:auto;padding:5px 10px;font-size:11px" onchange="filterWishlistMkt()">
+        <option value="">Rozmiar</option>${SIZES.map(s=>`<option>${s}</option>`).join('')}
+      </select>
+    </div>
+  </div>
+  <div id="wl-mkt-grid" class="g3">${renderWishlistItems(items)}</div>`;
+  window._wlMktItems=items;
+}
+
+function filterWishlistMkt(){
+  const q=(document.getElementById('wl-search')?.value||'').toLowerCase();
+  const club=document.getElementById('wl-filter-club')?.value||'';
+  const size=document.getElementById('wl-filter-size')?.value||'';
+  let items=[...(window._wlMktItems||[])];
+  if(q)items=items.filter(w=>(w.club||'').toLowerCase().includes(q)||(w.profiles?.nick||'').toLowerCase().includes(q));
+  if(club)items=items.filter(w=>w.club===club);
+  if(size)items=items.filter(w=>w.size===size);
+  const grid=document.getElementById('wl-mkt-grid');
+  if(grid)grid.innerHTML=renderWishlistItems(items);
+}
+
+function renderWishlistItems(items){
+  if(!items.length)return`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">BRAK WYNIKÓW</div></div></div>`;
+  return items.map(w=>{
+    const nick=w.profiles?.nick||'?';
+    const isOwn=w.user_id===currentUser?.id;
+    return `<div class="card" style="border-color:rgba(236,72,153,.15)">
+      <div class="fx-b mb8">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--t1)">${w.club||'Dowolny klub'}</div>
+        <span style="font-size:18px">❤️</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px">
+        ${w.season?`<div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--t2)">📅 ${w.season}</div>`:''}
+        ${w.size?`<div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--t2)">📏 ${w.size}</div>`:''}
+        ${w.max_price?`<div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--a)">💰 Max: ${w.max_price} PLN</div>`:''}
+        ${w.kind?`<div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--t2)">👕 ${kindLabel(w.kind)}</div>`:''}
+        ${w.notes?`<div style="font-size:10px;color:var(--t2);margin-top:4px">${w.notes}</div>`:''}
+      </div>
+      <div class="div" style="margin:8px 0"></div>
+      <div class="fx-b">
+        <div class="fx-c gap6" style="cursor:pointer" onclick="viewProfile('${nick}')">
+          <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--a),#065f46);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--on-a)">${nick[0].toUpperCase()}</div>
+          <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#f472b6">${nick}</span>
+        </div>
+        ${!isOwn?`<button class="btn" style="padding:4px 10px;font-size:10px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3);color:#60a5fa" onclick="contactSeller('${w.user_id}','${nick}')">💬 Napisz</button>`:'<span style="font-size:9px;font-family:\'JetBrains Mono\',monospace;color:var(--t3)">TWOJA</span>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function loadPublicProfilesSection(){
+  const el=document.getElementById('mkt-profiles-section');if(!el)return;
+  el.innerHTML=`<div class="empty-state"><div class="empty-icon loading-pulse" style="font-size:28px">⏳</div></div>`;
+  const profiles=await sbLoadProfiles();
+  if(!profiles.length){el.innerHTML=`<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">BRAK PUBLICZNYCH PROFILI</div></div>`;return;}
+  el.innerHTML=`<div class="g3">${profiles.map(p=>`
+    <div class="card fx-c gap12" style="cursor:pointer" onclick="viewProfile('${p.nick}')">
+      <div class="profile-avatar" style="width:44px;height:44px;font-size:18px">${(p.nick||'?')[0].toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.04em">${p.nick||'—'}</div>
+        ${p.bio?`<div style="font-size:10px;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.bio}</div>`:''}
+        <div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:#a78bfa;margin-top:3px">${(p.shirt_count||0)} koszulek</div>
+      </div>
+      <button class="btn btn-g" style="padding:4px 10px;font-size:10px;flex-shrink:0" onclick="event.stopPropagation();contactSeller('${p.user_id}','${p.nick}')">💬</button>
+    </div>`).join('')}</div>`;
+}
 }
 
 async function loadMarketplace(){
   const grid=document.getElementById('mkt-grid');if(!grid)return;
-  grid.innerHTML=`<div class="empty-state"><div class="empty-icon loading-pulse" style="font-size:32px">⏳</div><div class="empty-text">${db.lang==='pl'?'ŁADOWANIE...':'LOADING...'}</div></div>`;
+  grid.innerHTML=`<div class="empty-state"><div class="empty-icon loading-pulse" style="font-size:32px">⏳</div></div>`;
   try{
     const items=await sbLoadMarket();
+    _mktAllItems=items;
     renderMarketItems(items);
-    const profiles=await sbLoadProfiles();
-    renderMarketProfiles(profiles);
   }catch(e){
-    grid.innerHTML=`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">${db.lang==='pl'?'BŁĄD ŁADOWANIA':'LOAD ERROR'}</div></div></div>`;
+    grid.innerHTML=`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-text">BŁĄD ŁADOWANIA</div></div></div>`;
   }
 }
 
@@ -1008,8 +1157,8 @@ function renderMarketItems(items){
         </div>
         <div class="div" style="margin:8px 0"></div>
         <div class="fx-b">
-          <div class="mkt-seller fx-c gap6">
-            <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--a),#065f46);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;font-family:'Bebas Neue',sans-serif">${(i.seller_nick||'?')[0].toUpperCase()}</div>
+          <div class="mkt-seller fx-c gap6" style="cursor:pointer" onclick="viewProfile('${i.seller_nick||''}')">
+            <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--a),#065f46);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--on-a)">${(i.seller_nick||'?')[0].toUpperCase()}</div>
             ${i.seller_nick||'—'}
           </div>
           ${isOwn?`<button class="btn btn-d" style="padding:4px 10px;font-size:10px" onclick="removeListing('${i.id}')">✕ ${T('mkt_remove')}</button>`:`<button class="btn btn-mkt" style="padding:4px 10px;font-size:10px" onclick="contactSeller('${i.user_id||''}','${i.seller_nick||''}')">💬 ${T('mkt_contact')}</button>`}
@@ -1020,23 +1169,6 @@ function renderMarketItems(items){
   }).join('');
 }
 
-function renderMarketProfiles(profiles){
-  const el=document.getElementById('mkt-profiles-section');if(!el)return;
-  const valid=profiles.filter(p=>p&&p.nick&&p.public);
-  if(!valid.length){el.innerHTML='';return;}
-  el.innerHTML=`
-  <div class="fx-b mb12"><div class="clabel">${T('browse_profiles')}</div></div>
-  <div class="g3">${valid.map(p=>`
-    <div class="card fx-c gap12" style="cursor:inherit" onclick="viewProfile('${p.nick}')">
-      <div class="profile-avatar" style="width:44px;height:44px;font-size:18px">${(p.nick||'?')[0].toUpperCase()}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.04em">${p.nick||'—'}</div>
-        ${p.bio?`<div style="font-size:10px;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.bio}</div>`:''}
-        <div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:#a78bfa;margin-top:3px">${(p.shirt_count||0)} ${db.lang==='pl'?'koszulek':'jerseys'}</div>
-      </div>
-    </div>`).join('')}
-  </div>`;
-}
 
 async function contactSeller(userId,nick){
   if(!userId){toast('Nie można otworzyć czatu — brak ID sprzedającego');return;}
