@@ -1210,8 +1210,13 @@ async function removeListing(listingId){
 }
 
 async function viewProfile(nick){
-  const {data}=await sb.from('profiles').select('*').eq('nick',nick).maybeSingle();
-  if(!data)return toast(db.lang==='pl'?'Profil nie istnieje':'Profile not found');
+  if(!nick||nick==='?'||nick==='—'){toast(db.lang==='pl'?'Brak nicku sprzedającego':'No seller nick');return;}
+  const{data}=await sb.from('profiles').select('*').ilike('nick',nick).maybeSingle();
+  if(!data){
+    // Spróbuj po user_id jeśli nick to user_id
+    toast(db.lang==='pl'?'Profil nie znaleziony':'Profile not found');
+    return;
+  }
   openProfileView(data);
 }
 
@@ -2410,67 +2415,112 @@ function bAuctions(){
       <button class="btn" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171" onclick="openCreateAuction()">+ Nowa Licytacja</button>
     </div>
   </div>
+  <div class="tabs mb12">
+    <div class="tab active" id="auc-tab-live" onclick="switchAucTab('live')">🔴 Live</div>
+    <div class="tab" id="auc-tab-mine" onclick="switchAucTab('mine')">👤 Moje</div>
+    <div class="tab" id="auc-tab-bidding" onclick="switchAucTab('bidding')">⚡ Licytuję</div>
+    <div class="tab" id="auc-tab-ended" onclick="switchAucTab('ended')">✅ Zakończone</div>
+  </div>
   <div id="auctions-grid" class="g3 s2"><div class="empty-state"><div class="empty-icon loading-pulse" style="font-size:28px">⏳</div></div></div>`;
+}
+
+let _aucTab='live';
+function switchAucTab(tab){
+  _aucTab=tab;
+  ['live','mine','bidding','ended'].forEach(t=>{
+    document.getElementById('auc-tab-'+t)?.classList.toggle('active',t===tab);
+  });
+  initAuctionsView();
 }
 
 async function initAuctionsView(){
   const grid=document.getElementById('auctions-grid');if(!grid)return;
-  const auctions=await loadAuctions();
+  grid.innerHTML=`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon loading-pulse" style="font-size:28px">⏳</div></div></div>`;
+  let auctions=[];
+  const tab=_aucTab||'live';
+  if(tab==='live'){
+    const{data}=await sb.from('auctions').select('*').eq('status','active').order('ends_at',{ascending:true});
+    auctions=data||[];
+  } else if(tab==='mine'){
+    const{data}=await sb.from('auctions').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false});
+    auctions=data||[];
+  } else if(tab==='bidding'){
+    // Aukcje w których złożyłem ofertę
+    const{data:myBids}=await sb.from('bids').select('auction_id').eq('user_id',currentUser.id);
+    const aucIds=[...new Set((myBids||[]).map(b=>b.auction_id))];
+    if(aucIds.length){
+      const{data}=await sb.from('auctions').select('*').in('id',aucIds).order('ends_at',{ascending:true});
+      auctions=data||[];
+    }
+  } else if(tab==='ended'){
+    const{data}=await sb.from('auctions').select('*').in('status',['ended','sold','cancelled']).or(`user_id.eq.${currentUser.id},winner_id.eq.${currentUser.id}`).order('created_at',{ascending:false}).limit(20);
+    auctions=data||[];
+  }
   if(!auctions.length){
-    grid.innerHTML=`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">🏷️</div><div class="empty-text">BRAK AKTYWNYCH LICYTACJI — BĄDŹ PIERWSZY!</div></div></div>`;
+    const msgs={live:'BRAK AKTYWNYCH LICYTACJI — BĄDŹ PIERWSZY!',mine:'NIE MASZ ŻADNYCH LICYTACJI',bidding:'NIE LICYTUJESZ W ŻADNEJ AUKCJI',ended:'BRAK ZAKOŃCZONYCH LICYTACJI'};
+    grid.innerHTML=`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">🏷️</div><div class="empty-text">${msgs[tab]||'BRAK'}</div></div></div>`;
     return;
   }
-  grid.innerHTML=auctions.map(a=>{
-    const isOwn=a.user_id===currentUser?.id;
-    const hasKN=a.buy_now_price&&!a.highest_bidder_id;
-    const timerId=`timer-${a.id}`;
-    setTimeout(()=>startAuctionTimer(a.id,a.ends_at,timerId),50);
-    return `<div class="mkt-card" style="border-color:rgba(239,68,68,.2);background:rgba(239,68,68,.03)">
-      <div class="shirt-photo" style="background:rgba(0,0,0,.5)">
-        ${a.photo?`<img src="${a.photo}" style="width:100%;height:100%;object-fit:cover">`:`<div class="shirt-photo-placeholder">👕</div>`}
-        <div style="position:absolute;top:8px;left:8px;background:rgba(239,68,68,.9);border-radius:6px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:8px;color:#fff;display:flex;align-items:center;gap:4px"><span style="width:5px;height:5px;border-radius:50%;background:#fff;animation:pulse 1s ease-in-out infinite"></span>LIVE</div>
-        ${hasKN?`<div style="position:absolute;top:8px;right:8px;background:rgba(16,185,129,.9);border-radius:6px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:8px;color:#fff">KUP TERAZ</div>`:''}
-        <div style="position:absolute;bottom:8px;left:8px;right:8px;background:rgba(0,0,0,.75);border-radius:8px;padding:5px 10px;display:flex;justify-content:space-between;align-items:center">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.6);letter-spacing:.06em">KOŃCZY SIĘ</div>
-          <div id="${timerId}" style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--a);letter-spacing:.05em">${formatCountdown(a.ends_at)}</div>
+  grid.innerHTML=auctions.map(a=>buildAuctionCard(a)).join('');
+  // Realtime tylko dla live
+  if(tab==='live'){
+    const auctionCh=sb.channel('auctions-live-'+Date.now())
+      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'auctions'},()=>{
+        if(windows['auctions']&&_aucTab==='live')initAuctionsView();
+      }).subscribe();
+    _rtSubs.push(auctionCh);
+  }
+}
+
+function buildAuctionCard(a){
+  const isOwn=a.user_id===currentUser?.id;
+  const isWinner=a.winner_id===currentUser?.id;
+  const hasKN=a.buy_now_price&&!a.highest_bidder_id;
+  const isEnded=a.status!=='active';
+  const timerId=`timer-${a.id}`;
+  if(!isEnded)setTimeout(()=>startAuctionTimer(a.id,a.ends_at,timerId),50);
+  return `<div class="mkt-card" style="border-color:${isEnded?'rgba(255,255,255,.08)':'rgba(239,68,68,.2)'};background:${isEnded?'rgba(255,255,255,.02)':'rgba(239,68,68,.03)'}">
+    <div class="shirt-photo" style="background:rgba(0,0,0,.5)">
+      ${a.photo?`<img src="${a.photo}" style="width:100%;height:100%;object-fit:cover">`:`<div class="shirt-photo-placeholder">👕</div>`}
+      ${!isEnded?`<div style="position:absolute;top:8px;left:8px;background:rgba(239,68,68,.9);border-radius:6px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:8px;color:#fff;display:flex;align-items:center;gap:4px"><span style="width:5px;height:5px;border-radius:50%;background:#fff;animation:pulse 1s ease-in-out infinite"></span>LIVE</div>`:`<div style="position:absolute;top:8px;left:8px;background:rgba(0,0,0,.7);border-radius:6px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.5)">${a.status==='sold'?'SPRZEDANA':a.status==='cancelled'?'ANULOWANA':'ZAKOŃCZONA'}</div>`}
+      ${isWinner?`<div style="position:absolute;top:8px;right:8px;background:rgba(245,158,11,.9);border-radius:6px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:8px;color:#fff">🏆 WYGRAŁEŚ</div>`:''}
+      ${hasKN?`<div style="position:absolute;top:8px;right:8px;background:rgba(16,185,129,.9);border-radius:6px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:8px;color:#fff">KUP TERAZ</div>`:''}
+      ${!isEnded?`<div style="position:absolute;bottom:8px;left:8px;right:8px;background:rgba(0,0,0,.75);border-radius:8px;padding:5px 10px;display:flex;justify-content:space-between;align-items:center">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:8px;color:rgba(255,255,255,.6);letter-spacing:.06em">KOŃCZY SIĘ</div>
+        <div id="${timerId}" style="font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--a);letter-spacing:.05em">${formatCountdown(a.ends_at)}</div>
+      </div>`:''}
+    </div>
+    <div class="shirt-card-body">
+      <div class="shirt-card-club">${a.club||'—'}</div>
+      <div class="shirt-card-season">${[a.season,a.kind,a.size].filter(Boolean).join(' · ')}</div>
+      ${a.personalization?`<div style="font-size:10px;color:var(--t2);margin-bottom:4px;font-family:'JetBrains Mono',monospace">${a.personalization}</div>`:''}
+      <div class="fx-b mb8">
+        <div>
+          <div style="font-size:8px;font-family:'JetBrains Mono',monospace;color:var(--t2);letter-spacing:.1em;margin-bottom:2px">${isEnded?'KOŃCOWA CENA':'AKTUALNA OFERTA'}</div>
+          <div class="shirt-card-price" style="color:${isEnded?'var(--t2)':'#f87171'}">${parseFloat(a.current_price||0).toFixed(2)} PLN</div>
+          ${!isEnded?`<div style="font-size:8px;font-family:'JetBrains Mono',monospace;color:var(--t2);margin-top:2px">min. podbicie: +${a.min_bid_increment||1} PLN</div>`:''}
         </div>
+        ${hasKN?`<div style="text-align:right"><div style="font-size:8px;font-family:'JetBrains Mono',monospace;color:#34d399;letter-spacing:.1em;margin-bottom:2px">KUP TERAZ</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#34d399">${parseFloat(a.buy_now_price).toFixed(2)} PLN</div></div>`:''}
       </div>
-      <div class="shirt-card-body">
-        <div class="shirt-card-club">${a.club||'—'}</div>
-        <div class="shirt-card-season">${[a.season,a.kind,a.size].filter(Boolean).join(' · ')}</div>
-        ${a.personalization?`<div style="font-size:10px;color:var(--t2);margin-bottom:4px;font-family:'JetBrains Mono',monospace">${a.personalization}</div>`:''}
-        <div class="fx-b mb8">
-          <div>
-            <div style="font-size:8px;font-family:'JetBrains Mono',monospace;color:var(--t2);letter-spacing:.1em;margin-bottom:2px">AKTUALNA OFERTA</div>
-            <div class="shirt-card-price" style="color:#f87171">${parseFloat(a.current_price||0).toFixed(2)} PLN</div>
-            <div style="font-size:8px;font-family:'JetBrains Mono',monospace;color:var(--t2);margin-top:2px">min. podbicie: +${a.min_bid_increment||1} PLN</div>
-          </div>
-          ${hasKN?`<div style="text-align:right"><div style="font-size:8px;font-family:'JetBrains Mono',monospace;color:#34d399;letter-spacing:.1em;margin-bottom:2px">KUP TERAZ</div><div style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#34d399">${parseFloat(a.buy_now_price).toFixed(2)} PLN</div></div>`:''}
-        </div>
-        ${a.highest_bidder_nick?`<div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t2);margin-bottom:8px">🏆 ${a.highest_bidder_nick}</div>`:'<div style="font-size:9px;font-family:\'JetBrains Mono\',monospace;color:var(--t2);margin-bottom:8px">Brak ofert — bądź pierwszy!</div>'}
-        <div class="div" style="margin:6px 0"></div>
-        <div class="fx-c gap6">
-          ${isOwn?
-            `<button class="btn btn-d w100" style="font-size:10px;padding:6px" onclick="cancelAuction('${a.id}')">Anuluj licytację</button>`
-            :`<button class="btn w100" style="font-size:10px;padding:6px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171" onclick="openBidModal('${a.id}',${a.current_price},${a.min_bid_increment})">⚡ Złóż ofertę</button>`}
-          ${hasKN&&!isOwn?`<button class="btn btn-p" style="font-size:10px;padding:6px;flex-shrink:0" onclick="buyNow('${a.id}')">Kup Teraz</button>`:''}
-          <button class="btn btn-g" style="font-size:10px;padding:6px;flex-shrink:0" onclick="openBidHistory('${a.id}')">Historia</button>
-        </div>
-        <div class="fx-b" style="margin-top:8px;padding-top:6px;border-top:1px solid rgba(239,68,68,.06)">
-          <div class="mkt-seller fx-c gap6" style="color:rgba(239,68,68,.7)">
-            <div style="width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#ef4444,#7f1d1d);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-family:'Bebas Neue',sans-serif">${(a.seller_nick||'?')[0].toUpperCase()}</div>
-            ${a.seller_nick||'—'}
-          </div>
-        </div>
+      ${a.highest_bidder_nick?`<div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t2);margin-bottom:8px">🏆 ${a.highest_bidder_nick}</div>`:''}
+      ${a.winner_nick&&isEnded?`<div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--gold);margin-bottom:8px">🏆 Wygrał: ${a.winner_nick}</div>`:''}
+      <div class="div" style="margin:6px 0"></div>
+      <div class="fx-c gap6">
+        ${!isEnded&&isOwn?`<button class="btn btn-d w100" style="font-size:10px;padding:6px" onclick="cancelAuction('${a.id}')">Anuluj</button>`:''}
+        ${!isEnded&&!isOwn?`<button class="btn w100" style="font-size:10px;padding:6px;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171" onclick="openBidModal('${a.id}',${a.current_price},${a.min_bid_increment})">⚡ Złóż ofertę</button>`:''}
+        ${hasKN&&!isOwn&&!isEnded?`<button class="btn btn-p" style="font-size:10px;padding:6px;flex-shrink:0" onclick="buyNow('${a.id}')">Kup Teraz</button>`:''}
+        <button class="btn btn-g" style="font-size:10px;padding:6px;flex-shrink:0" onclick="openBidHistory('${a.id}')">Historia</button>
+        ${isWinner?`<button class="btn" style="font-size:10px;padding:6px;flex-shrink:0;background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:var(--gold)" onclick="contactSeller('${a.user_id}','${a.seller_nick||''}')">💬 Kontakt</button>`:''}
       </div>
-    </div>`;
-  }).join('');
-  // Realtime for auctions
-  const auctionCh=sb.channel('auctions-live')
-    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'auctions'},()=>{
-      if(windows['auctions'])initAuctionsView();
-    }).subscribe();
-  _rtSubs.push(auctionCh);
+      <div class="fx-b" style="margin-top:8px;padding-top:6px;border-top:1px solid rgba(239,68,68,.06)">
+        <div class="mkt-seller fx-c gap6" style="color:rgba(239,68,68,.7)">
+          <div style="width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#ef4444,#7f1d1d);display:flex;align-items:center;justify-content:center;font-size:9px;color:#fff;font-family:'Bebas Neue',sans-serif">${(a.seller_nick||'?')[0].toUpperCase()}</div>
+          ${a.seller_nick||'—'}
+        </div>
+        ${isOwn?`<span style="font-size:8px;font-family:'JetBrains Mono',monospace;color:var(--a)">TWOJA</span>`:''}
+      </div>
+    </div>
+  </div>`;
 }
 
 function openBidModal(auctionId,currentPrice,minIncrement){
