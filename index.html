@@ -22,6 +22,11 @@ body{font-family:'Barlow',system-ui,sans-serif;background:var(--bg);color:var(--
 body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 70% 60% at 15% 0%,rgba(16,185,129,.2) 0%,transparent 60%),radial-gradient(ellipse 60% 50% at 85% 10%,rgba(5,150,105,.14) 0%,transparent 55%),radial-gradient(ellipse 55% 55% at 50% 100%,rgba(6,78,59,.18) 0%,transparent 55%),#0a0f0b;pointer-events:none}
 body.use-cursor,body.use-cursor *{cursor:none!important}
 body.use-cursor input[type="color"],body.use-cursor input[type="range"],body.use-cursor input[type="file"],body.use-cursor label{cursor:default!important}
+/* MOBILE: kursor zawsze wyłączony, dotyk nie ma kursora */
+@media (pointer: coarse){
+  body.use-cursor,body.use-cursor *{cursor:auto!important}
+  #cd,#cr{display:none!important}
+}
 body.no-cursor *{cursor:default!important}
 input,textarea,button,select{font-family:'Barlow',sans-serif}
 input,textarea{background:transparent!important;border:none!important;outline:none!important;color:var(--t1)!important;width:100%}
@@ -78,6 +83,59 @@ textarea{resize:none}
 .win-ico-sm{width:14px;height:14px;opacity:.5;flex-shrink:0}
 .win-resize{position:absolute;bottom:0;right:0;width:16px;height:16px;cursor:se-resize;background:linear-gradient(135deg,transparent 50%,rgba(16,185,129,.15) 50%);border-radius:0 0 var(--r) 0}
 .win-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 22px;scrollbar-gutter:stable}
+
+/* ══════════════════════════════════════════════════════
+   MOBILE RESPONSIVE — telefony i wąskie ekrany (≤768px)
+   ══════════════════════════════════════════════════════ */
+@media (max-width: 768px){
+  html,body{overflow:auto}
+  #desktop{inset:0 0 56px 0}
+  .desk-icons{top:16px;left:12px;right:12px;grid-template-columns:repeat(4,1fr);gap:4px;width:auto}
+  .dicon{width:auto;padding:8px 4px}
+  .dicon-ico{width:44px;height:44px}
+  .dicon-ico svg{width:22px;height:22px}
+  .dicon-lbl{font-size:8.5px}
+  /* Okna: pełnoekranowe, bez drag/resize, stack jeden na drugim */
+  .win{position:fixed!important;left:0!important;top:0!important;width:100vw!important;height:calc(100vh - 56px)!important;border-radius:0;min-width:0;min-height:0}
+  .win-bar{cursor:default;padding:14px 14px;flex-wrap:nowrap}
+  .win-bar:active{cursor:default}
+  .win-resize{display:none}
+  .win-body{padding:14px 14px 24px}
+  .win-title{font-size:13px}
+  /* Ukryj trzecią informację (FOOTBALL VAULT label) na mobile dla miejsca */
+  .win-bar>div:last-child{display:none}
+  /* Taskbar: kompaktowy, scrollowalny poziomo dla appek */
+  #taskbar{height:56px;padding:0 8px}
+  .tb-logo{display:none}
+  #tb-apps{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  #tb-apps::-webkit-scrollbar{display:none}
+  .tb-app span{display:none}
+  .tb-app{padding:8px;gap:0}
+  #tb-net{display:none}
+  #tb-user{display:none}
+  #tb-clock-wrap{display:none}
+  #tb-settings-btn,#notif-panel ~ button{width:40px;height:40px}
+  /* Grids: jedna kolumna na mobile */
+  .g4,.g3,.g2{grid-template-columns:1fr}
+  .g12{grid-template-columns:1fr}
+  .c8,.c4{grid-column:span 1}
+  /* Modal pełnoekranowy */
+  #modal-box{width:100vw;max-width:100vw;height:100vh;max-height:100vh;border-radius:0}
+  .modal-body{padding:16px}
+  /* Settings panel pełnoekranowy */
+  #settings-panel{right:0;left:0;bottom:0;width:100vw;max-height:85vh;border-radius:20px 20px 0 0}
+  #notif-panel{right:0;left:0;width:100vw;max-height:75vh;border-radius:20px 20px 0 0}
+  /* Chat: stack sidebar nad oknem zamiast obok */
+  #chat-main,.conv-item{font-size:13px}
+  /* Auth box mniejszy padding */
+  #auth-box{padding:28px 22px}
+  /* Photo grid mniejszy */
+  .photo-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media (max-width: 480px){
+  .ph-title{font-size:28px}
+  .desk-icons{grid-template-columns:repeat(3,1fr)}
+}
 /* TASKBAR */
 #taskbar{position:fixed;bottom:0;left:0;right:0;height:50px;background:rgba(10,15,11,.92);border-top:1px solid rgba(16,185,129,.1);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);display:flex;align-items:center;z-index:5000;padding:0 14px}
 #taskbar::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--a-rgb),.4),transparent)}
@@ -701,7 +759,7 @@ function beep(f=440,v=.06,d=.04){if(!db.fx?.sound)return;try{if(!_ac)_ac=new(win
 function chime(){[440,550,660].forEach((f,i)=>setTimeout(()=>beep(f,.12,.04),i*80));}
 let _toast=null;
 function toast(msg){if(_toast){_toast.remove();_toast=null;}const el=document.createElement('div');el.className='toast';el.textContent=msg;document.body.appendChild(el);_toast=el;setTimeout(()=>{if(_toast){_toast.style.opacity='0';_toast.style.transform='translateY(4px)';setTimeout(()=>{_toast&&_toast.remove();_toast=null;},280);}},2200);}
-function applyFX(){const sl=document.getElementById('sl');if(sl)sl.style.opacity=db.fx.scanlines?'1':'0';$d.style.display=db.fx.cursor?'block':'none';_r2.style.display=db.fx.cursor?'block':'none';document.body.classList.toggle('use-cursor',!!db.fx.cursor);document.body.classList.toggle('no-cursor',!db.fx.cursor);}
+function applyFX(){const mobile=isMobile();const sl=document.getElementById('sl');if(sl)sl.style.opacity=db.fx.scanlines?'1':'0';const cursorOn=db.fx.cursor&&!mobile;$d.style.display=cursorOn?'block':'none';_r2.style.display=cursorOn?'block':'none';document.body.classList.toggle('use-cursor',cursorOn);document.body.classList.toggle('no-cursor',!cursorOn);}
 function applyTaskbar(){
   const tb=document.getElementById('taskbar');if(!tb)return;
   const col=db.tbColor||'';
@@ -783,6 +841,8 @@ let windows={},zC=100,activeWin=null;
 function defSize(id){return {dash:{w:900,h:540},collection:{w:980,h:600},forsale:{w:900,h:560},market:{w:940,h:600},auctions:{w:980,h:640},chat:{w:860,h:580},wishlist:{w:900,h:560},profile:{w:740,h:520}}[id]||{w:820,h:520};}
 function appLabel(app){return db.lang==='en'?app.len:app.lpl;}
 
+function isMobile(){return window.matchMedia('(max-width: 768px)').matches||('ontouchstart' in window&&window.matchMedia('(pointer: coarse)').matches);}
+
 function openApp(id){
   if(windows[id]){if(windows[id].minimized){windows[id].minimized=false;windows[id].el.classList.remove('minimized');}focusWin(id);return;}
   const app=APPS.find(a=>a.id===id);if(!app)return;
@@ -794,7 +854,8 @@ function openApp(id){
   win.innerHTML=`<div class="win-bar" id="bar-${id}"><div class="win-btns"><button class="wbtn close" onclick="closeApp('${id}')"></button><button class="wbtn min" onclick="minimizeApp('${id}')"></button><button class="wbtn max" onclick="maximizeApp('${id}')"></button></div><div class="win-ico-sm">${WICO[app.icon]||''}</div><div class="win-title">${appLabel(app)}</div><div style="font-family:'JetBrains Mono',monospace;font-size:7.5px;color:var(--t3);letter-spacing:.1em">FOOTBALL VAULT</div></div><div class="win-body" id="body-${id}">${buildContent(id)}</div><div class="win-resize" id="rsz-${id}"></div>`;
   document.getElementById('desktop').appendChild(win);
   windows[id]={el:win,minimized:false,maximized:false,prevState:null};
-  makeDrag(id);makeResize(id);win.addEventListener('mousedown',()=>focusWin(id));
+  if(!isMobile()){makeDrag(id);makeResize(id);}
+  win.addEventListener('mousedown',()=>focusWin(id));
   focusWin(id);renderTB();beep(500,.06);
   if(_postOpen[id])_postOpen[id]();
 }
