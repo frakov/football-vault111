@@ -83,59 +83,6 @@ textarea{resize:none}
 .win-ico-sm{width:14px;height:14px;opacity:.5;flex-shrink:0}
 .win-resize{position:absolute;bottom:0;right:0;width:16px;height:16px;cursor:se-resize;background:linear-gradient(135deg,transparent 50%,rgba(16,185,129,.15) 50%);border-radius:0 0 var(--r) 0}
 .win-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 22px;scrollbar-gutter:stable}
-
-/* ══════════════════════════════════════════════════════
-   MOBILE RESPONSIVE — telefony i wąskie ekrany (≤768px)
-   ══════════════════════════════════════════════════════ */
-@media (max-width: 768px){
-  html,body{overflow:auto}
-  #desktop{inset:0 0 56px 0}
-  .desk-icons{top:16px;left:12px;right:12px;grid-template-columns:repeat(4,1fr);gap:4px;width:auto}
-  .dicon{width:auto;padding:8px 4px}
-  .dicon-ico{width:44px;height:44px}
-  .dicon-ico svg{width:22px;height:22px}
-  .dicon-lbl{font-size:8.5px}
-  /* Okna: pełnoekranowe, bez drag/resize, stack jeden na drugim */
-  .win{position:fixed!important;left:0!important;top:0!important;width:100vw!important;height:calc(100vh - 56px)!important;border-radius:0;min-width:0;min-height:0}
-  .win-bar{cursor:default;padding:14px 14px;flex-wrap:nowrap}
-  .win-bar:active{cursor:default}
-  .win-resize{display:none}
-  .win-body{padding:14px 14px 24px}
-  .win-title{font-size:13px}
-  /* Ukryj trzecią informację (FOOTBALL VAULT label) na mobile dla miejsca */
-  .win-bar>div:last-child{display:none}
-  /* Taskbar: kompaktowy, scrollowalny poziomo dla appek */
-  #taskbar{height:56px;padding:0 8px}
-  .tb-logo{display:none}
-  #tb-apps{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-  #tb-apps::-webkit-scrollbar{display:none}
-  .tb-app span{display:none}
-  .tb-app{padding:8px;gap:0}
-  #tb-net{display:none}
-  #tb-user{display:none}
-  #tb-clock-wrap{display:none}
-  #tb-settings-btn,#notif-panel ~ button{width:40px;height:40px}
-  /* Grids: jedna kolumna na mobile */
-  .g4,.g3,.g2{grid-template-columns:1fr}
-  .g12{grid-template-columns:1fr}
-  .c8,.c4{grid-column:span 1}
-  /* Modal pełnoekranowy */
-  #modal-box{width:100vw;max-width:100vw;height:100vh;max-height:100vh;border-radius:0}
-  .modal-body{padding:16px}
-  /* Settings panel pełnoekranowy */
-  #settings-panel{right:0;left:0;bottom:0;width:100vw;max-height:85vh;border-radius:20px 20px 0 0}
-  #notif-panel{right:0;left:0;width:100vw;max-height:75vh;border-radius:20px 20px 0 0}
-  /* Chat: stack sidebar nad oknem zamiast obok */
-  #chat-main,.conv-item{font-size:13px}
-  /* Auth box mniejszy padding */
-  #auth-box{padding:28px 22px}
-  /* Photo grid mniejszy */
-  .photo-grid{grid-template-columns:repeat(3,1fr)}
-}
-@media (max-width: 480px){
-  .ph-title{font-size:28px}
-  .desk-icons{grid-template-columns:repeat(3,1fr)}
-}
 /* TASKBAR */
 #taskbar{position:fixed;bottom:0;left:0;right:0;height:50px;background:rgba(10,15,11,.92);border-top:1px solid rgba(16,185,129,.1);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);display:flex;align-items:center;z-index:5000;padding:0 14px}
 #taskbar::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(var(--a-rgb),.4),transparent)}
@@ -342,6 +289,88 @@ select option{background:#0a0f0b}
 .chat-time{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t3);margin-top:3px;text-align:right}
 .conv-item{display:flex;align-items:center;gap:10px;padding:10px 8px;border-radius:10px;cursor:inherit;transition:background .14s;margin-bottom:2px}
 .conv-item:hover,.conv-item.active{background:rgba(59,130,246,.08)}
+
+/* ══════════════════════════════════════════════════════
+   MOBILE RESPONSIVE — umieszczone na końcu pliku CSS celowo,
+   żeby mieć priorytet nad wszystkimi wcześniejszymi regułami
+   bazowymi o tej samej specyficzności (np. #taskbar, .tb-app)
+   ══════════════════════════════════════════════════════ */
+@media (pointer: coarse), (max-width: 768px){
+  html,body{overflow:auto;font-size:14px}
+  #desktop{inset:0 0 60px 0}
+
+  /* IKONY NA PULPICIE */
+  .desk-icons{top:14px;left:10px;right:10px;width:auto;grid-template-columns:repeat(4,1fr);gap:2px}
+  .dicon{width:auto;padding:8px 2px}
+  .dicon-ico{width:46px;height:46px;margin:0 auto}
+  .dicon-ico svg{width:23px;height:23px}
+  .dicon-lbl{font-size:8.5px;margin-top:2px}
+
+  /* OKNA — pełnoekranowe, bez drag/resize */
+  .win{position:fixed!important;left:0!important;top:0!important;right:0!important;bottom:60px!important;width:100%!important;height:auto!important;border-radius:0;min-width:0;min-height:0;max-width:100vw}
+  .win-bar{cursor:default;padding:12px 14px;flex-shrink:0}
+  .win-bar:active{cursor:default}
+  .win-resize{display:none!important}
+  .win-body{padding:14px 16px 80px;-webkit-overflow-scrolling:touch}
+  .win-title{font-size:13px}
+  .win-bar>div:last-child{display:none}
+
+  /* TASKBAR — to jest sekcja na samym końcu, więc wygrywa specyficzność */
+  #taskbar{height:60px;padding:0 6px;overflow:visible}
+  .tb-logo{display:none}
+  #tb-apps{flex:1;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:2px;justify-content:flex-start}
+  #tb-apps::-webkit-scrollbar{display:none}
+  .tb-app{flex-direction:column;gap:2px;padding:6px 10px;min-width:50px}
+  .tb-app span{display:block;font-size:6.5px}
+  .tb-app-dot{display:none}
+  #tb-net,#tb-user,#tb-clock-wrap{display:none!important}
+  #tb-right{border-left:none}
+  #tb-settings-btn{margin-left:4px;width:38px;height:38px;flex-shrink:0}
+  #tb-right button{width:38px;height:38px;flex-shrink:0}
+
+  /* GRIDY — jedna kolumna */
+  .g4,.g3,.g2{grid-template-columns:1fr;gap:10px}
+  .g12{grid-template-columns:1fr;gap:10px}
+  .c8,.c4{grid-column:1/-1}
+
+  /* MODAL — pełnoekranowy */
+  #modal-box{width:100vw;max-width:100vw;height:100vh;max-height:100vh;border-radius:0;margin:0}
+  #modal-overlay{align-items:stretch}
+  .modal-header{padding:16px}
+  .modal-body{padding:14px 16px 90px}
+
+  /* PANELE — pełnoekranowe od dołu */
+  #settings-panel{right:0!important;left:0!important;bottom:60px!important;width:100%!important;max-height:80vh;border-radius:18px 18px 0 0}
+  #notif-panel{right:0!important;left:0!important;bottom:60px!important;width:100%!important;max-height:75vh;border-radius:18px 18px 0 0}
+
+  /* CZAT — sidebar nad oknem, nie obok */
+  #chat-main,.conv-item{font-size:13px}
+
+  /* FORMULARZE — jedna kolumna zamiast dwóch */
+  div[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}
+
+  /* AUTH BOX */
+  #auth-box{padding:26px 20px;width:92vw}
+
+  /* ZDJĘCIA */
+  .photo-grid{grid-template-columns:repeat(4,1fr);gap:5px}
+
+  /* TYTUŁY */
+  .ph-title{font-size:30px}
+
+  /* TABS */
+  .tabs{flex-wrap:wrap}
+  .tab{font-size:8px;padding:6px 4px}
+
+  /* KARTY MARKETPLACE/CHAT split */
+  div[style*="grid-template-columns:260px 1fr"]{grid-template-columns:1fr!important;height:auto!important}
+}
+
+@media (max-width: 420px){
+  .ph-title{font-size:24px}
+  .desk-icons{grid-template-columns:repeat(3,1fr)}
+  .dicon-ico{width:42px;height:42px}
+}
 
 </style>
 </head>
