@@ -153,6 +153,7 @@ textarea{resize:none}
 .sh-status.collection{color:rgba(255,255,255,.6);background:rgba(255,255,255,.06)}
 .sh-status.forsale{color:var(--a);background:rgba(16,185,129,.1)}
 .sh-status.listed{color:var(--gold);background:rgba(245,158,11,.1)}
+.sh-status.sold{color:#34d399;background:rgba(52,211,153,.12)}
 .sh-status.public{color:#a78bfa;background:rgba(139,92,246,.1)}
 /* FILTER */
 .filt-btn{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;padding:5px 12px;border-radius:999px;border:1px solid rgba(16,185,129,.12);background:rgba(0,0,0,.4);color:var(--t2);cursor:inherit;transition:all .14s}
@@ -284,6 +285,8 @@ select option{background:#0a0f0b}
 .chat-msg.me{flex-direction:row-reverse}
 .chat-avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--a),#065f46);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#fff;flex-shrink:0}
 .chat-bubble{max-width:70%;padding:8px 12px;border-radius:14px;font-size:12px;line-height:1.5;word-break:break-word}
+.msg-del-btn{position:absolute;top:-8px;right:-8px;width:20px;height:20px;border-radius:50%;background:rgba(244,33,46,.9);border:none;color:#fff;font-size:9px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.4);z-index:2}
+.chat-bubble.mine:hover .msg-del-btn{display:flex}
 .chat-bubble.mine{background:rgba(16,185,129,.2);border:1px solid rgba(16,185,129,.25);color:var(--t1);border-bottom-right-radius:4px}
 .chat-bubble.theirs{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:var(--t1);border-bottom-left-radius:4px}
 .chat-time{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t3);margin-top:3px;text-align:right}
@@ -665,7 +668,7 @@ pl:{
   nav_dash:'Dashboard',nav_collection:'Kolekcja',nav_forsale:'Na Sprzedaż',
   nav_market:'Marketplace',nav_profile:'Profil',
   add_shirt:'Dodaj Koszulkę',edit_shirt:'Edytuj',save:'Zapisz',cancel:'Anuluj',delete:'Usuń',
-  status_collection:'W Kolekcji',status_forsale:'Na Sprzedaż',status_listed:'Wystawiona',
+  status_collection:'W Kolekcji',status_forsale:'Na Sprzedaż',status_listed:'Wystawiona',status_sold:'Sprzedana',
   filter_all:'Wszystkie',filter_col:'Kolekcja',filter_sale:'Na Sprzedaż',filter_listed:'Wystawione',
   f_club:'Klub / Reprezentacja',f_season:'Sezon',f_kind:'Rodzaj',f_type:'Typ Koszulki',
   f_size:'Rozmiar',f_cond:'Stan (1–10)',f_pers:'Personalizacja',f_patches:'Naszywki/Patche',
@@ -696,7 +699,7 @@ en:{
   nav_dash:'Dashboard',nav_collection:'Collection',nav_forsale:'For Sale',
   nav_market:'Marketplace',nav_profile:'Profile',
   add_shirt:'Add Jersey',edit_shirt:'Edit',save:'Save',cancel:'Cancel',delete:'Delete',
-  status_collection:'In Collection',status_forsale:'For Sale',status_listed:'Listed',
+  status_collection:'In Collection',status_forsale:'For Sale',status_listed:'Listed',status_sold:'Sold',
   filter_all:'All',filter_col:'Collection',filter_sale:'For Sale',filter_listed:'Listed',
   f_club:'Club / National Team',f_season:'Season',f_kind:'Kit Type',f_type:'Jersey Type',
   f_size:'Size',f_cond:'Condition (1–10)',f_pers:'Personalization',f_patches:'Patches/Badges',
@@ -917,6 +920,7 @@ function buildContent(id){switch(id){case 'dash':return bDash();case 'collection
 
 // Post-open hooks for async content
 const _postOpen={
+  dash:()=>setTimeout(()=>loadDashActivityStats(),50),
   market:()=>setTimeout(()=>loadMarketplace(),50),
   auctions:()=>setTimeout(()=>initAuctionsView(),50),
   chat:()=>setTimeout(()=>initChatView(),50),
@@ -924,7 +928,7 @@ const _postOpen={
 };
 
 // ── HELPERS ──
-function statusLabel(s){return {collection:T('status_collection'),forsale:T('status_forsale'),listed:T('status_listed')}[s]||s;}
+function statusLabel(s){return {collection:T('status_collection'),forsale:T('status_forsale'),listed:T('status_listed'),sold:T('status_sold')}[s]||s;}
 function kindLabel(k){return {home:T('kind_home'),away:T('kind_away'),third:T('kind_third'),special:T('kind_special')}[k]||k||'';}
 function typeLabel(t){return {replica:'Replica',player:'Player Issue',matchworn:'Matchworn'}[t]||t||'';}
 function condColor(c){const n=parseInt(c);if(!n)return 'var(--t2)';if(n>=9)return '#34d399';if(n>=7)return 'var(--a)';if(n>=5)return 'var(--gold)';return 'var(--red)';}
@@ -978,7 +982,39 @@ function bDash(){
   <div class="s4">
     <div class="fx-b mb12"><div class="clabel" style="margin:0">${db.lang==='pl'?'Ostatnio Dodane':'Recently Added'}</div><button class="btn btn-p" onclick="openApp('collection')">+ ${T('add_shirt')}</button></div>
     ${recent.length?`<div class="g3">${recent.map(s=>shirtCardMini(s)).join('')}</div>`:`<div class="empty-state"><div class="empty-icon">👕</div><div class="empty-text">${T('empty_col')}</div></div>`}
+  </div>
+  <div class="s4" style="margin-top:18px">
+    <div class="clabel mb12">${db.lang==='pl'?'Aktywność':'Activity'}</div>
+    <div class="g4" id="dash-activity-stats">
+      <div class="card"><div class="clabel">${db.lang==='pl'?'Konwersacje':'Conversations'}</div><div class="cval loading-pulse">···</div></div>
+      <div class="card"><div class="clabel">${db.lang==='pl'?'Moje Licytacje':'My Auctions'}</div><div class="cval loading-pulse">···</div></div>
+      <div class="card"><div class="clabel">${db.lang==='pl'?'Licytuję':'Bidding On'}</div><div class="cval loading-pulse">···</div></div>
+      <div class="card"><div class="clabel">${db.lang==='pl'?'Na Wishliście':'Wishlist Items'}</div><div class="cval loading-pulse">···</div></div>
+    </div>
   </div>`;
+}
+
+async function loadDashActivityStats(){
+  if(!currentUser)return;
+  const statsEl=document.getElementById('dash-activity-stats');
+  if(!statsEl)return;
+  try{
+    const[convsRes,myAucRes,biddingRes,wishRes]=await Promise.all([
+      sb.from('conversations').select('id',{count:'exact',head:true}).or(`user1_id.eq.${currentUser.id},user2_id.eq.${currentUser.id}`),
+      sb.from('auctions').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id).eq('status','active'),
+      sb.from('bids').select('auction_id').eq('user_id',currentUser.id),
+      sb.from('wishlist').select('id',{count:'exact',head:true}).eq('user_id',currentUser.id)
+    ]);
+    const convCount=convsRes.count||0;
+    const myAucCount=myAucRes.count||0;
+    const biddingAucIds=[...new Set((biddingRes.data||[]).map(b=>b.auction_id))];
+    const wishCount=wishRes.count||0;
+    const cards=statsEl.querySelectorAll('.card .cval');
+    if(cards[0]){cards[0].textContent=convCount;cards[0].classList.remove('loading-pulse');}
+    if(cards[1]){cards[1].textContent=myAucCount;cards[1].classList.remove('loading-pulse');}
+    if(cards[2]){cards[2].textContent=biddingAucIds.length;cards[2].classList.remove('loading-pulse');}
+    if(cards[3]){cards[3].textContent=wishCount;cards[3].classList.remove('loading-pulse');}
+  }catch(e){console.error('loadDashActivityStats error:',e);}
 }
 
 function buildChart(hist){
@@ -1012,24 +1048,31 @@ function shirtCardMini(s){
 }
 
 // ── COLLECTION ──
-let sF={status:'all',search:'',size:'',brand:''};
+let sF={status:'all',search:'',size:'',brand:'',sort:''};
 function bCollection(){
   return `
   <div class="fx-b mb12 s1">
     <div><div class="ph-sub"><span class="dot"></span><span>${T('nav_collection')}</span></div><div class="ph-title">${db.lang==='pl'?'KOLEKCJA':'COLLECTION'}</div></div>
-    <div class="fx-c gap8"><button class="btn btn-g" onclick="exportPDF('all')">${T('pdf')}</button><button class="btn btn-p" onclick="openAddShirt()">+ ${T('add_shirt')}</button></div>
+    <div class="fx-c gap8"><button class="btn btn-g" onclick="exportCSV('all')">CSV</button><button class="btn btn-g" onclick="exportPDF('all')">${T('pdf')}</button><button class="btn btn-p" onclick="openAddShirt()">+ ${T('add_shirt')}</button></div>
   </div>
   <div class="card mb12 s2" style="padding:12px 16px">
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <div class="field" style="flex:1;min-width:160px;padding:6px 12px"><input type="text" id="sh-search" placeholder="🔍 ${db.lang==='pl'?'Szukaj...':'Search...'}" oninput="sF.search=this.value;renderGrid()" style="font-size:12px"></div>
       <div style="display:flex;gap:4px;flex-wrap:wrap">
-        ${['all','collection','forsale','listed'].map(v=>`<button onclick="sF.status='${v}';this.closest('.card').querySelectorAll('.filt-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');renderGrid()" class="filt-btn ${sF.status===v?'active':''}">${v==='all'?T('filter_all'):statusLabel(v)}</button>`).join('')}
+        ${['all','collection','forsale','listed','sold'].map(v=>`<button onclick="sF.status='${v}';this.closest('.card').querySelectorAll('.filt-btn').forEach(b=>b.classList.remove('active'));this.classList.add('active');renderGrid()" class="filt-btn ${sF.status===v?'active':''}">${v==='all'?T('filter_all'):statusLabel(v)}</button>`).join('')}
       </div>
       <select class="form-select" style="width:auto;padding:6px 10px;font-size:11px" onchange="sF.size=this.value;renderGrid()">
         <option value="">${T('f_size')}</option>${SIZES.map(s=>`<option value="${s}" ${sF.size===s?'selected':''}>${s}</option>`).join('')}
       </select>
       <select class="form-select" style="width:auto;padding:6px 10px;font-size:11px" onchange="sF.brand=this.value;renderGrid()">
         <option value="">${T('f_brand')}</option>${BRANDS.map(b=>`<option value="${b}" ${sF.brand===b?'selected':''}>${b}</option>`).join('')}
+      </select>
+      <select class="form-select" style="width:auto;padding:6px 10px;font-size:11px" onchange="sF.sort=this.value;renderGrid()">
+        <option value="" ${sF.sort===''?'selected':''}>${db.lang==='pl'?'Najnowsze':'Newest'}</option>
+        <option value="oldest" ${sF.sort==='oldest'?'selected':''}>${db.lang==='pl'?'Najstarsze':'Oldest'}</option>
+        <option value="value-desc" ${sF.sort==='value-desc'?'selected':''}>${db.lang==='pl'?'Wartość: malejąco':'Value: high to low'}</option>
+        <option value="value-asc" ${sF.sort==='value-asc'?'selected':''}>${db.lang==='pl'?'Wartość: rosnąco':'Value: low to high'}</option>
+        <option value="club" ${sF.sort==='club'?'selected':''}>${db.lang==='pl'?'Klub A-Z':'Club A-Z'}</option>
       </select>
     </div>
   </div>
@@ -1042,6 +1085,11 @@ function renderGrid(ret=false){
   if(sF.search){const q=sF.search.toLowerCase();list=list.filter(s=>(s.club||'').toLowerCase().includes(q)||(s.season||'').includes(q)||(s.personalization||'').toLowerCase().includes(q)||(s.notes||'').toLowerCase().includes(q));}
   if(sF.size)list=list.filter(s=>(s.customSize||s.size)===sF.size);
   if(sF.brand)list=list.filter(s=>s.brand===sF.brand);
+  if(sF.sort==='value-desc')list.sort((a,b)=>toPLN(b.marketValue||b.buyPrice)-toPLN(a.marketValue||a.buyPrice));
+  else if(sF.sort==='value-asc')list.sort((a,b)=>toPLN(a.marketValue||a.buyPrice)-toPLN(b.marketValue||b.buyPrice));
+  else if(sF.sort==='club')list.sort((a,b)=>(a.club||'').localeCompare(b.club||''));
+  else if(sF.sort==='oldest')list.reverse();
+  // domyślnie: najnowsze pierwsze (kolejność z db.shirts, bo unshift dodaje na początek)
   const html=list.length?list.map(s=>shirtCardMini(s)).join(''):`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">${T('empty_col')}</div></div></div>`;
   if(ret)return html;
   const el=document.getElementById('col-grid');if(el)el.innerHTML=html;
@@ -1053,7 +1101,7 @@ function bForSale(){
   return `
   <div class="fx-b mb18 s1">
     <div><div class="ph-sub"><span class="dot"></span><span>${T('nav_forsale')}</span></div><div class="ph-title">${db.lang==='pl'?'NA SPRZEDAŻ':'FOR SALE'}</div></div>
-    <button class="btn btn-g" onclick="exportPDF('forsale')">${T('pdf')}</button>
+    <div class="fx-c gap8"><button class="btn btn-g" onclick="exportCSV('forsale')">CSV</button><button class="btn btn-g" onclick="exportPDF('forsale')">${T('pdf')}</button></div>
   </div>
   ${ss.length?`<div class="g3 s2">${ss.map(s=>saleCard(s)).join('')}</div>`:`<div class="empty-state s2"><div class="empty-icon">🏷️</div><div class="empty-text">${T('empty_sale')}</div></div>`}`;
 }
@@ -1072,12 +1120,25 @@ function saleCard(s){
         <div><div class="clabel" style="font-size:8px;margin-bottom:2px">${db.lang==='pl'?'CENA':'PRICE'}</div><div class="shirt-card-price">${fmt(toDisp(mv))}</div></div>
         <div style="text-align:right"><div class="clabel" style="font-size:8px;margin-bottom:2px">${T('profit').toUpperCase()}</div><div style="font-size:16px;font-weight:800;font-family:'Bebas Neue',sans-serif;color:${prof>=0?'#34d399':'var(--red)'}">${prof>=0?'+':''}${fmt(toDisp(prof))}</div></div>
       </div>
-      <div class="fx-c gap6">
+      <div class="fx-c gap6 mb8">
         <button class="btn btn-p" style="flex:1;padding:7px 0;font-size:10px" onclick="openMarketPack('${s.id}')">${T('collage')}</button>
         <button class="btn btn-g" style="padding:7px 10px;font-size:10px" onclick="openEditShirt('${s.id}')">${T('edit_shirt')}</button>
       </div>
+      <button class="btn w100" style="padding:6px 0;font-size:10px;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.25);color:#34d399" onclick="markAsSold('${s.id}')">✓ ${db.lang==='pl'?'Oznacz jako sprzedane':'Mark as sold'}</button>
     </div>
   </div>`;
+}
+
+async function markAsSold(id){
+  const s=(db.shirts||[]).find(x=>String(x.id)===String(id));if(!s)return;
+  const activeAuc=await getActiveAuctionForShirt(id);
+  if(activeAuc){toast(db.lang==='pl'?'⚠️ Koszulka jest w trakcie licytacji — zakończ ją najpierw':'⚠️ Jersey has an active auction — finish it first');return;}
+  if(!confirm(db.lang==='pl'?'Oznaczyć koszulkę jako sprzedaną? Zostanie zdjęta z Marketplace.':'Mark jersey as sold? It will be removed from Marketplace.'))return;
+  s.status='sold';
+  s.marketListed=false;
+  await sbRemoveFromMarket(id);
+  await sbSaveShirt(s);
+  save();toast(db.lang==='pl'?'Oznaczono jako sprzedane ✓':'Marked as sold ✓');
 }
 
 // ── MARKETPLACE ──
@@ -1437,8 +1498,40 @@ async function removeFromMkt(id){
 
 // ── SHIRT FORM ──
 let editId=null,editPhotos=[],editPhotoFiles=[];
+
+async function getActiveAuctionForShirt(shirtId){
+  const{data}=await sb.from('auctions').select('id,status,current_price,highest_bidder_nick').eq('shirt_id',shirtId).eq('status','active').maybeSingle();
+  return data||null;
+}
+
 function openAddShirt(){editId=null;editPhotos=[];editPhotoFiles=[];document.getElementById('modal-title').textContent=T('add_shirt');document.getElementById('modal-body').innerHTML=buildShirtForm(null);document.getElementById('modal-overlay').classList.add('open');beep(500,.06);}
-function openEditShirt(id){const s=(db.shirts||[]).find(x=>String(x.id)===String(id));if(!s)return;editId=id;editPhotos=[...(s.photos||[])];editPhotoFiles=[];document.getElementById('modal-title').textContent=T('edit_shirt');document.getElementById('modal-body').innerHTML=buildShirtForm(s);document.getElementById('modal-overlay').classList.add('open');beep(500,.06);}
+
+async function openEditShirt(id){
+  const s=(db.shirts||[]).find(x=>String(x.id)===String(id));if(!s)return;
+  const activeAuc=await getActiveAuctionForShirt(id);
+  if(activeAuc){
+    const hasBids=!!activeAuc.highest_bidder_nick;
+    document.getElementById('modal-title').textContent=db.lang==='pl'?'Koszulka w trakcie licytacji':'Jersey in active auction';
+    document.getElementById('modal-body').innerHTML=`
+    <div class="card mb14" style="border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.06)">
+      <div style="font-size:13px;font-weight:600;color:#f87171;margin-bottom:8px">⚠️ ${db.lang==='pl'?'Ta koszulka jest aktualnie licytowana':'This jersey has an active auction'}</div>
+      <div style="font-size:11px;color:var(--t2);line-height:1.7">
+        ${hasBids
+          ?(db.lang==='pl'?`Ktoś już złożył ofertę (${activeAuc.current_price} PLN). Edycja danych koszulki w tym momencie mogłaby wprowadzić licytujących w błąd co do tego, na co faktycznie licytują.`:`Someone already placed a bid (${activeAuc.current_price} PLN). Editing jersey details now could mislead bidders about what they're bidding on.`)
+          :(db.lang==='pl'?'Licytacja jest aktywna, ale nikt jeszcze nie złożył oferty.':'Auction is active, but no bids yet.')}
+      </div>
+    </div>
+    <div class="fx-c gap8" style="justify-content:flex-end">
+      <button class="btn btn-g" onclick="closeModal()">${T('cancel')}</button>
+      <button class="btn" style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171" onclick="closeModal();openApp('auctions')">${db.lang==='pl'?'Przejdź do licytacji':'Go to auction'}</button>
+      ${!hasBids?`<button class="btn btn-d" onclick="closeModal();cancelAuction('${activeAuc.id}').then(()=>openEditShirt('${id}'))">${db.lang==='pl'?'Anuluj licytację i edytuj':'Cancel auction and edit'}</button>`:''}
+    </div>`;
+    document.getElementById('modal-overlay').classList.add('open');
+    return;
+  }
+  editId=id;editPhotos=[...(s.photos||[])];editPhotoFiles=[];document.getElementById('modal-title').textContent=T('edit_shirt');document.getElementById('modal-body').innerHTML=buildShirtForm(s);document.getElementById('modal-overlay').classList.add('open');beep(500,.06);
+}
+
 function closeModal(){document.getElementById('modal-overlay').classList.remove('open');editId=null;editPhotos=[];editPhotoFiles=[];}
 
 function buildShirtForm(s){
@@ -1457,6 +1550,7 @@ function buildShirtForm(s){
           <option value="collection" ${(v.status||'collection')==='collection'?'selected':''}>${T('status_collection')}</option>
           <option value="forsale" ${v.status==='forsale'?'selected':''}>${T('status_forsale')}</option>
           <option value="listed" ${v.status==='listed'?'selected':''}>${T('status_listed')}</option>
+          <option value="sold" ${v.status==='sold'?'selected':''}>${T('status_sold')}</option>
         </select>
       </div>
       <div class="form-group"><div class="form-label">${T('f_club')}</div>
@@ -1526,7 +1620,7 @@ function buildShirtForm(s){
   </div>
   <div class="div"></div>
   <div class="fx-c gap8" style="justify-content:flex-end">
-    ${s?`<button class="btn btn-d" onclick="delShirt('${s.id}');closeModal()">🗑 ${T('delete')}</button>`:''}
+    ${s?`<button class="btn btn-d" onclick="delShirt('${s.id}')">🗑 ${T('delete')}</button>`:''}
     <button class="btn btn-g" onclick="closeModal()">${T('cancel')}</button>
     <button class="btn btn-p" id="save-btn" onclick="saveShirt()">${T('save')}</button>
   </div>`;
@@ -1624,11 +1718,17 @@ async function saveShirt(){
 }
 
 async function delShirt(id){
+  const activeAuc=await getActiveAuctionForShirt(id);
+  if(activeAuc){
+    toast(db.lang==='pl'?'⚠️ Nie można usunąć — koszulka jest licytowana. Anuluj licytację najpierw.':'⚠️ Cannot delete — jersey has an active auction. Cancel the auction first.');
+    return;
+  }
   if(!confirm(T('confirm_del')))return;
   db.shirts=(db.shirts||[]).filter(x=>String(x.id)!==String(id));
   await sbDeleteShirt(id);
   await sbRemoveFromMarket(id);
   save();toast(T('deleted'));
+  closeModal();
 }
 
 // ── MARKETPLACE PACK ──
@@ -1793,6 +1893,36 @@ td{padding:7px 10px;border-bottom:1px solid #f0f0f0;font-size:11px}tr:hover td{b
 <tbody>${rows||'<tr><td colspan="12" style="text-align:center;color:#aaa;padding:24px">Brak danych</td></tr>'}</tbody></table>
 </body></html>`;
   const w=window.open('','_blank','width=1200,height=800');w.document.write(html);w.document.close();setTimeout(()=>w.print(),450);toast(db.lang==='pl'?'PDF gotowy!':'PDF ready!');
+}
+
+function csvEscape(val){
+  const s=String(val??'');
+  if(s.includes(',')||s.includes('"')||s.includes('\n'))return '"'+s.replace(/"/g,'""')+'"';
+  return s;
+}
+
+function exportCSV(mode){
+  let ss=db.shirts||[];if(mode==='forsale')ss=ss.filter(s=>s.status==='forsale'||s.status==='listed');
+  const headers=['Klub','Sezon','Marka','Rodzaj','Typ','Rozmiar','Stan','Personalizacja','Naszywki','Style Code','Cena Zakupu','Wartość Rynkowa','Zysk/Strata','Status','Uwagi','Data Dodania'];
+  const rows=ss.map(s=>{
+    const mv=toPLN(s.marketValue||s.buyPrice),bp=toPLN(s.buyPrice),p=mv-bp;
+    return [
+      s.club||'',s.season||'',s.brand||'',kindLabel(s.kind),typeLabel(s.shirtType)||'Replica',
+      s.customSize||s.size||'',s.condition||'',s.personalization||'',
+      s.patches==='yes'?'Tak':s.patches==='no'?'Nie':'Nieznane',
+      s.styleCode||'',bp.toFixed(2),mv.toFixed(2),p.toFixed(2),
+      statusLabel(s.status),s.notes||'',s.created||''
+    ].map(csvEscape).join(',');
+  });
+  const csv='\uFEFF'+[headers.map(csvEscape).join(','),...rows].join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`football-vault-${mode==='forsale'?'na-sprzedaz':'kolekcja'}-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast(db.lang==='pl'?'CSV pobrany!':'CSV downloaded!');
 }
 
 // ── SETTINGS PANEL ──
@@ -2024,8 +2154,10 @@ async function renderNotifPanel(){
 function notifClick(link){
   if(!link)return;
   if(link.startsWith('auction:'))openAuctionById(link.split(':')[1]);
+  else if(link==='auctions')openApp('auctions');
   else if(link.startsWith('chat:'))openChatWith(link.split(':')[1]);
   else if(link.startsWith('market'))openApp('market');
+  else if(link==='wishlist')openApp('wishlist');
 }
 
 // ══════════════════════════════════════════════════════
@@ -2054,13 +2186,16 @@ function handleNewMessage(msg){
   // Jeśli to własna wiadomość — już załadowana przez sendChatMsg
   if(msg.sender_id===currentUser?.id)return;
   // Jeśli czat z tą konwersacją jest otwarty — odśwież
-  if(msg.conversation_id===activeConvId&&document.getElementById('chat-messages-'+activeConvId)){
+  const chatArea=document.getElementById('chat-messages-area');
+  if(msg.conversation_id===activeConvId&&chatArea){
     loadChatMessages(activeConvId);
   } else {
     // Pokaż badge na ikonce czatu
     const badge=document.getElementById('tb-chat-badge');
     if(badge){const c=parseInt(badge.textContent||'0')+1;badge.textContent=c>9?'9+':c;badge.style.display='flex';}
     toast('💬 Nowa wiadomość');
+    // Odśwież listę konwersacji jeśli okno czatu jest otwarte (żeby zaktualizować last_message)
+    if(windows['chat'])initChatView();
   }
 }
 async function openChatWith(userId){
@@ -2087,9 +2222,19 @@ async function loadChatMessages(convId){
     const isMe=m.sender_id===currentUser?.id;
     const nick=nickMap[m.sender_id]||'?';
     const time=m.created_at?new Date(m.created_at).toLocaleTimeString('pl-PL',{hour:'2-digit',minute:'2-digit'}):'';
-    return `<div class="chat-msg ${isMe?'me':'them'}">
+    if(m.deleted){
+      return `<div class="chat-msg ${isMe?'me':'them'}">
+        ${!isMe?`<div class="chat-avatar" style="width:28px;height:28px;font-size:12px">${nick[0].toUpperCase()}</div>`:''}
+        <div class="chat-bubble ${isMe?'mine':'theirs'}" style="opacity:.5;font-style:italic">
+          <div style="font-size:11px">${db.lang==='pl'?'Wiadomość usunięta':'Message deleted'}</div>
+          <div class="chat-time">${isMe?'Ty':nick} · ${time}</div>
+        </div>
+      </div>`;
+    }
+    return `<div class="chat-msg ${isMe?'me':'them'}" data-msg-id="${m.id}">
       ${!isMe?`<div class="chat-avatar" style="width:28px;height:28px;font-size:12px">${nick[0].toUpperCase()}</div>`:''}
-      <div class="chat-bubble ${isMe?'mine':'theirs'}">
+      <div class="chat-bubble ${isMe?'mine':'theirs'}" style="position:relative">
+        ${isMe?`<button class="msg-del-btn" onclick="deleteMessage('${m.id}','${convId}')" title="${db.lang==='pl'?'Usuń':'Delete'}">🗑</button>`:''}
         ${m.image_url?`<img src="${m.image_url}" style="max-width:200px;border-radius:8px;display:block;margin-bottom:4px" onclick="document.getElementById('lb-img').src='${m.image_url}';document.getElementById('lightbox').classList.add('open')">`:''}
         ${m.content?`<div>${m.content}</div>`:''}
         <div class="chat-time">${isMe?'Ty':nick} · ${time}</div>
@@ -2097,6 +2242,14 @@ async function loadChatMessages(convId){
     </div>`;
   }).join('');
   if(atBottom||msgs.length<5)el.scrollTop=el.scrollHeight;
+}
+
+async function deleteMessage(msgId,convId){
+  if(!confirm(db.lang==='pl'?'Usunąć tę wiadomość?':'Delete this message?'))return;
+  const{error}=await sb.from('messages').update({deleted:true,content:'',image_url:null}).eq('id',msgId).eq('sender_id',currentUser.id);
+  if(error){toast(db.lang==='pl'?'Błąd usuwania':'Delete error');return;}
+  await loadChatMessages(convId);
+  toast(db.lang==='pl'?'Wiadomość usunięta':'Message deleted');
 }
 
 function bChat(){
@@ -2117,7 +2270,8 @@ function bChat(){
       <!-- NAGŁÓWEK — statyczny -->
       <div style="padding:10px 16px;border-bottom:1px solid rgba(59,130,246,.08);display:flex;align-items:center;gap:10px;flex-shrink:0">
         <div id="chat-avatar-main" class="chat-avatar" style="width:32px;height:32px;font-size:14px">?</div>
-        <div id="chat-header-nick" style="font-weight:700;font-size:13px">—</div>
+        <div id="chat-header-nick" style="font-weight:700;font-size:13px;flex:1">—</div>
+        <button class="xbtn" id="chat-del-conv-btn" style="display:none" onclick="deleteCurrentConv()" title="${db.lang==='pl'?'Usuń konwersację':'Delete conversation'}">🗑</button>
       </div>
       <!-- WIADOMOŚCI — podmieniane przez loadChatMessages -->
       <div id="chat-messages-area" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;min-height:0">
@@ -2147,16 +2301,23 @@ async function initChatView(){
   const partnerIds=convs.map(c=>c.user1_id===currentUser.id?c.user2_id:c.user1_id);
   const{data:profiles}=await sb.from('profiles').select('user_id,nick').in('user_id',partnerIds);
   const profileMap={};(profiles||[]).forEach(p=>profileMap[p.user_id]=p.nick);
+  // Pobierz liczbę nieprzeczytanych wiadomości per konwersacja
+  const convIds=convs.map(c=>c.id);
+  const{data:unreadMsgs}=await sb.from('messages').select('conversation_id').in('conversation_id',convIds).eq('read',false).neq('sender_id',currentUser.id);
+  const unreadCountMap={};
+  (unreadMsgs||[]).forEach(m=>{unreadCountMap[m.conversation_id]=(unreadCountMap[m.conversation_id]||0)+1;});
   inner.innerHTML=convs.map(c=>{
     const pid=c.user1_id===currentUser.id?c.user2_id:c.user1_id;
     const nick=profileMap[pid]||'Użytkownik';
     const isActive=activeConvId===c.id;
+    const unreadCount=unreadCountMap[c.id]||0;
     return `<div class="conv-item ${isActive?'active':''}" onclick="selectConv('${c.id}','${nick}')">
       <div class="chat-avatar" style="width:36px;height:36px;font-size:15px;flex-shrink:0">${nick[0].toUpperCase()}</div>
       <div style="flex:1;min-width:0">
         <div style="font-size:12px;font-weight:600;color:var(--t1)">${nick}</div>
         <div style="font-size:10px;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.last_message||'...'}</div>
       </div>
+      ${unreadCount>0?`<div style="min-width:18px;height:18px;border-radius:9px;background:var(--a);color:var(--on-a,#fff);font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px;flex-shrink:0">${unreadCount>9?'9+':unreadCount}</div>`:''}
     </div>`;
   }).join('');
 }
@@ -2168,6 +2329,10 @@ async function selectConv(convId,nick){
   if(header)header.textContent=nick||'—';
   const avatar=document.getElementById('chat-avatar-main');
   if(avatar)avatar.textContent=(nick||'?')[0].toUpperCase();
+  const delBtn=document.getElementById('chat-del-conv-btn');
+  if(delBtn)delBtn.style.display='flex';
+  // Oznacz wiadomości jako przeczytane
+  await sb.from('messages').update({read:true}).eq('conversation_id',convId).neq('sender_id',currentUser.id).eq('read',false);
   // Załaduj wiadomości
   await loadChatMessages(convId);
   // Oznacz aktywną konwersację w liście
@@ -2183,6 +2348,25 @@ async function selectConv(convId,nick){
   _rtSubs.push(ch);
 }
 
+async function deleteCurrentConv(){
+  if(!activeConvId)return;
+  if(!confirm(db.lang==='pl'?'Usunąć całą konwersację? Ta operacja jest nieodwracalna.':'Delete entire conversation? This cannot be undone.'))return;
+  await sb.from('messages').delete().eq('conversation_id',activeConvId);
+  await sb.from('conversations').delete().eq('id',activeConvId);
+  const convId=activeConvId;
+  activeConvId=null;
+  toast(db.lang==='pl'?'Konwersacja usunięta':'Conversation deleted');
+  const header=document.getElementById('chat-header-nick');
+  if(header)header.textContent='—';
+  const avatar=document.getElementById('chat-avatar-main');
+  if(avatar)avatar.textContent='?';
+  const delBtn=document.getElementById('chat-del-conv-btn');
+  if(delBtn)delBtn.style.display='none';
+  const chatArea=document.getElementById('chat-messages-area');
+  if(chatArea)chatArea.innerHTML=`<div class="empty-state"><div class="empty-icon">💬</div><div class="empty-text">${db.lang==='pl'?'WYBIERZ KONWERSACJĘ':'SELECT A CONVERSATION'}</div></div>`;
+  initChatView();
+}
+
 async function sendChatMsgActive(){
   if(!activeConvId)return;
   const inp=document.getElementById('chat-input-main');
@@ -2194,17 +2378,41 @@ async function sendChatMsgActive(){
   await loadChatMessages(activeConvId);
 }
 
-async function sendChatImageActive(inp){
-  if(!activeConvId){toast('Wybierz konwersację');return;}
+let _pendingChatImage=null;
+function sendChatImageActive(inp){
+  if(!activeConvId){toast(db.lang==='pl'?'Wybierz konwersację':'Select a conversation');inp.value='';return;}
   const file=inp.files[0];if(!file)return;
+  _pendingChatImage=file;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    document.getElementById('modal-title').textContent=db.lang==='pl'?'Wysłać zdjęcie?':'Send photo?';
+    document.getElementById('modal-body').innerHTML=`
+    <div style="text-align:center">
+      <img src="${e.target.result}" style="max-width:100%;max-height:50vh;border-radius:12px;margin-bottom:16px">
+    </div>
+    <div class="fx-c gap8" style="justify-content:flex-end">
+      <button class="btn btn-g" onclick="_pendingChatImage=null;closeModal();document.getElementById('chat-img-upload').value=''">${T('cancel')}</button>
+      <button class="btn btn-p" onclick="confirmSendChatImage()">${db.lang==='pl'?'Wyślij':'Send'}</button>
+    </div>`;
+    document.getElementById('modal-overlay').classList.add('open');
+  };
+  reader.readAsDataURL(file);
+  inp.value='';
+}
+
+async function confirmSendChatImage(){
+  if(!_pendingChatImage||!activeConvId)return;
+  const file=_pendingChatImage;
+  _pendingChatImage=null;
+  closeModal();
+  toast(db.lang==='pl'?'Wysyłanie...':'Sending...');
   const ext=file.name.split('.').pop()||'jpg';
   const path=`chat/${currentUser.id}/${Date.now()}.${ext}`;
   const{data,error}=await sb.storage.from('shirt-photos').upload(path,file,{upsert:true});
-  if(error){toast('Błąd uploadu');return;}
+  if(error){toast(db.lang==='pl'?'Błąd uploadu':'Upload error');return;}
   const{data:{publicUrl}}=sb.storage.from('shirt-photos').getPublicUrl(path);
   await sendMessage(activeConvId,'',publicUrl);
   await loadChatMessages(activeConvId);
-  inp.value='';
 }
 
 // ══════════════════════════════════════════════════════
@@ -2256,7 +2464,10 @@ async function initWishlistView(){
   <div class="card" style="border-color:rgba(236,72,153,.15)">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
       <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.05em;color:var(--t1)">${w.club||'Dowolny klub'}</div>
-      <button class="xbtn" onclick="removeFromWishlist('${w.id}');initWishlistView()">✕</button>
+      <div class="fx-c gap4">
+        <button class="xbtn" style="color:var(--t2)" onclick="openEditWishlistItem('${w.id}')" title="${db.lang==='pl'?'Edytuj':'Edit'}">✎</button>
+        <button class="xbtn" onclick="removeFromWishlist('${w.id}');initWishlistView()">✕</button>
+      </div>
     </div>
     <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px">
       ${w.season?`<div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--t2)">📅 ${w.season}</div>`:''}
@@ -2296,44 +2507,70 @@ async function initWishlistView(){
   }
 }
 
+let editWishlistId=null;
+
 function openAddWishlistItem(){
-  document.getElementById('modal-title').textContent='Dodaj do Wishlisty';
-  document.getElementById('modal-body').innerHTML=`
+  editWishlistId=null;
+  _wlPublic=false;
+  document.getElementById('modal-title').textContent=db.lang==='pl'?'Dodaj do Wishlisty':'Add to Wishlist';
+  document.getElementById('modal-body').innerHTML=buildWishlistForm(null);
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+async function openEditWishlistItem(id){
+  const items=await loadWishlist();
+  const item=items.find(w=>String(w.id)===String(id));
+  if(!item){toast(db.lang==='pl'?'Nie znaleziono pozycji':'Item not found');return;}
+  editWishlistId=id;
+  _wlPublic=!!item.public;
+  document.getElementById('modal-title').textContent=db.lang==='pl'?'Edytuj Wishlistę':'Edit Wishlist Item';
+  document.getElementById('modal-body').innerHTML=buildWishlistForm(item);
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function buildWishlistForm(item){
+  const w=item||{};
+  return `
   <div class="g2">
     <div>
-      <div class="form-group"><div class="form-label">Klub / Reprezentacja</div><input class="form-input" id="wl-club" placeholder="np. FC Barcelona"></div>
-      <div class="form-group"><div class="form-label">Sezon</div><input class="form-input" id="wl-season" placeholder="2024/25"></div>
-      <div class="form-group"><div class="form-label">Rodzaj</div>
+      <div class="form-group"><div class="form-label">${db.lang==='pl'?'Klub / Reprezentacja':'Club / National team'}</div><input class="form-input" id="wl-club" value="${w.club||''}" placeholder="np. FC Barcelona"></div>
+      <div class="form-group"><div class="form-label">${db.lang==='pl'?'Sezon':'Season'}</div><input class="form-input" id="wl-season" value="${w.season||''}" placeholder="2024/25"></div>
+      <div class="form-group"><div class="form-label">${db.lang==='pl'?'Rodzaj':'Kit type'}</div>
         <select class="form-select" id="wl-kind">
-          <option value="">Dowolny</option>
-          <option value="home">Domowa</option><option value="away">Wyjazdowa</option>
-          <option value="third">Trzecia</option><option value="special">Specjalna</option>
+          <option value="" ${!w.kind?'selected':''}>${db.lang==='pl'?'Dowolny':'Any'}</option>
+          <option value="home" ${w.kind==='home'?'selected':''}>${T('kind_home')}</option>
+          <option value="away" ${w.kind==='away'?'selected':''}>${T('kind_away')}</option>
+          <option value="third" ${w.kind==='third'?'selected':''}>${T('kind_third')}</option>
+          <option value="special" ${w.kind==='special'?'selected':''}>${T('kind_special')}</option>
         </select>
       </div>
     </div>
     <div>
-      <div class="form-group"><div class="form-label">Rozmiar</div>
+      <div class="form-group"><div class="form-label">${db.lang==='pl'?'Rozmiar':'Size'}</div>
         <select class="form-select" id="wl-size">
-          <option value="">Dowolny</option>${SIZES.map(s=>`<option>${s}</option>`).join('')}
+          <option value="" ${!w.size?'selected':''}>${db.lang==='pl'?'Dowolny':'Any'}</option>
+          ${SIZES.map(s=>`<option ${w.size===s?'selected':''}>${s}</option>`).join('')}
         </select>
       </div>
-      <div class="form-group"><div class="form-label">Maks. cena (PLN)</div><input class="form-input" type="number" id="wl-price" placeholder="np. 300"></div>
-      <div class="form-group"><div class="form-label">Uwagi</div><textarea class="form-input" id="wl-notes" rows="3" placeholder="Dodatkowe wymagania..."></textarea></div>
+      <div class="form-group"><div class="form-label">${db.lang==='pl'?'Maks. cena (PLN)':'Max price (PLN)'}</div><input class="form-input" type="number" id="wl-price" value="${w.max_price||''}" placeholder="np. 300"></div>
+      <div class="form-group"><div class="form-label">${db.lang==='pl'?'Uwagi':'Notes'}</div><textarea class="form-input" id="wl-notes" rows="3" placeholder="${db.lang==='pl'?'Dodatkowe wymagania...':'Additional requirements...'}">${w.notes||''}</textarea></div>
       <div class="toggle-row" id="wl-pub-row" onclick="toggleWLPublic()">
-        <div class="tg-label"><span>Publiczna wishlist</span><small>Widoczna na Twoim profilu</small></div>
-        <div class="tg-track" id="tg-wl-pub"><div class="tg-knob"></div></div>
+        <div class="tg-label"><span>${db.lang==='pl'?'Publiczna wishlist':'Public wishlist'}</span><small>${db.lang==='pl'?'Widoczna na Twoim profilu':'Visible on your profile'}</small></div>
+        <div class="tg-track ${_wlPublic?'on':''}" id="tg-wl-pub"><div class="tg-knob"></div></div>
       </div>
     </div>
   </div>
   <div class="div"></div>
   <div class="fx-c gap8" style="justify-content:flex-end">
-    <button class="btn btn-g" onclick="closeModal()">Anuluj</button>
-    <button class="btn btn-p" style="background:linear-gradient(135deg,#ec4899,#9d174d)" onclick="saveWishlistItem()">Dodaj do Wishlisty ❤️</button>
+    ${item?`<button class="btn btn-d" onclick="removeFromWishlist('${item.id}');closeModal();if(windows['wishlist'])initWishlistView()">🗑 ${T('delete')}</button>`:''}
+    <button class="btn btn-g" onclick="closeModal()">${T('cancel')}</button>
+    <button class="btn btn-p" style="background:linear-gradient(135deg,#ec4899,#9d174d)" onclick="saveWishlistItem()">${item?(db.lang==='pl'?'Zapisz zmiany':'Save changes'):(db.lang==='pl'?'Dodaj do Wishlisty ❤️':'Add to Wishlist ❤️')}</button>
   </div>`;
-  document.getElementById('modal-overlay').classList.add('open');
 }
+
 let _wlPublic=false;
 function toggleWLPublic(){_wlPublic=!_wlPublic;document.getElementById('tg-wl-pub')?.classList.toggle('on',_wlPublic);}
+
 async function saveWishlistItem(){
   const item={
     club:document.getElementById('wl-club')?.value||'',
@@ -2344,7 +2581,14 @@ async function saveWishlistItem(){
     notes:document.getElementById('wl-notes')?.value||'',
     public:_wlPublic
   };
-  await addToWishlist(item);
+  if(editWishlistId){
+    const{error}=await sb.from('wishlist').update(item).eq('id',editWishlistId).eq('user_id',currentUser.id);
+    if(error){toast(db.lang==='pl'?'Błąd zapisu':'Save error');return;}
+    toast(db.lang==='pl'?'Zaktualizowano! ❤️':'Updated! ❤️');
+  } else {
+    await addToWishlist(item);
+  }
+  editWishlistId=null;
   closeModal();
   if(windows['wishlist'])initWishlistView();
 }
@@ -2554,12 +2798,17 @@ async function initAuctionsView(){
     return;
   }
   grid.innerHTML=auctions.map(a=>buildAuctionCard(a)).join('');
-  // Realtime tylko dla live
+  // Realtime tylko dla live — stała nazwa kanału żeby uniknąć wycieku subskrypcji
   if(tab==='live'){
-    const auctionCh=sb.channel('auctions-live-'+Date.now())
+    try{sb.removeChannel(sb.channel('auctions-live-feed'));}catch(e){}
+    const auctionCh=sb.channel('auctions-live-feed')
       .on('postgres_changes',{event:'UPDATE',schema:'public',table:'auctions'},()=>{
         if(windows['auctions']&&_aucTab==='live')initAuctionsView();
-      }).subscribe();
+      })
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'auctions'},()=>{
+        if(windows['auctions']&&_aucTab==='live')initAuctionsView();
+      })
+      .subscribe();
     _rtSubs.push(auctionCh);
   }
 }
@@ -2665,9 +2914,25 @@ async function openBidHistory(auctionId){
 }
 
 async function cancelAuction(auctionId){
-  if(!confirm('Anulować licytację?'))return;
+  const{data:auction}=await sb.from('auctions').select('*').eq('id',auctionId).maybeSingle();
+  if(!auction)return;
+  const hasBids=!!auction.highest_bidder_id;
+  const msg=hasBids
+    ?(db.lang==='pl'?`Ktoś już licytuje (${auction.current_price} PLN). Na pewno chcesz anulować? Licytujący zostanie powiadomiony.`:`Someone is already bidding (${auction.current_price} PLN). Cancel anyway? The bidder will be notified.`)
+    :(db.lang==='pl'?'Anulować licytację?':'Cancel auction?');
+  if(!confirm(msg))return;
   await sb.from('auctions').update({status:'cancelled'}).eq('id',auctionId).eq('user_id',currentUser.id);
-  toast('Licytacja anulowana');
+  // Powiadom wszystkich licytujących o anulowaniu
+  if(hasBids){
+    const{data:bidders}=await sb.from('bids').select('user_id').eq('auction_id',auctionId);
+    const uniqueBidders=[...new Set((bidders||[]).map(b=>b.user_id))];
+    for(const bidderId of uniqueBidders){
+      if(bidderId!==currentUser.id){
+        await createNotification(bidderId,'cancelled',db.lang==='pl'?'Licytacja anulowana':'Auction cancelled',`${auction.club} ${auction.season||''} — ${db.lang==='pl'?'sprzedający anulował licytację':'seller cancelled the auction'}`,'auctions');
+      }
+    }
+  }
+  toast(db.lang==='pl'?'Licytacja anulowana':'Auction cancelled');
   if(windows['auctions'])initAuctionsView();
 }
 
