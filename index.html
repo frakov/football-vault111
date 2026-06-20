@@ -644,14 +644,16 @@ async function sbSaveProfile(){
     club:s.club,season:s.season,kind:kindLabel(s.kind),status:s.status,
     photo:s.photos&&s.photos[0]?s.photos[0].slice(0,500):null
   }));
-  await sb.from('profiles').upsert({
+  const{error}=await sb.from('profiles').upsert({
     user_id:currentUser.id, nick:db.profile.nick, bio:db.profile.bio||'',
-    public:db.profile.public||false, shirt_count:(db.shirts||[]).length, public_shirts:publicShirts
+    visible:db.profile.public||false, shirt_count:(db.shirts||[]).length, public_shirts:publicShirts
   },{onConflict:'user_id'});
+  if(error){console.error('sbSaveProfile error:',error);toast('Błąd zapisu profilu: '+error.message);}
 }
 
 async function sbLoadProfiles(){
-  const{data}=await sb.from('profiles').select('*').eq('public',true);
+  const{data,error}=await sb.from('profiles').select('*').eq('visible',true);
+  if(error)console.error('sbLoadProfiles error:',error);
   return data||[];
 }
 
