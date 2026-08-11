@@ -32,22 +32,171 @@ textarea{resize:none}
 #sl{position:fixed;inset:0;z-index:8000;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.012) 2px,rgba(0,0,0,.012) 4px);transition:opacity .4s;opacity:0}
 .noise{position:fixed;inset:0;z-index:8001;pointer-events:none;opacity:.018;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");background-size:180px}
 /* AUTH OVERLAY */
-#auth-overlay{position:fixed;inset:0;z-index:20000;background:rgba(10,10,15,.98);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center}
-#auth-box{background:rgba(10,10,15,.97);border:1px solid rgba(var(--a-rgb),.2);border-radius:24px;width:min(440px,94vw);padding:40px 36px;box-shadow:0 40px 100px rgba(0,0,0,.8)}
-.auth-logo{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:.1em;text-align:center;margin-bottom:6px}
-.auth-logo span{color:var(--a)}
-.auth-sub{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--t2);text-align:center;margin-bottom:32px}
-.auth-tabs{display:flex;gap:2px;background:rgba(0,0,0,.3);border:1px solid rgba(var(--a-rgb),.1);border-radius:10px;padding:3px;margin-bottom:24px}
-.auth-tab{flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);padding:8px 0;border-radius:8px;transition:all .14s;cursor:pointer}
-.auth-tab.active{background:rgba(var(--a-rgb),.15);color:var(--a)}
-.auth-field{background:rgba(0,0,0,.35);border:1px solid rgba(var(--a-rgb),.12);border-radius:12px;padding:12px 16px;margin-bottom:12px;transition:border-color .15s}
-.auth-field:focus-within{border-color:rgba(var(--a-rgb),.4)}
-.auth-field label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t2);display:block;margin-bottom:4px}
-.auth-field input{font-size:14px;font-weight:500}
-.auth-btn{width:100%;background:var(--a);color:#fff;border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:700;letter-spacing:.04em;margin-top:8px;box-shadow:0 2px 16px rgba(var(--a-rgb),.35);transition:all .15s;cursor:pointer}
-.auth-btn:hover{filter:brightness(1.1);box-shadow:0 4px 24px rgba(var(--a-rgb),.5)}
-.auth-err{font-size:11px;color:var(--red);text-align:center;margin-top:8px;min-height:18px;font-family:'JetBrains Mono',monospace}
-.auth-ok{font-size:11px;color:var(--a);text-align:center;margin-top:8px;min-height:18px;font-family:'JetBrains Mono',monospace}
+/* ══════ LANDING PAGE — Editorial Premium Retail ══════ */
+#landing{position:fixed;inset:0;z-index:20000;overflow-y:auto;overflow-x:hidden;background:#f7f5f2;font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;color:#161512}
+#landing.hidden{display:none}
+#landing ::selection{background:#161512;color:#f7f5f2}
+
+/* NAV */
+.lp-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 56px;height:76px;background:rgba(247,245,242,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(22,21,18,.08)}
+.lp-logo{font-family:'Bebas Neue',sans-serif;font-size:23px;letter-spacing:.08em;color:#161512}
+.lp-logo span{color:var(--a-editorial,#b5442e)}
+.lp-nav-links{display:flex;align-items:center;gap:40px}
+.lp-nav-link{font-size:12.5px;font-weight:600;color:#161512;cursor:pointer;transition:opacity .15s;letter-spacing:.04em;text-transform:uppercase;border:none;background:none;opacity:.55}
+.lp-nav-link:hover{opacity:1}
+.lp-nav-cta{display:flex;align-items:center;gap:14px}
+.lp-btn-ghost{font-size:12.5px;font-weight:600;color:#161512;border:none;background:none;cursor:pointer;letter-spacing:.03em;text-transform:uppercase;opacity:.7;transition:opacity .15s}
+.lp-btn-ghost:hover{opacity:1;text-decoration:underline;text-underline-offset:3px}
+.lp-btn-primary{font-size:12.5px;font-weight:700;color:#f7f5f2;background:#161512;border:none;border-radius:2px;padding:12px 26px;cursor:pointer;transition:all .18s;letter-spacing:.05em;text-transform:uppercase}
+.lp-btn-primary:hover{background:#b5442e}
+
+/* HERO — editorial magazine cover style */
+.lp-hero{position:relative;display:grid;grid-template-columns:1fr 1fr;min-height:88vh;background:#161512;overflow:hidden}
+.lp-hero-left{display:flex;flex-direction:column;justify-content:center;padding:0 64px;position:relative;z-index:2}
+.lp-hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#e8a798;margin-bottom:24px;display:flex;align-items:center;gap:10px}
+.lp-hero-eyebrow::before{content:'';width:28px;height:1px;background:#e8a798}
+.lp-hero-h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(56px,6.4vw,96px);letter-spacing:.01em;color:#f7f5f2;line-height:.92;margin-bottom:28px}
+.lp-hero-h1 em{font-style:normal;color:#e8a798}
+.lp-hero-sub{font-size:16px;color:rgba(247,245,242,.6);line-height:1.7;max-width:420px;margin-bottom:40px;font-weight:400}
+.lp-hero-sub strong{color:#f7f5f2;font-weight:600}
+.lp-hero-cta{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:56px}
+.lp-btn-hero{font-size:13px;font-weight:700;color:#161512;background:#f7f5f2;border:none;border-radius:2px;padding:16px 34px;cursor:pointer;transition:all .18s;letter-spacing:.05em;text-transform:uppercase}
+.lp-btn-hero:hover{background:#e8a798;transform:translateY(-1px)}
+.lp-btn-hero-ghost{font-size:13px;font-weight:600;color:#f7f5f2;background:none;border:1px solid rgba(247,245,242,.3);border-radius:2px;padding:15px 30px;cursor:pointer;transition:all .18s;letter-spacing:.05em;text-transform:uppercase}
+.lp-btn-hero-ghost:hover{border-color:#f7f5f2;background:rgba(247,245,242,.06)}
+.lp-hero-stats{display:flex;gap:36px}
+.lp-stat{padding-left:16px;border-left:1px solid rgba(247,245,242,.15)}
+.lp-stat-num{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:.02em;color:#f7f5f2;line-height:1}
+.lp-stat-label{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(247,245,242,.4);margin-top:5px}
+
+/* HERO RIGHT — jersey showcase grid */
+.lp-hero-right{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(247,245,242,.06)}
+.lp-jersey-tile{position:relative;overflow:hidden;background:#1c1b17;display:flex;align-items:center;justify-content:center;transition:transform .5s var(--e1,cubic-bezier(.16,1,.3,1))}
+.lp-jersey-tile:hover{transform:scale(1.03)}
+.lp-jersey-tile:nth-child(1){grid-row:1/3}
+
+/* CSS-drawn jersey graphic */
+.cf-jersey{position:relative;width:78%;aspect-ratio:.82;filter:drop-shadow(0 20px 40px rgba(0,0,0,.5))}
+.cf-jersey-body{position:absolute;inset:0;clip-path:polygon(22% 0%,78% 0%,100% 14%,88% 24%,82% 20%,82% 100%,18% 100%,18% 20%,12% 24%,0% 14%);}
+.cf-jersey-collar{position:absolute;top:0;left:38%;width:24%;height:9%;border-radius:0 0 40% 40%}
+.cf-stripe{position:absolute;top:0;bottom:0;width:16.6%}
+
+/* PILLS */
+.lp-pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:0}
+.lp-pill{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(247,245,242,.55);border:1px solid rgba(247,245,242,.18);border-radius:2px;padding:8px 16px;cursor:pointer;transition:all .15s;background:none}
+.lp-pill:hover,.lp-pill.active{background:#f7f5f2;color:#161512;border-color:#f7f5f2}
+
+/* MARQUEE — scrolling brand strip */
+.lp-marquee{background:#161512;border-top:1px solid rgba(247,245,242,.1);padding:20px 0;overflow:hidden;position:relative}
+.lp-marquee-track{display:flex;gap:0;animation:lpScroll 32s linear infinite;width:max-content}
+.lp-marquee-track:hover{animation-play-state:paused}
+.lp-marquee-set{display:flex;gap:0;flex-shrink:0}
+.lp-marquee-item{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.06em;color:rgba(247,245,242,.28);padding:0 36px;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:36px}
+.lp-marquee-item::after{content:'';width:5px;height:5px;border-radius:50%;background:rgba(232,167,152,.4)}
+@keyframes lpScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* SECTION FRAME */
+.lp-section{padding:120px 56px;max-width:1280px;margin:0 auto}
+.lp-section-head{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:end;margin-bottom:64px}
+.lp-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#b5442e;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.lp-eyebrow::before{content:'';width:28px;height:1px;background:#b5442e}
+.lp-h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,4.4vw,64px);letter-spacing:.01em;color:#161512;line-height:.94}
+.lp-section-desc{font-size:15.5px;color:rgba(22,21,18,.55);line-height:1.75;max-width:440px}
+
+/* PRODUCT-STYLE FEATURE GRID */
+.lp-feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(22,21,18,.1);border:1px solid rgba(22,21,18,.1)}
+.lp-feature-card{background:#f7f5f2;padding:40px 32px;transition:background .2s;position:relative}
+.lp-feature-card:hover{background:#fff}
+.lp-feature-num{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;color:rgba(22,21,18,.3);margin-bottom:28px}
+.lp-feature-icon{width:40px;height:40px;color:#b5442e;margin-bottom:20px}
+.lp-feature-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.02em;color:#161512;margin-bottom:10px}
+.lp-feature-desc{font-size:13.5px;color:rgba(22,21,18,.55);line-height:1.7}
+
+/* EDITORIAL SPLIT SECTION */
+.lp-split{display:grid;grid-template-columns:.9fr 1.1fr;gap:0;background:#161512}
+.lp-split-media{position:relative;overflow:hidden;min-height:560px;display:flex;align-items:center;justify-content:center;background:#1c1b17}
+.lp-split-content{padding:80px 64px;display:flex;flex-direction:column;justify-content:center}
+.lp-split-content .lp-eyebrow{color:#e8a798}
+.lp-split-content .lp-eyebrow::before{background:#e8a798}
+.lp-split-content .lp-h2{color:#f7f5f2}
+.lp-split-steps{margin-top:40px;display:flex;flex-direction:column;gap:0}
+.lp-split-step{display:flex;gap:22px;padding:22px 0;border-top:1px solid rgba(247,245,242,.1)}
+.lp-split-step:last-child{border-bottom:1px solid rgba(247,245,242,.1)}
+.lp-split-step-num{font-family:'Bebas Neue',sans-serif;font-size:28px;color:#e8a798;flex-shrink:0;width:36px}
+.lp-split-step-title{font-size:15px;font-weight:700;color:#f7f5f2;margin-bottom:4px}
+.lp-split-step-desc{font-size:13px;color:rgba(247,245,242,.5);line-height:1.6}
+
+/* STAT BAND */
+.lp-stat-band{background:#f7f5f2;border-top:1px solid rgba(22,21,18,.1);border-bottom:1px solid rgba(22,21,18,.1);display:grid;grid-template-columns:repeat(4,1fr)}
+.lp-stat-band-item{padding:48px 32px;text-align:center;border-left:1px solid rgba(22,21,18,.1)}
+.lp-stat-band-item:first-child{border-left:none}
+.lp-stat-band-num{font-family:'Bebas Neue',sans-serif;font-size:48px;color:#161512;line-height:1}
+.lp-stat-band-num span{color:#b5442e}
+.lp-stat-band-label{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,18,.45);margin-top:8px}
+
+/* FINAL CTA — full bleed dark */
+.lp-cta-section{background:#161512;padding:140px 56px;text-align:center;position:relative;overflow:hidden}
+.lp-cta-section::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:800px;height:500px;background:radial-gradient(ellipse,rgba(181,68,46,.15) 0%,transparent 70%);pointer-events:none}
+.lp-cta-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#e8a798;margin-bottom:20px;position:relative;z-index:1}
+.lp-cta-section h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(44px,6vw,80px);color:#f7f5f2;letter-spacing:.01em;line-height:.95;margin-bottom:20px;position:relative;z-index:1}
+.lp-cta-section p{font-size:16px;color:rgba(247,245,242,.5);margin-bottom:44px;position:relative;z-index:1;max-width:440px;margin-left:auto;margin-right:auto;line-height:1.7}
+.lp-cta-btns{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;position:relative;z-index:1}
+
+/* FOOTER */
+.lp-footer{background:#f7f5f2;padding:56px 56px 32px;border-top:1px solid rgba(22,21,18,.08)}
+.lp-footer-top{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:40px;border-bottom:1px solid rgba(22,21,18,.08);margin-bottom:24px}
+.lp-footer-logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.08em;color:#161512}
+.lp-footer-logo span{color:#b5442e}
+.lp-footer-tag{font-size:12.5px;color:rgba(22,21,18,.45);margin-top:8px;max-width:260px;line-height:1.6}
+.lp-footer-cols{display:flex;gap:64px}
+.lp-footer-col-title{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(22,21,18,.35);margin-bottom:14px}
+.lp-footer-link{display:block;font-size:12.5px;color:rgba(22,21,18,.6);margin-bottom:9px;cursor:pointer;transition:color .15s}
+.lp-footer-link:hover{color:#161512}
+.lp-footer-bottom{display:flex;justify-content:space-between;align-items:center}
+.lp-footer-copy{font-size:11px;color:rgba(22,21,18,.35);font-family:'JetBrains Mono',monospace;letter-spacing:.04em}
+
+/* AUTH MODAL */
+#auth-modal{position:fixed;inset:0;z-index:30000;background:rgba(22,21,18,.7);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center}
+#auth-modal.open{display:flex}
+#auth-box{background:#f7f5f2;border:none;border-radius:2px;width:min(420px,94vw);padding:44px 40px;box-shadow:0 40px 100px rgba(0,0,0,.5);position:relative;color:#161512}
+.auth-modal-close{position:absolute;top:20px;right:20px;width:30px;height:30px;border-radius:50%;background:rgba(22,21,18,.06);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(22,21,18,.5);transition:all .15s}
+.auth-modal-close:hover{background:rgba(22,21,18,.1);color:#161512}
+.auth-logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:.08em;text-align:center;margin-bottom:4px;color:#161512}
+.auth-logo span{color:#b5442e}
+.auth-sub{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,18,.4);text-align:center;margin-bottom:32px}
+.auth-tabs{display:flex;gap:2px;background:rgba(22,21,18,.05);border:1px solid rgba(22,21,18,.08);border-radius:3px;padding:3px;margin-bottom:24px}
+.auth-tab{flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(22,21,18,.4);padding:8px 0;border-radius:2px;transition:all .14s;cursor:pointer}
+.auth-tab.active{background:#161512;color:#f7f5f2}
+.auth-field{background:#fff;border:1px solid rgba(22,21,18,.15);border-radius:2px;padding:12px 15px;margin-bottom:12px;transition:border-color .15s}
+.auth-field:focus-within{border-color:#161512}
+.auth-field label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(22,21,18,.4);display:block;margin-bottom:4px}
+.auth-field input{font-size:14px;font-weight:500;color:#161512;background:transparent;border:none;width:100%;outline:none}
+.auth-btn{width:100%;background:#161512;color:#f7f5f2;border:none;border-radius:2px;padding:14px;font-size:12.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-top:8px;cursor:pointer;transition:all .15s}
+.auth-btn:hover{background:#b5442e}
+.auth-err{font-size:11px;color:#c0392b;text-align:center;margin-top:10px;min-height:16px;font-family:'JetBrains Mono',monospace}
+.auth-ok{font-size:11px;color:#1a7a4c;text-align:center;margin-top:10px;min-height:16px;font-family:'JetBrains Mono',monospace}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .lp-hero{grid-template-columns:1fr;min-height:auto}
+  .lp-hero-left{padding:56px 24px 40px}
+  .lp-hero-right{min-height:340px}
+  .lp-hero-stats{flex-wrap:wrap;gap:20px}
+  .lp-nav{padding:0 20px}.lp-nav-links{display:none}
+  .lp-section{padding:64px 20px}
+  .lp-section-head{grid-template-columns:1fr;gap:20px}
+  .lp-feature-grid{grid-template-columns:1fr}
+  .lp-split{grid-template-columns:1fr}
+  .lp-split-media{min-height:280px}
+  .lp-split-content{padding:48px 24px}
+  .lp-stat-band{grid-template-columns:repeat(2,1fr)}
+  .lp-stat-band-item:nth-child(3){border-left:none}
+  .lp-cta-section{padding:80px 24px}
+  .lp-footer{padding:40px 20px 24px}
+  .lp-footer-top{flex-direction:column;gap:24px}
+  .lp-footer-cols{gap:40px;flex-wrap:wrap}
+  .lp-footer-bottom{flex-direction:column;gap:10px;align-items:flex-start}
+}
 /* DESKTOP */
 #desktop{position:fixed;inset:0 0 50px 0;z-index:1;overflow:hidden}
 .desk-icons{position:absolute;top:24px;left:24px;display:grid;grid-template-columns:80px 80px;grid-auto-rows:max-content;align-content:start;gap:6px;z-index:2}
@@ -376,9 +525,185 @@ select option{background:#0a0a0f}
 <div id="wallpaper-el" style="position:fixed;inset:0;z-index:0;pointer-events:none"></div>
 <div id="sl"></div><div class="noise"></div>
 
-<!-- AUTH OVERLAY -->
-<div id="auth-overlay">
+<!-- LANDING PAGE -->
+<div id="landing">
+  <!-- NAV -->
+  <nav class="lp-nav">
+    <div class="lp-logo">FOOTBALL<span> VAULT</span></div>
+    <div class="lp-nav-links">
+      <button class="lp-nav-link" onclick="scrollTo({top:document.getElementById('lp-features').offsetTop-76,behavior:'smooth'})">Funkcje</button>
+      <button class="lp-nav-link" onclick="scrollTo({top:document.getElementById('lp-how').offsetTop-76,behavior:'smooth'})">Jak działa</button>
+      <button class="lp-nav-link" onclick="openAuthModal('register')">Dla kolekcjonerów</button>
+    </div>
+    <div class="lp-nav-cta">
+      <button class="lp-btn-ghost" onclick="openAuthModal('login')">Zaloguj się</button>
+      <button class="lp-btn-primary" onclick="openAuthModal('register')">Załóż konto</button>
+    </div>
+  </nav>
+
+  <!-- HERO — editorial split -->
+  <section class="lp-hero">
+    <div class="lp-hero-left">
+      <div class="lp-hero-eyebrow">Platforma dla kolekcjonerów</div>
+      <h1 class="lp-hero-h1">TWOJA<br>KOLEKCJA,<br><em>UPORZĄDKOWANA.</em></h1>
+      <p class="lp-hero-sub">Kataloguj, wyceniaj, sprzedawaj i licytuj koszulki piłkarskie w jednym miejscu. <strong>Bez prowizji, bez ograniczeń.</strong></p>
+      <div class="lp-hero-cta">
+        <button class="lp-btn-hero" onclick="openAuthModal('register')">Zacznij za darmo</button>
+        <button class="lp-btn-hero-ghost" onclick="openAuthModal('login')">Mam już konto</button>
+      </div>
+      <div class="lp-pills" style="margin-bottom:44px">
+        <button class="lp-pill active">Kolekcja</button>
+        <button class="lp-pill">Marketplace</button>
+        <button class="lp-pill">Licytacje</button>
+        <button class="lp-pill">Weryfikacja</button>
+      </div>
+      <div class="lp-hero-stats">
+        <div class="lp-stat"><div class="lp-stat-num">0 ZŁ</div><div class="lp-stat-label">Prowizji od sprzedaży</div></div>
+        <div class="lp-stat"><div class="lp-stat-num">24/7</div><div class="lp-stat-label">Marketplace live</div></div>
+        <div class="lp-stat"><div class="lp-stat-num">100%</div><div class="lp-stat-label">Darmowe konto</div></div>
+      </div>
+    </div>
+    <div class="lp-hero-right" id="lp-hero-jerseys"></div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="lp-marquee">
+    <div class="lp-marquee-track" id="lp-marquee-track">
+      <div class="lp-marquee-set" id="lp-marquee-set"></div>
+      <div class="lp-marquee-set" id="lp-marquee-set2"></div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="lp-section" id="lp-features">
+    <div class="lp-section-head">
+      <div>
+        <div class="lp-eyebrow">Funkcjonalności</div>
+        <h2 class="lp-h2">ZBUDOWANE DLA<br>KOLEKCJONERÓW</h2>
+      </div>
+      <p class="lp-section-desc">Od pierwszej koszulki po zaawansowaną licytację — każda funkcja Football Vault powstała z myślą o realnych potrzebach kolekcjonera.</p>
+    </div>
+    <div class="lp-feature-grid">
+      <div class="lp-feature-card">
+        <div class="lp-feature-num">01</div>
+        <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg></div>
+        <div class="lp-feature-title">Zarządzanie kolekcją</div>
+        <div class="lp-feature-desc">Klub, sezon, marka, stan, personalizacja, style code, zdjęcia. Pełna kartoteka każdej koszulki wraz z historią wartości rynkowej.</div>
+      </div>
+      <div class="lp-feature-card">
+        <div class="lp-feature-num">02</div>
+        <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg></div>
+        <div class="lp-feature-title">Marketplace bez prowizji</div>
+        <div class="lp-feature-desc">Wystawiaj koszulki dla wszystkich kolekcjonerów na platformie. Filtruj po klubie, rozmiarze, stanie i cenie. Zero opłat od transakcji.</div>
+      </div>
+      <div class="lp-feature-card">
+        <div class="lp-feature-num">03</div>
+        <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M14.5 10.5l-8 8a2.12 2.12 0 01-3-3l8-8"/><path d="M15.5 5.5l3 3"/><path d="M20 9l-9 9"/><path d="M7 4l3 3"/></svg></div>
+        <div class="lp-feature-title">Licytacje na żywo</div>
+        <div class="lp-feature-desc">Odliczanie w czasie rzeczywistym, minimalne podbicia i automatyczne przedłużenie w ostatnich sekundach walki o koszulkę.</div>
+      </div>
+      <div class="lp-feature-card">
+        <div class="lp-feature-num">04</div>
+        <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
+        <div class="lp-feature-title">Weryfikacja autentyczności</div>
+        <div class="lp-feature-desc">Zgłoś koszulkę do weryfikacji i zdobądź odznakę potwierdzoną, widoczną dla każdego kupującego na marketplace.</div>
+      </div>
+      <div class="lp-feature-card">
+        <div class="lp-feature-num">05</div>
+        <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+        <div class="lp-feature-title">Wishlist z dopasowaniem</div>
+        <div class="lp-feature-desc">Dodaj koszulkę której szukasz. System automatycznie powiadomi Cię gdy pojawi się pasujące ogłoszenie na marketplace.</div>
+      </div>
+      <div class="lp-feature-card">
+        <div class="lp-feature-num">06</div>
+        <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div class="lp-feature-title">Czat i negocjacje</div>
+        <div class="lp-feature-desc">Rozmawiaj bezpośrednio ze sprzedającymi, wysyłaj zdjęcia i finalizuj transakcje bez opuszczania platformy.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPLIT — how it works, editorial dark -->
+  <section class="lp-split" id="lp-how">
+    <div class="lp-split-media" id="lp-split-jersey"></div>
+    <div class="lp-split-content">
+      <div class="lp-eyebrow">Jak to działa</div>
+      <h2 class="lp-h2">CZTERY KROKI<br>DO KOLEKCJI</h2>
+      <div class="lp-split-steps">
+        <div class="lp-split-step">
+          <div class="lp-split-step-num">01</div>
+          <div><div class="lp-split-step-title">Załóż konto</div><div class="lp-split-step-desc">Rejestracja zajmuje 30 sekund — tylko email i hasło.</div></div>
+        </div>
+        <div class="lp-split-step">
+          <div class="lp-split-step-num">02</div>
+          <div><div class="lp-split-step-title">Dodaj koszulki</div><div class="lp-split-step-desc">Kataloguj kolekcję ze zdjęciami i wartością rynkową.</div></div>
+        </div>
+        <div class="lp-split-step">
+          <div class="lp-split-step-num">03</div>
+          <div><div class="lp-split-step-title">Wystawiaj i licytuj</div><div class="lp-split-step-desc">Sprzedawaj bezpośrednio lub uruchom licytację na żywo.</div></div>
+        </div>
+        <div class="lp-split-step">
+          <div class="lp-split-step-num">04</div>
+          <div><div class="lp-split-step-title">Buduj sieć</div><div class="lp-split-step-desc">Przeglądaj profile kolekcjonerów i wymieniaj się koszulkami.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STAT BAND -->
+  <div class="lp-stat-band">
+    <div class="lp-stat-band-item"><div class="lp-stat-band-num">100<span>%</span></div><div class="lp-stat-band-label">Darmowe konto</div></div>
+    <div class="lp-stat-band-item"><div class="lp-stat-band-num"><span>0</span> ZŁ</div><div class="lp-stat-band-label">Prowizji od sprzedaży</div></div>
+    <div class="lp-stat-band-item"><div class="lp-stat-band-num">24<span>/7</span></div><div class="lp-stat-band-label">Marketplace live</div></div>
+    <div class="lp-stat-band-item"><div class="lp-stat-band-num"><span>∞</span></div><div class="lp-stat-band-label">Koszulek w kolekcji</div></div>
+  </div>
+
+  <!-- FINAL CTA -->
+  <section class="lp-cta-section">
+    <div class="lp-cta-eyebrow">Dołącz dzisiaj</div>
+    <h2>ZBUDUJ SWOJĄ<br>KOLEKCJĘ.</h2>
+    <p>Dołącz do kolekcjonerów, którzy już zarządzają swoją kolekcją w Football Vault.</p>
+    <div class="lp-cta-btns">
+      <button class="lp-btn-hero" onclick="openAuthModal('register')">Zacznij za darmo</button>
+      <button class="lp-btn-hero-ghost" onclick="openAuthModal('login')">Zaloguj się</button>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="lp-footer">
+    <div class="lp-footer-top">
+      <div>
+        <div class="lp-footer-logo">FOOTBALL<span> VAULT</span></div>
+        <div class="lp-footer-tag">Platforma dla kolekcjonerów koszulek piłkarskich. Katalog, marketplace i licytacje w jednym miejscu.</div>
+      </div>
+      <div class="lp-footer-cols">
+        <div>
+          <div class="lp-footer-col-title">Platforma</div>
+          <div class="lp-footer-link" onclick="openAuthModal('register')">Załóż konto</div>
+          <div class="lp-footer-link" onclick="scrollTo({top:document.getElementById('lp-features').offsetTop-76,behavior:'smooth'})">Funkcje</div>
+          <div class="lp-footer-link" onclick="scrollTo({top:document.getElementById('lp-how').offsetTop-76,behavior:'smooth'})">Jak działa</div>
+        </div>
+        <div>
+          <div class="lp-footer-col-title">Konto</div>
+          <div class="lp-footer-link" onclick="openAuthModal('login')">Zaloguj się</div>
+          <div class="lp-footer-link" onclick="openAuthModal('reset')">Reset hasła</div>
+        </div>
+      </div>
+    </div>
+    <div class="lp-footer-bottom">
+      <div class="lp-footer-copy">© 2026 FOOTBALL VAULT</div>
+      <div class="lp-footer-copy">WSZYSTKIE PRAWA ZASTRZEŻONE</div>
+    </div>
+  </footer>
+</div>
+
+
+<!-- AUTH MODAL -->
+<div id="auth-modal">
   <div id="auth-box">
+    <button class="auth-modal-close" onclick="closeAuthModal()">
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
     <div class="auth-logo">FOOTBALL<span> VAULT</span></div>
     <div class="auth-sub">Twoja kolekcja koszulek piłkarskich</div>
     <div class="auth-tabs">
@@ -386,39 +711,21 @@ select option{background:#0a0a0f}
       <div class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Rejestracja</div>
       <div class="auth-tab" id="tab-reset" onclick="switchAuthTab('reset')">Reset hasła</div>
     </div>
-    <!-- LOGIN -->
     <div id="form-login">
-      <div class="auth-field">
-        <label for="login-email">Email</label>
-        <input type="email" id="login-email" placeholder="twoj@email.com" autocomplete="email">
-      </div>
-      <div class="auth-field">
-        <label for="login-pass">Hasło</label>
-        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password">
-      </div>
+      <div class="auth-field"><label for="login-email">Email</label><input type="email" id="login-email" placeholder="twoj@email.com" autocomplete="email"></div>
+      <div class="auth-field"><label for="login-pass">Hasło</label><input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"></div>
       <button class="auth-btn" onclick="doLogin()">Zaloguj się →</button>
       <div class="auth-err" id="login-err"></div>
     </div>
-    <!-- REGISTER -->
     <div id="form-register" style="display:none">
-      <div class="auth-field">
-        <label for="reg-email">Email</label>
-        <input type="email" id="reg-email" placeholder="twoj@email.com" autocomplete="email">
-      </div>
-      <div class="auth-field">
-        <label for="reg-pass">Hasło (min. 6 znaków)</label>
-        <input type="password" id="reg-pass" placeholder="••••••••" autocomplete="new-password">
-      </div>
+      <div class="auth-field"><label for="reg-email">Email</label><input type="email" id="reg-email" placeholder="twoj@email.com" autocomplete="email"></div>
+      <div class="auth-field"><label for="reg-pass">Hasło (min. 6 znaków)</label><input type="password" id="reg-pass" placeholder="••••••••" autocomplete="new-password"></div>
       <button class="auth-btn" onclick="doRegister()">Utwórz konto →</button>
       <div class="auth-err" id="reg-err"></div>
       <div class="auth-ok" id="reg-ok"></div>
     </div>
-    <!-- RESET -->
     <div id="form-reset" style="display:none">
-      <div class="auth-field">
-        <label for="reset-email">Email</label>
-        <input type="email" id="reset-email" placeholder="twoj@email.com">
-      </div>
+      <div class="auth-field"><label for="reset-email">Email</label><input type="email" id="reset-email" placeholder="twoj@email.com"></div>
       <button class="auth-btn" onclick="doReset()">Wyślij link resetujący →</button>
       <div class="auth-err" id="reset-err"></div>
       <div class="auth-ok" id="reset-ok"></div>
@@ -2051,15 +2358,88 @@ function renderSP(){
 // INIT — Auth state listener
 // ══════════════════════════════════════════════════════
 // Jedyna funkcja inicjalizacji — wywolywana zawsze po zalogowaniu
+// ── LANDING PAGE FUNCTIONS ──
+function openAuthModal(tab){
+  const modal=document.getElementById('auth-modal');
+  if(modal)modal.classList.add('open');
+  if(tab)switchAuthTab(tab);
+}
+function closeAuthModal(){
+  const modal=document.getElementById('auth-modal');
+  if(modal)modal.classList.remove('open');
+}
+function initLandingMarquee(){
+  const clubs=['FC BARCELONA','REAL MADRID','MANCHESTER CITY','LIVERPOOL FC','JUVENTUS','PARIS SAINT-GERMAIN','BAYERN MONACHIUM','BORUSSIA DORTMUND','AC MILAN','ARSENAL','CHELSEA','INTER MEDIOLAN'];
+  const html=clubs.map(c=>`<div class="lp-marquee-item">${c}</div>`).join('');
+  const s1=document.getElementById('lp-marquee-set');
+  const s2=document.getElementById('lp-marquee-set2');
+  if(s1)s1.innerHTML=html;
+  if(s2)s2.innerHTML=html;
+}
+
+// Generuje realistyczną grafikę koszulki CSS (paski, kolory, kołnierz)
+function drawJersey(bodyColor,stripeColor,collarColor,pattern){
+  const stripes=pattern==='stripes'
+    ?[0,2,4].map(i=>`<div class="cf-stripe" style="left:${i*16.6}%;background:${stripeColor}"></div>`).join('')
+    :'';
+  const halves=pattern==='halves'
+    ?`<div style="position:absolute;inset:0 50% 0 0;background:${stripeColor}"></div>`
+    :'';
+  const chevron=pattern==='chevron'
+    ?`<div style="position:absolute;inset:0;background:linear-gradient(135deg,transparent 45%,${stripeColor} 45%,${stripeColor} 55%,transparent 55%)"></div>`
+    :'';
+  return `<div class="cf-jersey">
+    <div class="cf-jersey-body" style="background:${bodyColor}">${stripes}${halves}${chevron}</div>
+    <div class="cf-jersey-collar" style="background:${collarColor}"></div>
+  </div>`;
+}
+
+function initLandingJerseys(){
+  const heroConfigs=[
+    {body:'#a6192e',stripe:'#161512',collar:'#f7f5f2',pattern:'stripes'},
+    {body:'#f7f5f2',stripe:'#a6192e',collar:'#161512',pattern:'halves'},
+    {body:'#1c2b4a',stripe:'#e8a798',collar:'#f7f5f2',pattern:'chevron'},
+    {body:'#161512',stripe:'#b5442e',collar:'#e8a798',pattern:'stripes'},
+  ];
+  const heroEl=document.getElementById('lp-hero-jerseys');
+  if(heroEl){
+    heroEl.innerHTML=heroConfigs.map(c=>`<div class="lp-jersey-tile">${drawJersey(c.body,c.stripe,c.collar,c.pattern)}</div>`).join('');
+  }
+  const splitEl=document.getElementById('lp-split-jersey');
+  if(splitEl){
+    splitEl.innerHTML=drawJersey('#a6192e','#161512','#f7f5f2','stripes');
+  }
+}
+// Close modal on backdrop click
+document.addEventListener('click',e=>{
+  const modal=document.getElementById('auth-modal');
+  if(modal&&e.target===modal)closeAuthModal();
+});
+// Close modal on Escape
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeAuthModal();
+  if(e.key!=='Enter')return;
+  const lo=document.getElementById('form-login');
+  const re=document.getElementById('form-register');
+  const rs=document.getElementById('form-reset');
+  if(lo&&lo.style.display!=='none')doLogin();
+  else if(re&&re.style.display!=='none')doRegister();
+  else if(rs&&rs.style.display!=='none')doReset();
+});
+// Init brand marquee and jersey graphics
+initLandingMarquee();
+initLandingJerseys();
+
 async function initAfterLogin(user){
   currentUser=user;
-  const ao=document.getElementById('auth-overlay');
-  if(ao)ao.style.display='none';
+  // Hide landing, show app
+  const landing=document.getElementById('landing');
+  if(landing)landing.classList.add('hidden');
+  closeAuthModal();
   const ue=document.getElementById('tb-user-email');
   if(ue)ue.textContent=currentUser.email;
   applyTheme();applyFX();applyTaskbar();renderDesktopIcons();updateTaskbar();
   if(!windows['dash'])openApp('dash');
-  // setTimeout — ucieczka z onAuthStateChange locka (deadlock fix)
   setTimeout(async()=>{
     await sbLoadData();
     saveLocalCache();
@@ -2083,15 +2463,14 @@ function doLogout(){
   db=JSON.parse(JSON.stringify(DEF));
   Object.keys(windows).forEach(id=>closeApp(id));
   unreadNotifs=0;updateNotifBadge();
-  const ao=document.getElementById('auth-overlay');
-  if(ao)ao.style.display='flex';
+  // Show landing again
+  const landing=document.getElementById('landing');
+  if(landing)landing.classList.remove('hidden');
   const ue=document.getElementById('tb-user-email');
   if(ue)ue.textContent='—';
   const di=document.getElementById('desk-icons');
   if(di)di.innerHTML='';
 }
-
-// ── AUTH STATE — bez _initDone (deadlock fix) ──
 sb.auth.onAuthStateChange((event, session) => {
   if(session?.user){
     if(currentUser && currentUser.id===session.user.id && Object.keys(windows).length>0){
@@ -2111,15 +2490,7 @@ sb.auth.onAuthStateChange((event, session) => {
   }
 });
 
-document.addEventListener('keydown',e=>{
-  if(e.key!=='Enter')return;
-  const lo=document.getElementById('form-login');
-  const re=document.getElementById('form-register');
-  const rs=document.getElementById('form-reset');
-  if(lo&&lo.style.display!=='none')doLogin();
-  else if(re&&re.style.display!=='none')doRegister();
-  else if(rs&&rs.style.display!=='none')doReset();
-});
+// keydown handled above in auth modal section
 
 // ══════════════════════════════════════════════════════
 // REALTIME SUBSCRIPTIONS
