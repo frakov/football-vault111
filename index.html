@@ -85,7 +85,8 @@ textarea{resize:none}
 .lp-jersey-tile{position:relative;overflow:hidden;background:#1c1b17;display:flex;align-items:center;justify-content:center;transition:transform .5s cubic-bezier(.16,1,.3,1)}
 .lp-jersey-tile:hover{transform:scale(1.03)}
 .lp-jersey-tile:nth-child(1){grid-row:1/3}
-.cf-jersey{position:relative;width:78%;aspect-ratio:.82;filter:drop-shadow(0 20px 40px rgba(0,0,0,.5))}
+.cf-jersey{position:relative;width:78%;max-width:170px;aspect-ratio:.82;filter:drop-shadow(0 16px 32px rgba(0,0,0,.5))}
+.lp-split-media .cf-jersey{max-width:300px}
 .cf-jersey-body{position:absolute;inset:0;clip-path:polygon(22% 0%,78% 0%,100% 14%,88% 24%,82% 20%,82% 100%,18% 100%,18% 20%,12% 24%,0% 14%)}
 .cf-jersey-collar{position:absolute;top:0;left:38%;width:24%;height:9%;border-radius:0 0 40% 40%}
 .cf-stripe{position:absolute;top:0;bottom:0;width:16.6%}
@@ -120,7 +121,20 @@ textarea{resize:none}
 
 /* CLUB GRID — "Popular Leagues & Teams" style */
 .lp-club-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:rgba(22,21,18,.08);border:1px solid rgba(22,21,18,.08)}
-.lp-club-tile{background:#fff;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:background .15s;cursor:pointer}
+.lp-club-tile{position:relative;background:#fff;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:background .15s;cursor:pointer}
+.club-logo-upload{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:#b7791f;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;z-index:2}
+.club-logo-upload:hover{filter:brightness(1.1)}
+/* ADMIN MODE */
+body.admin-mode [data-ck]{outline:1px dashed transparent;transition:outline-color .15s;cursor:text;border-radius:2px}
+body.admin-mode [data-ck]:hover{outline-color:rgba(183,121,31,.55)}
+body.admin-mode [data-ck]:focus{outline:2px solid #b7791f;outline-offset:2px}
+#admin-bar{position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#15181a;color:#f4f4ef;padding:12px 20px;display:flex;align-items:center;justify-content:center;gap:14px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.05em;box-shadow:0 -4px 20px rgba(0,0,0,.35)}
+#admin-bar span{color:rgba(244,244,239,.55);text-transform:uppercase;letter-spacing:.1em;font-size:10px}
+#admin-bar button{font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:9px 18px;border-radius:3px;border:none;cursor:pointer}
+#admin-bar .admin-save{background:#b7791f;color:#15181a}
+#admin-bar .admin-save:hover{filter:brightness(1.1)}
+#admin-bar .admin-exit{background:transparent;border:1px solid rgba(244,244,239,.3)!important;color:#f4f4ef}
+#admin-bar .admin-exit:hover{background:rgba(244,244,239,.08)}
 .lp-club-tile:hover{background:#eeede6}
 .lp-club-badge{width:46px;height:46px;border-radius:50%;background:#eeede6;border:1px solid rgba(22,21,18,.1);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.02em;color:#15181a}
 .lp-club-tile:hover .lp-club-badge{background:#15181a;color:#f4f4ef;border-color:#15181a}
@@ -601,15 +615,15 @@ select option{background:var(--bg2);color:var(--t1)}
 
 <!-- LANDING PAGE -->
 <div id="landing">
-  <div class="lp-utility">Bezpłatna rejestracja <span>·</span> Zero prowizji od sprzedaży <span>·</span> Marketplace 24/7</div>
+  <div class="lp-utility" data-ck="utility.bar">Bezpłatna rejestracja <span>·</span> Zero prowizji od sprzedaży <span>·</span> Marketplace 24/7</div>
 
   <nav class="lp-nav">
     <div class="lp-logo">FOOTBALL<span> VAULT</span></div>
     <div class="lp-nav-links">
-      <button class="lp-nav-link" onclick="scrollTo({top:document.getElementById('lp-clubs').offsetTop-76,behavior:'smooth'})">Kluby</button>
-      <button class="lp-nav-link" onclick="scrollTo({top:document.getElementById('lp-features').offsetTop-76,behavior:'smooth'})">Funkcje</button>
-      <button class="lp-nav-link" onclick="scrollTo({top:document.getElementById('lp-how').offsetTop-76,behavior:'smooth'})">Jak działa</button>
-      <button class="lp-nav-link" onclick="scrollTo({top:document.getElementById('lp-community').offsetTop-76,behavior:'smooth'})">Społeczność</button>
+      <button class="lp-nav-link" onclick="document.getElementById('landing').scrollTo({top:document.getElementById('lp-clubs').offsetTop-76,behavior:'smooth'})">Kluby</button>
+      <button class="lp-nav-link" onclick="document.getElementById('landing').scrollTo({top:document.getElementById('lp-features').offsetTop-76,behavior:'smooth'})">Funkcje</button>
+      <button class="lp-nav-link" onclick="document.getElementById('landing').scrollTo({top:document.getElementById('lp-how').offsetTop-76,behavior:'smooth'})">Jak działa</button>
+      <button class="lp-nav-link" onclick="document.getElementById('landing').scrollTo({top:document.getElementById('lp-community').offsetTop-76,behavior:'smooth'})">Społeczność</button>
     </div>
     <div class="lp-nav-cta">
       <button class="lp-btn-ghost" onclick="openAuthModal('login')">Zaloguj się</button>
@@ -619,23 +633,23 @@ select option{background:var(--bg2);color:var(--t1)}
 
   <div class="lp-subnav">
     <span class="lp-subnav-link" onclick="openAuthModal('register')">Nowości</span>
-    <span class="lp-subnav-link" onclick="scrollTo({top:document.getElementById('lp-clubs').offsetTop-76,behavior:'smooth'})">Kluby</span>
-    <span class="lp-subnav-link" onclick="scrollTo({top:document.getElementById('lp-features').offsetTop-76,behavior:'smooth'})">Marketplace</span>
-    <span class="lp-subnav-link" onclick="scrollTo({top:document.getElementById('lp-features').offsetTop-76,behavior:'smooth'})">Licytacje</span>
-    <span class="lp-subnav-link" onclick="scrollTo({top:document.getElementById('lp-features').offsetTop-76,behavior:'smooth'})">Weryfikacja</span>
-    <span class="lp-subnav-link" onclick="scrollTo({top:document.getElementById('lp-community').offsetTop-76,behavior:'smooth'})">Kolekcjonerzy</span>
+    <span class="lp-subnav-link" onclick="document.getElementById('landing').scrollTo({top:document.getElementById('lp-clubs').offsetTop-76,behavior:'smooth'})">Kluby</span>
+    <span class="lp-subnav-link" onclick="document.getElementById('landing').scrollTo({top:document.getElementById('lp-features').offsetTop-76,behavior:'smooth'})">Marketplace</span>
+    <span class="lp-subnav-link" onclick="document.getElementById('landing').scrollTo({top:document.getElementById('lp-features').offsetTop-76,behavior:'smooth'})">Licytacje</span>
+    <span class="lp-subnav-link" onclick="document.getElementById('landing').scrollTo({top:document.getElementById('lp-features').offsetTop-76,behavior:'smooth'})">Weryfikacja</span>
+    <span class="lp-subnav-link" onclick="document.getElementById('landing').scrollTo({top:document.getElementById('lp-community').offsetTop-76,behavior:'smooth'})">Kolekcjonerzy</span>
     <span class="lp-subnav-link" onclick="openAuthModal('register')">Dołącz</span>
   </div>
 
   <!-- HERO -->
   <section class="lp-hero">
     <div class="lp-hero-left">
-      <div class="lp-hero-eyebrow">Platforma dla kolekcjonerów</div>
-      <h1 class="lp-hero-h1">TWOJA<br>KOLEKCJA,<br><em>UPORZĄDKOWANA.</em></h1>
-      <p class="lp-hero-sub">Kataloguj, wyceniaj, sprzedawaj i licytuj koszulki piłkarskie w jednym miejscu. <strong>Bez prowizji, bez ograniczeń.</strong></p>
+      <div class="lp-hero-eyebrow" data-ck="hero.eyebrow">Platforma dla kolekcjonerów</div>
+      <h1 class="lp-hero-h1" data-ck="hero.title">TWOJA<br>KOLEKCJA,<br><em>UPORZĄDKOWANA.</em></h1>
+      <p class="lp-hero-sub" data-ck="hero.sub">Kataloguj, wyceniaj, sprzedawaj i licytuj koszulki piłkarskie w jednym miejscu. <strong>Bez prowizji, bez ograniczeń.</strong></p>
       <div class="lp-hero-cta">
-        <button class="lp-btn-hero" onclick="openAuthModal('register')">Zacznij za darmo</button>
-        <button class="lp-btn-hero-ghost" onclick="openAuthModal('login')">Mam już konto</button>
+        <button class="lp-btn-hero" data-ck="hero.cta_primary" onclick="openAuthModal('register')">Zacznij za darmo</button>
+        <button class="lp-btn-hero-ghost" data-ck="hero.cta_secondary" onclick="openAuthModal('login')">Mam już konto</button>
       </div>
       <div class="lp-pills" style="margin-bottom:44px">
         <button class="lp-pill active">Kolekcja</button>
@@ -644,9 +658,9 @@ select option{background:var(--bg2);color:var(--t1)}
         <button class="lp-pill">Weryfikacja</button>
       </div>
       <div class="lp-hero-stats">
-        <div class="lp-stat"><div class="lp-stat-num">0 ZŁ</div><div class="lp-stat-label">Prowizji od sprzedaży</div></div>
-        <div class="lp-stat"><div class="lp-stat-num">24/7</div><div class="lp-stat-label">Marketplace live</div></div>
-        <div class="lp-stat"><div class="lp-stat-num">100%</div><div class="lp-stat-label">Darmowe konto</div></div>
+        <div class="lp-stat"><div class="lp-stat-num" data-ck="hero.stat1_num">0 ZŁ</div><div class="lp-stat-label" data-ck="hero.stat1_label">Prowizji od sprzedaży</div></div>
+        <div class="lp-stat"><div class="lp-stat-num" data-ck="hero.stat2_num">24/7</div><div class="lp-stat-label" data-ck="hero.stat2_label">Marketplace live</div></div>
+        <div class="lp-stat"><div class="lp-stat-num" data-ck="hero.stat3_num">100%</div><div class="lp-stat-label" data-ck="hero.stat3_label">Darmowe konto</div></div>
       </div>
     </div>
     <div class="lp-hero-right" id="lp-hero-jerseys"></div>
@@ -672,10 +686,10 @@ select option{background:var(--bg2);color:var(--t1)}
   <section class="lp-section" id="lp-clubs">
     <div class="lp-section-head">
       <div>
-        <div class="lp-eyebrow">Przeglądaj według klubu</div>
-        <h2 class="lp-h2">POPULARNE<br>DRUŻYNY</h2>
+        <div class="lp-eyebrow" data-ck="clubs.eyebrow">Przeglądaj według klubu</div>
+        <h2 class="lp-h2" data-ck="clubs.title">POPULARNE<br>DRUŻYNY</h2>
       </div>
-      <p class="lp-section-desc">Kolekcjonerzy na Football Vault katalogują koszulki z każdej większej ligi europejskiej i nie tylko. Znajdź swój klub.</p>
+      <p class="lp-section-desc" data-ck="clubs.desc">Kolekcjonerzy na Football Vault katalogują koszulki z każdej większej ligi europejskiej i nie tylko. Znajdź swój klub.</p>
     </div>
     <div class="lp-club-grid" id="lp-club-grid"></div>
   </section>
@@ -684,47 +698,47 @@ select option{background:var(--bg2);color:var(--t1)}
   <section class="lp-section" id="lp-features">
     <div class="lp-section-head">
       <div>
-        <div class="lp-eyebrow">Funkcjonalności</div>
-        <h2 class="lp-h2">ZBUDOWANE DLA<br>KOLEKCJONERÓW</h2>
+        <div class="lp-eyebrow" data-ck="features.eyebrow">Funkcjonalności</div>
+        <h2 class="lp-h2" data-ck="features.title">ZBUDOWANE DLA<br>KOLEKCJONERÓW</h2>
       </div>
-      <p class="lp-section-desc">Od pierwszej koszulki po zaawansowaną licytację — każda funkcja Football Vault powstała z myślą o realnych potrzebach kolekcjonera.</p>
+      <p class="lp-section-desc" data-ck="features.desc">Od pierwszej koszulki po zaawansowaną licytację — każda funkcja Football Vault powstała z myślą o realnych potrzebach kolekcjonera.</p>
     </div>
     <div class="lp-feature-grid">
       <div class="lp-feature-card">
         <div class="lp-feature-num">01</div>
         <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg></div>
-        <div class="lp-feature-title">Zarządzanie kolekcją</div>
-        <div class="lp-feature-desc">Klub, sezon, marka, stan, personalizacja, style code, zdjęcia. Pełna kartoteka każdej koszulki wraz z historią wartości rynkowej.</div>
+        <div class="lp-feature-title" data-ck="feature1.title">Zarządzanie kolekcją</div>
+        <div class="lp-feature-desc" data-ck="feature1.desc">Klub, sezon, marka, stan, personalizacja, style code, zdjęcia. Pełna kartoteka każdej koszulki wraz z historią wartości rynkowej.</div>
       </div>
       <div class="lp-feature-card">
         <div class="lp-feature-num">02</div>
         <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg></div>
-        <div class="lp-feature-title">Marketplace bez prowizji</div>
-        <div class="lp-feature-desc">Wystawiaj koszulki dla wszystkich kolekcjonerów na platformie. Filtruj po klubie, rozmiarze, stanie i cenie. Zero opłat od transakcji.</div>
+        <div class="lp-feature-title" data-ck="feature2.title">Marketplace bez prowizji</div>
+        <div class="lp-feature-desc" data-ck="feature2.desc">Wystawiaj koszulki dla wszystkich kolekcjonerów na platformie. Filtruj po klubie, rozmiarze, stanie i cenie. Zero opłat od transakcji.</div>
       </div>
       <div class="lp-feature-card">
         <div class="lp-feature-num">03</div>
         <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M14.5 10.5l-8 8a2.12 2.12 0 01-3-3l8-8"/><path d="M15.5 5.5l3 3"/><path d="M20 9l-9 9"/><path d="M7 4l3 3"/></svg></div>
-        <div class="lp-feature-title">Licytacje na żywo</div>
-        <div class="lp-feature-desc">Odliczanie w czasie rzeczywistym, minimalne podbicia i automatyczne przedłużenie w ostatnich sekundach walki o koszulkę.</div>
+        <div class="lp-feature-title" data-ck="feature3.title">Licytacje na żywo</div>
+        <div class="lp-feature-desc" data-ck="feature3.desc">Odliczanie w czasie rzeczywistym, minimalne podbicia i automatyczne przedłużenie w ostatnich sekundach walki o koszulkę.</div>
       </div>
       <div class="lp-feature-card">
         <div class="lp-feature-num">04</div>
         <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
-        <div class="lp-feature-title">Weryfikacja autentyczności</div>
-        <div class="lp-feature-desc">Zgłoś koszulkę do weryfikacji i zdobądź odznakę potwierdzoną, widoczną dla każdego kupującego na marketplace.</div>
+        <div class="lp-feature-title" data-ck="feature4.title">Weryfikacja autentyczności</div>
+        <div class="lp-feature-desc" data-ck="feature4.desc">Zgłoś koszulkę do weryfikacji i zdobądź odznakę potwierdzoną, widoczną dla każdego kupującego na marketplace.</div>
       </div>
       <div class="lp-feature-card">
         <div class="lp-feature-num">05</div>
         <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
-        <div class="lp-feature-title">Wishlist z dopasowaniem</div>
-        <div class="lp-feature-desc">Dodaj koszulkę której szukasz. System automatycznie powiadomi Cię gdy pojawi się pasujące ogłoszenie na marketplace.</div>
+        <div class="lp-feature-title" data-ck="feature5.title">Wishlist z dopasowaniem</div>
+        <div class="lp-feature-desc" data-ck="feature5.desc">Dodaj koszulkę której szukasz. System automatycznie powiadomi Cię gdy pojawi się pasujące ogłoszenie na marketplace.</div>
       </div>
       <div class="lp-feature-card">
         <div class="lp-feature-num">06</div>
         <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
-        <div class="lp-feature-title">Czat i negocjacje</div>
-        <div class="lp-feature-desc">Rozmawiaj bezpośrednio ze sprzedającymi, wysyłaj zdjęcia i finalizuj transakcje bez opuszczania platformy.</div>
+        <div class="lp-feature-title" data-ck="feature6.title">Czat i negocjacje</div>
+        <div class="lp-feature-desc" data-ck="feature6.desc">Rozmawiaj bezpośrednio ze sprzedającymi, wysyłaj zdjęcia i finalizuj transakcje bez opuszczania platformy.</div>
       </div>
     </div>
   </section>
@@ -733,24 +747,24 @@ select option{background:var(--bg2);color:var(--t1)}
   <section class="lp-split" id="lp-how">
     <div class="lp-split-media" id="lp-split-jersey"></div>
     <div class="lp-split-content">
-      <div class="lp-eyebrow">Jak to działa</div>
-      <h2 class="lp-h2">CZTERY KROKI<br>DO KOLEKCJI</h2>
+      <div class="lp-eyebrow" data-ck="how.eyebrow">Jak to działa</div>
+      <h2 class="lp-h2" data-ck="how.title">CZTERY KROKI<br>DO KOLEKCJI</h2>
       <div class="lp-split-steps">
         <div class="lp-split-step">
           <div class="lp-split-step-num">01</div>
-          <div><div class="lp-split-step-title">Załóż konto</div><div class="lp-split-step-desc">Rejestracja zajmuje 30 sekund — tylko email i hasło.</div></div>
+          <div><div class="lp-split-step-title" data-ck="step1.title">Załóż konto</div><div class="lp-split-step-desc" data-ck="step1.desc">Rejestracja zajmuje 30 sekund — tylko email i hasło.</div></div>
         </div>
         <div class="lp-split-step">
           <div class="lp-split-step-num">02</div>
-          <div><div class="lp-split-step-title">Dodaj koszulki</div><div class="lp-split-step-desc">Kataloguj kolekcję ze zdjęciami i wartością rynkową.</div></div>
+          <div><div class="lp-split-step-title" data-ck="step2.title">Dodaj koszulki</div><div class="lp-split-step-desc" data-ck="step2.desc">Kataloguj kolekcję ze zdjęciami i wartością rynkową.</div></div>
         </div>
         <div class="lp-split-step">
           <div class="lp-split-step-num">03</div>
-          <div><div class="lp-split-step-title">Wystawiaj i licytuj</div><div class="lp-split-step-desc">Sprzedawaj bezpośrednio lub uruchom licytację na żywo.</div></div>
+          <div><div class="lp-split-step-title" data-ck="step3.title">Wystawiaj i licytuj</div><div class="lp-split-step-desc" data-ck="step3.desc">Sprzedawaj bezpośrednio lub uruchom licytację na żywo.</div></div>
         </div>
         <div class="lp-split-step">
           <div class="lp-split-step-num">04</div>
-          <div><div class="lp-split-step-title">Buduj sieć</div><div class="lp-split-step-desc">Przeglądaj profile kolekcjonerów i wymieniaj się koszulkami.</div></div>
+          <div><div class="lp-split-step-title" data-ck="step4.title">Buduj sieć</div><div class="lp-split-step-desc" data-ck="step4.desc">Przeglądaj profile kolekcjonerów i wymieniaj się koszulkami.</div></div>
         </div>
       </div>
     </div>
@@ -761,10 +775,10 @@ select option{background:var(--bg2);color:var(--t1)}
     <div class="lp-community-inner">
       <div class="lp-section-head" style="margin-bottom:0">
         <div>
-          <div class="lp-eyebrow">Społeczność</div>
-          <h2 class="lp-h2">KOLEKCJE<br>NASZYCH UŻYTKOWNIKÓW</h2>
+          <div class="lp-eyebrow" data-ck="community.eyebrow">Społeczność</div>
+          <h2 class="lp-h2" data-ck="community.title">KOLEKCJE<br>NASZYCH UŻYTKOWNIKÓW</h2>
         </div>
-        <p class="lp-section-desc">Prawdziwi kolekcjonerzy budują swoje archiwa na Football Vault każdego dnia. Dołącz i pokaż swoją kolekcję.</p>
+        <p class="lp-section-desc" data-ck="community.desc">Prawdziwi kolekcjonerzy budują swoje archiwa na Football Vault każdego dnia. Dołącz i pokaż swoją kolekcję.</p>
       </div>
       <div class="lp-community-grid" id="lp-community-grid"></div>
     </div>
@@ -772,43 +786,43 @@ select option{background:var(--bg2);color:var(--t1)}
 
   <!-- STAT BAND -->
   <div class="lp-stat-band">
-    <div class="lp-stat-band-item"><div class="lp-stat-band-num">100<span>%</span></div><div class="lp-stat-band-label">Darmowe konto</div></div>
-    <div class="lp-stat-band-item"><div class="lp-stat-band-num"><span>0</span> ZŁ</div><div class="lp-stat-band-label">Prowizji od sprzedaży</div></div>
-    <div class="lp-stat-band-item"><div class="lp-stat-band-num">24<span>/7</span></div><div class="lp-stat-band-label">Marketplace live</div></div>
-    <div class="lp-stat-band-item"><div class="lp-stat-band-num"><span>∞</span></div><div class="lp-stat-band-label">Koszulek w kolekcji</div></div>
+    <div class="lp-stat-band-item"><div class="lp-stat-band-num" data-ck="statband1.num">100<span>%</span></div><div class="lp-stat-band-label" data-ck="statband1.label">Darmowe konto</div></div>
+    <div class="lp-stat-band-item"><div class="lp-stat-band-num" data-ck="statband2.num"><span>0</span> ZŁ</div><div class="lp-stat-band-label" data-ck="statband2.label">Prowizji od sprzedaży</div></div>
+    <div class="lp-stat-band-item"><div class="lp-stat-band-num" data-ck="statband3.num">24<span>/7</span></div><div class="lp-stat-band-label" data-ck="statband3.label">Marketplace live</div></div>
+    <div class="lp-stat-band-item"><div class="lp-stat-band-num" data-ck="statband4.num"><span>∞</span></div><div class="lp-stat-band-label" data-ck="statband4.label">Koszulek w kolekcji</div></div>
   </div>
 
   <!-- JOIN / NEWSLETTER -->
   <section class="lp-join">
     <div class="lp-join-inner">
       <div>
-        <div class="lp-join-badge">Dołącz do klubu</div>
-        <h2>BĄDŹ NA BIEŻĄCO<br>Z KOLEKCJĄ.</h2>
-        <p style="color:rgba(247,245,242,.5);font-size:14px;line-height:1.7;max-width:400px">Zapisz się i otrzymuj powiadomienia o nowych ogłoszeniach pasujących do Twojej wishlisty oraz aktualizacje platformy.</p>
+        <div class="lp-join-badge" data-ck="join.badge">Dołącz do klubu</div>
+        <h2 data-ck="join.title">BĄDŹ NA BIEŻĄCO<br>Z KOLEKCJĄ.</h2>
+        <p data-ck="join.desc" style="color:rgba(247,245,242,.5);font-size:14px;line-height:1.7;max-width:400px">Zapisz się i otrzymuj powiadomienia o nowych ogłoszeniach pasujących do Twojej wishlisty oraz aktualizacje platformy.</p>
         <div class="lp-join-perks">
-          <div class="lp-join-perk"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Powiadomienia o dopasowaniach wishlisty</div>
-          <div class="lp-join-perk"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Wczesny dostęp do nowych funkcji</div>
-          <div class="lp-join-perk"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Zero spamu — tylko to co ważne</div>
+          <div class="lp-join-perk"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span data-ck="join.perk1">Powiadomienia o dopasowaniach wishlisty</span></div>
+          <div class="lp-join-perk"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span data-ck="join.perk2">Wczesny dostęp do nowych funkcji</span></div>
+          <div class="lp-join-perk"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span data-ck="join.perk3">Zero spamu — tylko to co ważne</span></div>
         </div>
       </div>
       <div class="lp-join-form">
         <div class="lp-join-input-row">
           <input type="email" class="lp-join-input" id="lp-newsletter-email" placeholder="twoj@email.com">
-          <button class="lp-btn-hero" onclick="openAuthModal('register')" style="flex-shrink:0">Dołącz</button>
+          <button class="lp-btn-hero" data-ck="join.cta" onclick="openAuthModal('register')" style="flex-shrink:0">Dołącz</button>
         </div>
-        <div class="lp-join-fine">Zero spamu. Rezygnacja w każdej chwili.</div>
+        <div class="lp-join-fine" data-ck="join.fine">Zero spamu. Rezygnacja w każdej chwili.</div>
       </div>
     </div>
   </section>
 
   <!-- FINAL CTA -->
   <section class="lp-cta-section">
-    <div class="lp-cta-eyebrow">Dołącz dzisiaj</div>
-    <h2>ZBUDUJ SWOJĄ<br>KOLEKCJĘ.</h2>
-    <p>Dołącz do kolekcjonerów, którzy już zarządzają swoją kolekcją w Football Vault.</p>
+    <div class="lp-cta-eyebrow" data-ck="cta.eyebrow">Dołącz dzisiaj</div>
+    <h2 data-ck="cta.title">ZBUDUJ SWOJĄ<br>KOLEKCJĘ.</h2>
+    <p data-ck="cta.desc">Dołącz do kolekcjonerów, którzy już zarządzają swoją kolekcją w Football Vault.</p>
     <div class="lp-cta-btns">
-      <button class="lp-btn-hero" onclick="openAuthModal('register')">Zacznij za darmo</button>
-      <button class="lp-btn-hero-ghost" onclick="openAuthModal('login')">Zaloguj się</button>
+      <button class="lp-btn-hero" data-ck="cta.primary" onclick="openAuthModal('register')">Zacznij za darmo</button>
+      <button class="lp-btn-hero-ghost" data-ck="cta.secondary" onclick="openAuthModal('login')">Zaloguj się</button>
     </div>
   </section>
 
@@ -817,7 +831,7 @@ select option{background:var(--bg2);color:var(--t1)}
     <div class="lp-footer-top">
       <div class="lp-footer-brand">
         <div class="lp-footer-logo">FOOTBALL<span> VAULT</span></div>
-        <div class="lp-footer-tag">Platforma dla kolekcjonerów koszulek piłkarskich. Katalog, marketplace i licytacje w jednym miejscu.</div>
+        <div class="lp-footer-tag" data-ck="footer.tag">Platforma dla kolekcjonerów koszulek piłkarskich. Katalog, marketplace i licytacje w jednym miejscu.</div>
         <div class="lp-footer-social">
           <div class="lp-footer-social-btn" title="Instagram"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div>
           <div class="lp-footer-social-btn" title="Twitter/X"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></div>
@@ -826,21 +840,21 @@ select option{background:var(--bg2);color:var(--t1)}
       </div>
       <div class="lp-footer-cols">
         <div>
-          <div class="lp-footer-col-title">Platforma</div>
+          <div class="lp-footer-col-title" data-ck="footer.col1_title">Platforma</div>
           <div class="lp-footer-link" onclick="openAuthModal('register')">Załóż konto</div>
-          <div class="lp-footer-link" onclick="scrollTo({top:document.getElementById('lp-features').offsetTop-76,behavior:'smooth'})">Funkcje</div>
-          <div class="lp-footer-link" onclick="scrollTo({top:document.getElementById('lp-how').offsetTop-76,behavior:'smooth'})">Jak działa</div>
-          <div class="lp-footer-link" onclick="scrollTo({top:document.getElementById('lp-clubs').offsetTop-76,behavior:'smooth'})">Kluby</div>
+          <div class="lp-footer-link" onclick="document.getElementById('landing').scrollTo({top:document.getElementById('lp-features').offsetTop-76,behavior:'smooth'})">Funkcje</div>
+          <div class="lp-footer-link" onclick="document.getElementById('landing').scrollTo({top:document.getElementById('lp-how').offsetTop-76,behavior:'smooth'})">Jak działa</div>
+          <div class="lp-footer-link" onclick="document.getElementById('landing').scrollTo({top:document.getElementById('lp-clubs').offsetTop-76,behavior:'smooth'})">Kluby</div>
         </div>
         <div>
-          <div class="lp-footer-col-title">Funkcje</div>
+          <div class="lp-footer-col-title" data-ck="footer.col2_title">Funkcje</div>
           <div class="lp-footer-link" onclick="openAuthModal('register')">Marketplace</div>
           <div class="lp-footer-link" onclick="openAuthModal('register')">Licytacje</div>
           <div class="lp-footer-link" onclick="openAuthModal('register')">Wishlist</div>
           <div class="lp-footer-link" onclick="openAuthModal('register')">Weryfikacja</div>
         </div>
         <div>
-          <div class="lp-footer-col-title">Konto</div>
+          <div class="lp-footer-col-title" data-ck="footer.col3_title">Konto</div>
           <div class="lp-footer-link" onclick="openAuthModal('login')">Zaloguj się</div>
           <div class="lp-footer-link" onclick="openAuthModal('reset')">Reset hasła</div>
           <div class="lp-footer-link" onclick="openAuthModal('register')">Rejestracja</div>
@@ -853,8 +867,8 @@ select option{background:var(--bg2);color:var(--t1)}
     </div>
 
     <div class="lp-footer-bottom">
-      <div class="lp-footer-copy">© 2026 FOOTBALL VAULT</div>
-      <div class="lp-footer-copy">WSZYSTKIE PRAWA ZASTRZEŻONE</div>
+      <div class="lp-footer-copy" data-ck="footer.copy1">© 2026 FOOTBALL VAULT</div>
+      <div class="lp-footer-copy" data-ck="footer.copy2">WSZYSTKIE PRAWA ZASTRZEŻONE</div>
     </div>
   </footer>
 </div>
@@ -2620,32 +2634,56 @@ function initLandingTrustBar(){
   if(s2)s2.innerHTML=html;
 }
 
+let LP_CLUBS=[
+  {code:'FCB',name:'Barcelona'},{code:'RMA',name:'Real Madrid'},{code:'MCI',name:'Man City'},
+  {code:'LIV',name:'Liverpool'},{code:'JUV',name:'Juventus'},{code:'PSG',name:'PSG'},
+  {code:'BVB',name:'Dortmund'},{code:'MUN',name:'Man Utd'},{code:'ARS',name:'Arsenal'},
+  {code:'CHE',name:'Chelsea'},{code:'BAY',name:'Bayern'},{code:'INT',name:'Inter'},
+];
 function initLandingClubGrid(){
-  const clubs=[
-    {code:'FCB',name:'Barcelona'},{code:'RMA',name:'Real Madrid'},{code:'MCI',name:'Man City'},
-    {code:'LIV',name:'Liverpool'},{code:'JUV',name:'Juventus'},{code:'PSG',name:'PSG'},
-    {code:'BVB',name:'Dortmund'},{code:'MUN',name:'Man Utd'},{code:'ARS',name:'Arsenal'},
-    {code:'CHE',name:'Chelsea'},{code:'BAY',name:'Bayern'},{code:'INT',name:'Inter'},
-  ];
   const el=document.getElementById('lp-club-grid');
   if(!el)return;
-  el.innerHTML=clubs.map(c=>`<div class="lp-club-tile" onclick="openAuthModal('register')"><div class="lp-club-badge">${c.code}</div><div class="lp-club-name">${c.name}</div></div>`).join('');
+  el.innerHTML=LP_CLUBS.map((c,i)=>{
+    const tileClick=adminMode?'':`onclick="openAuthModal('register')"`;
+    const badgeInner=c.logoUrl?`<img src="${c.logoUrl}" alt="${c.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:c.code;
+    const uploadBtn=adminMode?`<button class="club-logo-upload" onclick="event.stopPropagation();uploadClubLogo(${i})" title="Dodaj grafikę">+</button>`:'';
+    return `<div class="lp-club-tile" ${tileClick}><div class="lp-club-badge">${badgeInner}</div><div class="lp-club-name">${c.name}</div>${uploadBtn}</div>`;
+  }).join('');
+}
+async function uploadClubLogo(i){
+  const input=document.createElement('input');
+  input.type='file';input.accept='image/*';
+  input.onchange=async()=>{
+    const file=input.files[0];if(!file)return;
+    const ext=(file.name.split('.').pop()||'png').toLowerCase();
+    const path=`site/clubs/${LP_CLUBS[i].code}-${Date.now()}.${ext}`;
+    const {error}=await sb.storage.from('shirt-photos').upload(path,file,{upsert:true});
+    if(error){alert('Błąd uploadu: '+error.message);return;}
+    const {data:{publicUrl}}=sb.storage.from('shirt-photos').getPublicUrl(path);
+    LP_CLUBS[i].logoUrl=publicUrl;
+    initLandingClubGrid();
+  };
+  input.click();
 }
 
-function initLandingCommunityGrid(){
-  const configs=[
-    {body:'#a6192e',stripe:'#15181a',collar:'#f4f4ef',pattern:'stripes',club:'AC Milan',season:'2023/24',nick:'@kolekcjoner_pl'},
-    {body:'#1c2b4a',stripe:'#d9be82',collar:'#f4f4ef',pattern:'chevron',club:'Inter Mediolan',season:'2021/22',nick:'@shirtvault'},
-    {body:'#f4f4ef',stripe:'#a6192e',collar:'#15181a',pattern:'halves',club:'AS Roma',season:'2019/20',nick:'@retrokit'},
-    {body:'#15181a',stripe:'#8a6a1f',collar:'#d9be82',pattern:'stripes',club:'Juventus',season:'2020/21',nick:'@ultras_archive'},
-    {body:'#2563eb',stripe:'#f4f4ef',collar:'#15181a',pattern:'chevron',club:'Chelsea',season:'2022/23',nick:'@bluecollector'},
-  ];
+async function initLandingCommunityGrid(){
   const el=document.getElementById('lp-community-grid');
+  const section=document.getElementById('lp-community');
   if(!el)return;
-  el.innerHTML=configs.map(c=>`
+  let data=null;
+  try{
+    const res=await sb.from('market_listings').select('club,season,seller_nick,photo,listed_at').order('listed_at',{ascending:false}).limit(10);
+    data=res.data;
+    if(res.error)console.error('initLandingCommunityGrid error:',res.error);
+  }catch(e){console.error('initLandingCommunityGrid error:',e);}
+  if(!data||!data.length){
+    if(section)section.style.display='none';
+    return;
+  }
+  el.innerHTML=data.map(l=>`
     <div class="lp-community-card" onclick="openAuthModal('register')">
-      <div class="lp-community-card-jersey">${drawJersey(c.body,c.stripe,c.collar,c.pattern)}</div>
-      <div class="lp-community-card-label">${c.club} ${c.season}<div class="lp-community-card-nick">${c.nick}</div></div>
+      <div class="lp-community-card-jersey">${l.photo?`<img src="${l.photo}" alt="${l.club||''}" loading="lazy" style="width:100%;height:100%;object-fit:cover">`:`<div class="shirt-photo-placeholder" style="color:rgba(244,244,239,.22)"><svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg></div>`}</div>
+      <div class="lp-community-card-label">${l.club||'Koszulka'} ${l.season||''}<div class="lp-community-card-nick">@${l.seller_nick||'kolekcjoner'}</div></div>
     </div>`).join('');
 }
 
@@ -2679,6 +2717,89 @@ initLandingTrustBar();
 initLandingClubGrid();
 initLandingCommunityGrid();
 initLandingSeoFooter();
+loadSiteContent();
+
+// ══════════════════════════════════════════════════════
+// ADMIN CONTENT EDITOR (hidden — trigger via #admin in URL)
+// ══════════════════════════════════════════════════════
+const ADMIN_HASH='d622058c7a818485055ecc0062438d4c65e695084fa4481b30db3d1528a8cff3';
+let adminMode=false;
+
+async function sha256Hex(str){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function checkAdminHash(){
+  if(location.hash!=='#admin')return;
+  history.replaceState(null,'',location.pathname+location.search);
+  const pw=prompt('Hasło admina:');
+  if(pw==null)return;
+  const h=await sha256Hex(pw);
+  if(h===ADMIN_HASH)enterAdminMode();
+  else alert('Złe hasło.');
+}
+window.addEventListener('hashchange',checkAdminHash);
+checkAdminHash();
+
+// Block normal onclick actions on editable elements while in admin mode
+document.addEventListener('click',e=>{
+  if(!adminMode)return;
+  const target=e.target.closest('[data-ck]');
+  if(target){e.preventDefault();e.stopPropagation();}
+},true);
+
+function enterAdminMode(){
+  adminMode=true;
+  document.body.classList.add('admin-mode');
+  document.querySelectorAll('[data-ck]').forEach(el=>{el.contentEditable='true';el.spellcheck=false;});
+  initLandingClubGrid();
+  showAdminBar();
+}
+
+function exitAdminMode(){
+  adminMode=false;
+  document.body.classList.remove('admin-mode');
+  document.querySelectorAll('[data-ck]').forEach(el=>{el.contentEditable='false';});
+  initLandingClubGrid();
+  const bar=document.getElementById('admin-bar');
+  if(bar)bar.remove();
+}
+
+function showAdminBar(){
+  if(document.getElementById('admin-bar'))return;
+  const bar=document.createElement('div');
+  bar.id='admin-bar';
+  bar.innerHTML=`<span>Tryb edycji strony</span><button class="admin-save" onclick="saveAllAdminContent()">Zapisz zmiany</button><button class="admin-exit" onclick="exitAdminMode()">Wyjdź</button>`;
+  document.body.appendChild(bar);
+}
+
+async function saveAllAdminContent(){
+  const rows=[];
+  document.querySelectorAll('[data-ck]').forEach(el=>{
+    rows.push({key:el.getAttribute('data-ck'),value:el.innerHTML.trim()});
+  });
+  rows.push({key:'clubs',value:JSON.stringify(LP_CLUBS)});
+  const {error}=await sb.from('site_content').upsert(rows,{onConflict:'key'});
+  if(error){alert('Błąd zapisu: '+error.message);return;}
+  alert('Zapisano zmiany na stronie.');
+}
+
+async function loadSiteContent(){
+  try{
+    const {data,error}=await sb.from('site_content').select('key,value');
+    if(error||!data)return;
+    const map={};
+    data.forEach(r=>map[r.key]=r.value);
+    document.querySelectorAll('[data-ck]').forEach(el=>{
+      const k=el.getAttribute('data-ck');
+      if(map[k]!=null&&map[k]!=='')el.innerHTML=map[k];
+    });
+    if(map['clubs']){
+      try{const parsed=JSON.parse(map['clubs']);if(Array.isArray(parsed)&&parsed.length){LP_CLUBS=parsed;initLandingClubGrid();}}catch(e){}
+    }
+  }catch(e){console.error('loadSiteContent error:',e);}
+}
 
 async function initAfterLogin(user){
   currentUser=user;
