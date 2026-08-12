@@ -35,16 +35,20 @@ textarea{resize:none}
 #sl{position:fixed;inset:0;z-index:8000;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.008) 2px,rgba(0,0,0,.008) 4px);transition:opacity .4s;opacity:0}
 .noise{display:none}
 /* AUTH OVERLAY */
-/* ══════ LANDING PAGE — Editorial Premium Retail ══════ */
+/* ══════ LANDING PAGE — Editorial Premium Retail (CFS-inspired) ══════ */
 #landing{position:fixed;inset:0;z-index:20000;overflow-y:auto;overflow-x:hidden;background:#f7f5f2;font-family:'Barlow',sans-serif;-webkit-font-smoothing:antialiased;color:#161512}
 #landing.hidden{display:none}
 #landing ::selection{background:#161512;color:#f7f5f2}
 
+/* UTILITY BAR — top strip like CFS shipping banner */
+.lp-utility{background:#161512;color:rgba(247,245,242,.9);text-align:center;padding:7px 20px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+.lp-utility span{color:#e8a798}
+
 /* NAV */
-.lp-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 56px;height:76px;background:rgba(247,245,242,.92);backdrop-filter:blur(16px);border-bottom:1px solid rgba(22,21,18,.08)}
+.lp-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 56px;height:72px;background:rgba(247,245,242,.95);backdrop-filter:blur(16px);border-bottom:1px solid rgba(22,21,18,.08)}
 .lp-logo{font-family:'Bebas Neue',sans-serif;font-size:23px;letter-spacing:.08em;color:#161512}
-.lp-logo span{color:var(--a-editorial,#b5442e)}
-.lp-nav-links{display:flex;align-items:center;gap:40px}
+.lp-logo span{color:#b5442e}
+.lp-nav-links{display:flex;align-items:center;gap:32px}
 .lp-nav-link{font-size:12.5px;font-weight:600;color:#161512;cursor:pointer;transition:opacity .15s;letter-spacing:.04em;text-transform:uppercase;border:none;background:none;opacity:.55}
 .lp-nav-link:hover{opacity:1}
 .lp-nav-cta{display:flex;align-items:center;gap:14px}
@@ -52,21 +56,25 @@ textarea{resize:none}
 .lp-btn-ghost:hover{opacity:1;text-decoration:underline;text-underline-offset:3px}
 .lp-btn-primary{font-size:12.5px;font-weight:700;color:#f7f5f2;background:#161512;border:none;border-radius:2px;padding:12px 26px;cursor:pointer;transition:all .18s;letter-spacing:.05em;text-transform:uppercase}
 .lp-btn-primary:hover{background:#b5442e}
+/* Secondary pill row under main nav — like CFS "New in / Weekly Deals / Classic..." strip */
+.lp-subnav{display:flex;align-items:center;justify-content:center;gap:28px;padding:11px 24px;background:#f0ede7;border-bottom:1px solid rgba(22,21,18,.06);overflow-x:auto;white-space:nowrap}
+.lp-subnav-link{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(22,21,18,.55);cursor:pointer;transition:color .15s;flex-shrink:0}
+.lp-subnav-link:hover{color:#b5442e}
 
-/* HERO — editorial magazine cover style */
-.lp-hero{position:relative;display:grid;grid-template-columns:1fr 1fr;min-height:88vh;background:#161512;overflow:hidden}
+/* HERO — editorial split */
+.lp-hero{position:relative;display:grid;grid-template-columns:1fr 1fr;min-height:82vh;background:#161512;overflow:hidden}
 .lp-hero-left{display:flex;flex-direction:column;justify-content:center;padding:0 64px;position:relative;z-index:2}
 .lp-hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:#e8a798;margin-bottom:24px;display:flex;align-items:center;gap:10px}
 .lp-hero-eyebrow::before{content:'';width:28px;height:1px;background:#e8a798}
-.lp-hero-h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(56px,6.4vw,96px);letter-spacing:.01em;color:#f7f5f2;line-height:.92;margin-bottom:28px}
+.lp-hero-h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,6.4vw,88px);letter-spacing:.01em;color:#f7f5f2;line-height:.92;margin-bottom:28px}
 .lp-hero-h1 em{font-style:normal;color:#e8a798}
 .lp-hero-sub{font-size:16px;color:rgba(247,245,242,.6);line-height:1.7;max-width:420px;margin-bottom:40px;font-weight:400}
 .lp-hero-sub strong{color:#f7f5f2;font-weight:600}
-.lp-hero-cta{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:56px}
+.lp-hero-cta{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:44px}
 .lp-btn-hero{font-size:13px;font-weight:700;color:#161512;background:#f7f5f2;border:none;border-radius:2px;padding:16px 34px;cursor:pointer;transition:all .18s;letter-spacing:.05em;text-transform:uppercase}
 .lp-btn-hero:hover{background:#e8a798;transform:translateY(-1px)}
-.lp-btn-hero-ghost{font-size:13px;font-weight:600;color:#f7f5f2;background:none;border:1px solid rgba(247,245,242,.3);border-radius:2px;padding:15px 30px;cursor:pointer;transition:all .18s;letter-spacing:.05em;text-transform:uppercase}
-.lp-btn-hero-ghost:hover{border-color:#f7f5f2;background:rgba(247,245,242,.06)}
+.lp-btn-hero-ghost{font-size:13px;font-weight:600;color:#f7f5f2;background:none;border:1px solid rgba(247,245,242,.3);border-radius:2px;padding:15px 30px;cursor:pointer;transition:all .18s}
+.lp-btn-hero-ghost:hover{background:rgba(247,245,242,.06);border-color:#f7f5f2}
 .lp-hero-stats{display:flex;gap:36px}
 .lp-stat{padding-left:16px;border-left:1px solid rgba(247,245,242,.15)}
 .lp-stat-num{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:.02em;color:#f7f5f2;line-height:1}
@@ -74,37 +82,49 @@ textarea{resize:none}
 
 /* HERO RIGHT — jersey showcase grid */
 .lp-hero-right{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(247,245,242,.06)}
-.lp-jersey-tile{position:relative;overflow:hidden;background:#1c1b17;display:flex;align-items:center;justify-content:center;transition:transform .5s var(--e1,cubic-bezier(.16,1,.3,1))}
+.lp-jersey-tile{position:relative;overflow:hidden;background:#1c1b17;display:flex;align-items:center;justify-content:center;transition:transform .5s cubic-bezier(.16,1,.3,1)}
 .lp-jersey-tile:hover{transform:scale(1.03)}
 .lp-jersey-tile:nth-child(1){grid-row:1/3}
-
-/* CSS-drawn jersey graphic */
 .cf-jersey{position:relative;width:78%;aspect-ratio:.82;filter:drop-shadow(0 20px 40px rgba(0,0,0,.5))}
-.cf-jersey-body{position:absolute;inset:0;clip-path:polygon(22% 0%,78% 0%,100% 14%,88% 24%,82% 20%,82% 100%,18% 100%,18% 20%,12% 24%,0% 14%);}
+.cf-jersey-body{position:absolute;inset:0;clip-path:polygon(22% 0%,78% 0%,100% 14%,88% 24%,82% 20%,82% 100%,18% 100%,18% 20%,12% 24%,0% 14%)}
 .cf-jersey-collar{position:absolute;top:0;left:38%;width:24%;height:9%;border-radius:0 0 40% 40%}
 .cf-stripe{position:absolute;top:0;bottom:0;width:16.6%}
 
-/* PILLS */
-.lp-pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:0}
-.lp-pill{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(247,245,242,.55);border:1px solid rgba(247,245,242,.18);border-radius:2px;padding:8px 16px;cursor:pointer;transition:all .15s;background:none}
-.lp-pill:hover,.lp-pill.active{background:#f7f5f2;color:#161512;border-color:#f7f5f2}
+/* TRUST BAR — CFS-style repeating trust strip */
+.lp-trust{background:#161512;border-top:1px solid rgba(247,245,242,.08);padding:16px 0;overflow:hidden}
+.lp-trust-track{display:flex;gap:0;animation:lpTrustScroll 22s linear infinite;width:max-content}
+.lp-trust-track:hover{animation-play-state:paused}
+.lp-trust-set{display:flex;gap:0;flex-shrink:0}
+.lp-trust-item{display:flex;align-items:center;gap:10px;padding:0 32px;white-space:nowrap;flex-shrink:0}
+.lp-trust-item svg{color:#e8a798;flex-shrink:0}
+.lp-trust-item span{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:rgba(247,245,242,.65)}
+.lp-trust-dot{width:4px;height:4px;border-radius:50%;background:rgba(247,245,242,.25);flex-shrink:0}
+@keyframes lpTrustScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
 /* MARQUEE — scrolling brand strip */
-.lp-marquee{background:#161512;border-top:1px solid rgba(247,245,242,.1);padding:20px 0;overflow:hidden;position:relative}
+.lp-marquee{background:#f0ede7;border-top:1px solid rgba(22,21,18,.06);border-bottom:1px solid rgba(22,21,18,.06);padding:18px 0;overflow:hidden;position:relative}
 .lp-marquee-track{display:flex;gap:0;animation:lpScroll 32s linear infinite;width:max-content}
 .lp-marquee-track:hover{animation-play-state:paused}
 .lp-marquee-set{display:flex;gap:0;flex-shrink:0}
-.lp-marquee-item{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.06em;color:rgba(247,245,242,.28);padding:0 36px;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:36px}
-.lp-marquee-item::after{content:'';width:5px;height:5px;border-radius:50%;background:rgba(232,167,152,.4)}
+.lp-marquee-item{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.06em;color:rgba(22,21,18,.32);padding:0 32px;white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:32px}
+.lp-marquee-item::after{content:'';width:5px;height:5px;border-radius:50%;background:rgba(181,68,46,.4)}
 @keyframes lpScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 
 /* SECTION FRAME */
-.lp-section{padding:120px 56px;max-width:1280px;margin:0 auto}
-.lp-section-head{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:end;margin-bottom:64px}
+.lp-section{padding:100px 56px;max-width:1280px;margin:0 auto}
+.lp-section-head{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:end;margin-bottom:56px}
 .lp-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#b5442e;margin-bottom:16px;display:flex;align-items:center;gap:10px}
 .lp-eyebrow::before{content:'';width:28px;height:1px;background:#b5442e}
-.lp-h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,4.4vw,64px);letter-spacing:.01em;color:#161512;line-height:.94}
-.lp-section-desc{font-size:15.5px;color:rgba(22,21,18,.55);line-height:1.75;max-width:440px}
+.lp-h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(38px,4.2vw,60px);letter-spacing:.01em;color:#161512;line-height:.94}
+.lp-section-desc{font-size:15px;color:rgba(22,21,18,.55);line-height:1.75;max-width:440px}
+
+/* CLUB GRID — "Popular Leagues & Teams" style */
+.lp-club-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:rgba(22,21,18,.08);border:1px solid rgba(22,21,18,.08)}
+.lp-club-tile{background:#fff;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:background .15s;cursor:pointer}
+.lp-club-tile:hover{background:#f0ede7}
+.lp-club-badge{width:46px;height:46px;border-radius:50%;background:#f0ede7;border:1px solid rgba(22,21,18,.1);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.02em;color:#161512}
+.lp-club-tile:hover .lp-club-badge{background:#161512;color:#f7f5f2;border-color:#161512}
+.lp-club-name{font-size:11px;font-weight:600;color:rgba(22,21,18,.7);text-align:center;padding:0 6px}
 
 /* PRODUCT-STYLE FEATURE GRID */
 .lp-feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(22,21,18,.1);border:1px solid rgba(22,21,18,.1)}
@@ -129,6 +149,16 @@ textarea{resize:none}
 .lp-split-step-title{font-size:15px;font-weight:700;color:#f7f5f2;margin-bottom:4px}
 .lp-split-step-desc{font-size:13px;color:rgba(247,245,242,.5);line-height:1.6}
 
+/* COMMUNITY SECTION — "Community Fits" style photo grid */
+.lp-community{background:#f0ede7;padding:100px 56px}
+.lp-community-inner{max-width:1280px;margin:0 auto}
+.lp-community-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:16px}
+.lp-community-card{position:relative;aspect-ratio:.78;border-radius:4px;overflow:hidden;background:#1c1b17;cursor:pointer;transition:transform .3s}
+.lp-community-card:hover{transform:translateY(-4px)}
+.lp-community-card-jersey{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.lp-community-card-label{position:absolute;bottom:0;left:0;right:0;padding:14px 12px;background:linear-gradient(to top,rgba(0,0,0,.85),transparent);color:#f7f5f2;font-size:11px;font-weight:600;line-height:1.4}
+.lp-community-card-nick{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:#e8a798;margin-top:3px}
+
 /* STAT BAND */
 .lp-stat-band{background:#f7f5f2;border-top:1px solid rgba(22,21,18,.1);border-bottom:1px solid rgba(22,21,18,.1);display:grid;grid-template-columns:repeat(4,1fr)}
 .lp-stat-band-item{padding:48px 32px;text-align:center;border-left:1px solid rgba(22,21,18,.1)}
@@ -137,26 +167,85 @@ textarea{resize:none}
 .lp-stat-band-num span{color:#b5442e}
 .lp-stat-band-label{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,21,18,.45);margin-top:8px}
 
+/* NEWSLETTER / JOIN */
+.lp-join{position:relative;background:#161512;padding:90px 56px;overflow:hidden}
+.lp-join::before{content:'';position:absolute;top:50%;left:15%;transform:translateY(-50%);width:500px;height:500px;background:radial-gradient(ellipse,rgba(181,68,46,.18) 0%,transparent 70%);pointer-events:none}
+.lp-join-inner{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;position:relative;z-index:1}
+.lp-join-badge{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#e8a798;margin-bottom:16px}
+.lp-join h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(34px,3.6vw,50px);color:#f7f5f2;line-height:1;margin-bottom:16px}
+.lp-join-perks{display:flex;flex-direction:column;gap:12px;margin-top:24px}
+.lp-join-perk{display:flex;align-items:center;gap:12px;font-size:13.5px;color:rgba(247,245,242,.7)}
+.lp-join-perk svg{color:#e8a798;flex-shrink:0}
+.lp-join-form{display:flex;flex-direction:column;gap:14px}
+.lp-join-input-row{display:flex;gap:10px}
+.lp-join-input{flex:1;background:rgba(247,245,242,.06);border:1px solid rgba(247,245,242,.2);border-radius:2px;padding:15px 18px;color:#f7f5f2;font-size:13.5px}
+.lp-join-input::placeholder{color:rgba(247,245,242,.35)}
+.lp-join-fine{font-size:10.5px;color:rgba(247,245,242,.35);font-family:'JetBrains Mono',monospace}
+
 /* FINAL CTA — full bleed dark */
-.lp-cta-section{background:#161512;padding:140px 56px;text-align:center;position:relative;overflow:hidden}
+.lp-cta-section{background:#161512;padding:130px 56px;text-align:center;position:relative;overflow:hidden;border-top:1px solid rgba(247,245,242,.08)}
 .lp-cta-section::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:800px;height:500px;background:radial-gradient(ellipse,rgba(181,68,46,.15) 0%,transparent 70%);pointer-events:none}
 .lp-cta-eyebrow{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#e8a798;margin-bottom:20px;position:relative;z-index:1}
 .lp-cta-section h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(44px,6vw,80px);color:#f7f5f2;letter-spacing:.01em;line-height:.95;margin-bottom:20px;position:relative;z-index:1}
 .lp-cta-section p{font-size:16px;color:rgba(247,245,242,.5);margin-bottom:44px;position:relative;z-index:1;max-width:440px;margin-left:auto;margin-right:auto;line-height:1.7}
 .lp-cta-btns{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;position:relative;z-index:1}
 
-/* FOOTER */
-.lp-footer{background:#f7f5f2;padding:56px 56px 32px;border-top:1px solid rgba(22,21,18,.08)}
-.lp-footer-top{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:40px;border-bottom:1px solid rgba(22,21,18,.08);margin-bottom:24px}
+/* FOOTER — big multi-column SEO-style like CFS */
+.lp-footer{background:#f7f5f2;padding:64px 56px 0}
+.lp-footer-top{max-width:1280px;margin:0 auto;display:flex;justify-content:space-between;gap:40px;padding-bottom:48px;border-bottom:1px solid rgba(22,21,18,.08)}
+.lp-footer-brand{max-width:260px}
 .lp-footer-logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.08em;color:#161512}
 .lp-footer-logo span{color:#b5442e}
-.lp-footer-tag{font-size:12.5px;color:rgba(22,21,18,.45);margin-top:8px;max-width:260px;line-height:1.6}
-.lp-footer-cols{display:flex;gap:64px}
-.lp-footer-col-title{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(22,21,18,.35);margin-bottom:14px}
-.lp-footer-link{display:block;font-size:12.5px;color:rgba(22,21,18,.6);margin-bottom:9px;cursor:pointer;transition:color .15s}
+.lp-footer-tag{font-size:12.5px;color:rgba(22,21,18,.45);margin-top:10px;line-height:1.65}
+.lp-footer-social{display:flex;gap:10px;margin-top:20px}
+.lp-footer-social-btn{width:32px;height:32px;border-radius:50%;background:rgba(22,21,18,.06);display:flex;align-items:center;justify-content:center;color:rgba(22,21,18,.5);transition:all .15s;cursor:pointer}
+.lp-footer-social-btn:hover{background:#161512;color:#f7f5f2}
+.lp-footer-cols{display:flex;gap:56px;flex-wrap:wrap}
+.lp-footer-col-title{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(22,21,18,.35);margin-bottom:16px}
+.lp-footer-link{display:block;font-size:12.5px;color:rgba(22,21,18,.6);margin-bottom:10px;cursor:pointer;transition:color .15s}
 .lp-footer-link:hover{color:#161512}
-.lp-footer-bottom{display:flex;justify-content:space-between;align-items:center}
+.lp-footer-seo{max-width:1280px;margin:0 auto;padding:32px 0;border-bottom:1px solid rgba(22,21,18,.08)}
+.lp-footer-seo-row{font-size:11.5px;color:rgba(22,21,18,.4);line-height:2.1}
+.lp-footer-seo-row span{cursor:pointer;transition:color .15s}
+.lp-footer-seo-row span:hover{color:#b5442e}
+.lp-footer-seo-sep{color:rgba(22,21,18,.2);margin:0 8px}
+.lp-footer-bottom{max-width:1280px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:24px 0 32px}
 .lp-footer-copy{font-size:11px;color:rgba(22,21,18,.35);font-family:'JetBrains Mono',monospace;letter-spacing:.04em}
+
+/* PILLS */
+.lp-pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:0}
+.lp-pill{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(247,245,242,.55);border:1px solid rgba(247,245,242,.18);border-radius:2px;padding:8px 16px;cursor:pointer;transition:all .15s;background:none}
+.lp-pill:hover,.lp-pill.active{background:#f7f5f2;color:#161512;border-color:#f7f5f2}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .lp-utility{font-size:8.5px;padding:6px 12px}
+  .lp-nav{padding:0 20px}.lp-nav-links{display:none}
+  .lp-subnav{padding:9px 16px;gap:18px}
+  .lp-hero{grid-template-columns:1fr;min-height:auto}
+  .lp-hero-left{padding:56px 24px 40px}
+  .lp-hero-right{min-height:340px}
+  .lp-hero-stats{flex-wrap:wrap;gap:20px}
+  .lp-section{padding:64px 20px}
+  .lp-section-head{grid-template-columns:1fr;gap:20px}
+  .lp-club-grid{grid-template-columns:repeat(3,1fr)}
+  .lp-feature-grid{grid-template-columns:1fr}
+  .lp-split{grid-template-columns:1fr}
+  .lp-split-media{min-height:280px}
+  .lp-split-content{padding:48px 24px}
+  .lp-community{padding:56px 20px}
+  .lp-community-grid{grid-template-columns:repeat(2,1fr)}
+  .lp-stat-band{grid-template-columns:repeat(2,1fr)}
+  .lp-stat-band-item:nth-child(3){border-left:none}
+  .lp-join{padding:56px 20px}
+  .lp-join-inner{grid-template-columns:1fr;gap:32px}
+  .lp-join-input-row{flex-direction:column}
+  .lp-cta-section{padding:80px 24px}
+  .lp-footer{padding:48px 20px 0}
+  .lp-footer-top{flex-direction:column}
+  .lp-footer-cols{gap:32px}
+  .lp-footer-bottom{flex-direction:column;gap:10px;align-items:flex-start}
+}
 
 /* AUTH MODAL */
 #auth-modal{position:fixed;inset:0;z-index:30000;background:rgba(22,21,18,.7);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center}
@@ -509,13 +598,15 @@ select option{background:var(--bg2);color:var(--t1)}
 
 <!-- LANDING PAGE -->
 <div id="landing">
-  <!-- NAV -->
+  <div class="lp-utility">Bezpłatna rejestracja <span>·</span> Zero prowizji od sprzedaży <span>·</span> Marketplace 24/7</div>
+
   <nav class="lp-nav">
     <div class="lp-logo">FOOTBALL<span> VAULT</span></div>
     <div class="lp-nav-links">
+      <button class="lp-nav-link" onclick="scrollTo({top:document.getElementById('lp-clubs').offsetTop-76,behavior:'smooth'})">Kluby</button>
       <button class="lp-nav-link" onclick="scrollTo({top:document.getElementById('lp-features').offsetTop-76,behavior:'smooth'})">Funkcje</button>
       <button class="lp-nav-link" onclick="scrollTo({top:document.getElementById('lp-how').offsetTop-76,behavior:'smooth'})">Jak działa</button>
-      <button class="lp-nav-link" onclick="openAuthModal('register')">Dla kolekcjonerów</button>
+      <button class="lp-nav-link" onclick="scrollTo({top:document.getElementById('lp-community').offsetTop-76,behavior:'smooth'})">Społeczność</button>
     </div>
     <div class="lp-nav-cta">
       <button class="lp-btn-ghost" onclick="openAuthModal('login')">Zaloguj się</button>
@@ -523,7 +614,17 @@ select option{background:var(--bg2);color:var(--t1)}
     </div>
   </nav>
 
-  <!-- HERO — editorial split -->
+  <div class="lp-subnav">
+    <span class="lp-subnav-link" onclick="openAuthModal('register')">Nowości</span>
+    <span class="lp-subnav-link" onclick="scrollTo({top:document.getElementById('lp-clubs').offsetTop-76,behavior:'smooth'})">Kluby</span>
+    <span class="lp-subnav-link" onclick="scrollTo({top:document.getElementById('lp-features').offsetTop-76,behavior:'smooth'})">Marketplace</span>
+    <span class="lp-subnav-link" onclick="scrollTo({top:document.getElementById('lp-features').offsetTop-76,behavior:'smooth'})">Licytacje</span>
+    <span class="lp-subnav-link" onclick="scrollTo({top:document.getElementById('lp-features').offsetTop-76,behavior:'smooth'})">Weryfikacja</span>
+    <span class="lp-subnav-link" onclick="scrollTo({top:document.getElementById('lp-community').offsetTop-76,behavior:'smooth'})">Kolekcjonerzy</span>
+    <span class="lp-subnav-link" onclick="openAuthModal('register')">Dołącz</span>
+  </div>
+
+  <!-- HERO -->
   <section class="lp-hero">
     <div class="lp-hero-left">
       <div class="lp-hero-eyebrow">Platforma dla kolekcjonerów</div>
@@ -548,6 +649,14 @@ select option{background:var(--bg2);color:var(--t1)}
     <div class="lp-hero-right" id="lp-hero-jerseys"></div>
   </section>
 
+  <!-- TRUST BAR -->
+  <div class="lp-trust">
+    <div class="lp-trust-track" id="lp-trust-track">
+      <div class="lp-trust-set" id="lp-trust-set"></div>
+      <div class="lp-trust-set" id="lp-trust-set2"></div>
+    </div>
+  </div>
+
   <!-- MARQUEE -->
   <div class="lp-marquee">
     <div class="lp-marquee-track" id="lp-marquee-track">
@@ -555,6 +664,18 @@ select option{background:var(--bg2);color:var(--t1)}
       <div class="lp-marquee-set" id="lp-marquee-set2"></div>
     </div>
   </div>
+
+  <!-- CLUB GRID -->
+  <section class="lp-section" id="lp-clubs">
+    <div class="lp-section-head">
+      <div>
+        <div class="lp-eyebrow">Przeglądaj według klubu</div>
+        <h2 class="lp-h2">POPULARNE<br>DRUŻYNY</h2>
+      </div>
+      <p class="lp-section-desc">Kolekcjonerzy na Football Vault katalogują koszulki z każdej większej ligi europejskiej i nie tylko. Znajdź swój klub.</p>
+    </div>
+    <div class="lp-club-grid" id="lp-club-grid"></div>
+  </section>
 
   <!-- FEATURES -->
   <section class="lp-section" id="lp-features">
@@ -605,7 +726,7 @@ select option{background:var(--bg2);color:var(--t1)}
     </div>
   </section>
 
-  <!-- SPLIT — how it works, editorial dark -->
+  <!-- SPLIT — how it works -->
   <section class="lp-split" id="lp-how">
     <div class="lp-split-media" id="lp-split-jersey"></div>
     <div class="lp-split-content">
@@ -632,6 +753,20 @@ select option{background:var(--bg2);color:var(--t1)}
     </div>
   </section>
 
+  <!-- COMMUNITY -->
+  <section class="lp-community" id="lp-community">
+    <div class="lp-community-inner">
+      <div class="lp-section-head" style="margin-bottom:0">
+        <div>
+          <div class="lp-eyebrow">Społeczność</div>
+          <h2 class="lp-h2">KOLEKCJE<br>NASZYCH UŻYTKOWNIKÓW</h2>
+        </div>
+        <p class="lp-section-desc">Prawdziwi kolekcjonerzy budują swoje archiwa na Football Vault każdego dnia. Dołącz i pokaż swoją kolekcję.</p>
+      </div>
+      <div class="lp-community-grid" id="lp-community-grid"></div>
+    </div>
+  </section>
+
   <!-- STAT BAND -->
   <div class="lp-stat-band">
     <div class="lp-stat-band-item"><div class="lp-stat-band-num">100<span>%</span></div><div class="lp-stat-band-label">Darmowe konto</div></div>
@@ -639,6 +774,29 @@ select option{background:var(--bg2);color:var(--t1)}
     <div class="lp-stat-band-item"><div class="lp-stat-band-num">24<span>/7</span></div><div class="lp-stat-band-label">Marketplace live</div></div>
     <div class="lp-stat-band-item"><div class="lp-stat-band-num"><span>∞</span></div><div class="lp-stat-band-label">Koszulek w kolekcji</div></div>
   </div>
+
+  <!-- JOIN / NEWSLETTER -->
+  <section class="lp-join">
+    <div class="lp-join-inner">
+      <div>
+        <div class="lp-join-badge">Dołącz do klubu</div>
+        <h2>BĄDŹ NA BIEŻĄCO<br>Z KOLEKCJĄ.</h2>
+        <p style="color:rgba(247,245,242,.5);font-size:14px;line-height:1.7;max-width:400px">Zapisz się i otrzymuj powiadomienia o nowych ogłoszeniach pasujących do Twojej wishlisty oraz aktualizacje platformy.</p>
+        <div class="lp-join-perks">
+          <div class="lp-join-perk"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Powiadomienia o dopasowaniach wishlisty</div>
+          <div class="lp-join-perk"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Wczesny dostęp do nowych funkcji</div>
+          <div class="lp-join-perk"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Zero spamu — tylko to co ważne</div>
+        </div>
+      </div>
+      <div class="lp-join-form">
+        <div class="lp-join-input-row">
+          <input type="email" class="lp-join-input" id="lp-newsletter-email" placeholder="twoj@email.com">
+          <button class="lp-btn-hero" onclick="openAuthModal('register')" style="flex-shrink:0">Dołącz</button>
+        </div>
+        <div class="lp-join-fine">Zero spamu. Rezygnacja w każdej chwili.</div>
+      </div>
+    </div>
+  </section>
 
   <!-- FINAL CTA -->
   <section class="lp-cta-section">
@@ -654,9 +812,14 @@ select option{background:var(--bg2);color:var(--t1)}
   <!-- FOOTER -->
   <footer class="lp-footer">
     <div class="lp-footer-top">
-      <div>
+      <div class="lp-footer-brand">
         <div class="lp-footer-logo">FOOTBALL<span> VAULT</span></div>
         <div class="lp-footer-tag">Platforma dla kolekcjonerów koszulek piłkarskich. Katalog, marketplace i licytacje w jednym miejscu.</div>
+        <div class="lp-footer-social">
+          <div class="lp-footer-social-btn" title="Instagram"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div>
+          <div class="lp-footer-social-btn" title="Twitter/X"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></div>
+          <div class="lp-footer-social-btn" title="TikTok"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82s.51.5 0 0A4.278 4.278 0 0115.54 3h-3.09v12.4a2.592 2.592 0 01-2.59 2.5c-1.42 0-2.6-1.16-2.6-2.6 0-1.72 1.66-3.01 3.37-2.48V9.66c-3.45-.46-6.47 2.22-6.47 5.64 0 3.33 2.76 5.7 5.69 5.7 3.14 0 5.69-2.55 5.69-5.7V9.01a7.35 7.35 0 004.3 1.38V7.3s-1.88.09-3.24-1.48z"/></svg></div>
+        </div>
       </div>
       <div class="lp-footer-cols">
         <div>
@@ -664,14 +827,28 @@ select option{background:var(--bg2);color:var(--t1)}
           <div class="lp-footer-link" onclick="openAuthModal('register')">Załóż konto</div>
           <div class="lp-footer-link" onclick="scrollTo({top:document.getElementById('lp-features').offsetTop-76,behavior:'smooth'})">Funkcje</div>
           <div class="lp-footer-link" onclick="scrollTo({top:document.getElementById('lp-how').offsetTop-76,behavior:'smooth'})">Jak działa</div>
+          <div class="lp-footer-link" onclick="scrollTo({top:document.getElementById('lp-clubs').offsetTop-76,behavior:'smooth'})">Kluby</div>
+        </div>
+        <div>
+          <div class="lp-footer-col-title">Funkcje</div>
+          <div class="lp-footer-link" onclick="openAuthModal('register')">Marketplace</div>
+          <div class="lp-footer-link" onclick="openAuthModal('register')">Licytacje</div>
+          <div class="lp-footer-link" onclick="openAuthModal('register')">Wishlist</div>
+          <div class="lp-footer-link" onclick="openAuthModal('register')">Weryfikacja</div>
         </div>
         <div>
           <div class="lp-footer-col-title">Konto</div>
           <div class="lp-footer-link" onclick="openAuthModal('login')">Zaloguj się</div>
           <div class="lp-footer-link" onclick="openAuthModal('reset')">Reset hasła</div>
+          <div class="lp-footer-link" onclick="openAuthModal('register')">Rejestracja</div>
         </div>
       </div>
     </div>
+
+    <div class="lp-footer-seo">
+      <div class="lp-footer-seo-row" id="lp-seo-clubs"></div>
+    </div>
+
     <div class="lp-footer-bottom">
       <div class="lp-footer-copy">© 2026 FOOTBALL VAULT</div>
       <div class="lp-footer-copy">WSZYSTKIE PRAWA ZASTRZEŻONE</div>
@@ -2422,6 +2599,60 @@ function initLandingJerseys(){
     splitEl.innerHTML=drawJersey('#a6192e','#161512','#f7f5f2','stripes');
   }
 }
+
+function initLandingTrustBar(){
+  const items=[
+    {icon:'checkCircle',text:'Zero prowizji od sprzedaży'},
+    {icon:'shieldCheck',text:'Weryfikacja autentyczności'},
+    {icon:'zap',text:'Licytacje na żywo'},
+    {icon:'heart',text:'Wishlist z dopasowaniem'},
+    {icon:'messageCircle',text:'Czat wbudowany w platformę'},
+    {icon:'users',text:'Rosnąca społeczność kolekcjonerów'},
+  ];
+  const build=()=>items.map(it=>`<div class="lp-trust-item">${icon(it.icon,15)}<span>${it.text}</span></div><div class="lp-trust-dot"></div>`).join('');
+  const html=build();
+  const s1=document.getElementById('lp-trust-set');
+  const s2=document.getElementById('lp-trust-set2');
+  if(s1)s1.innerHTML=html;
+  if(s2)s2.innerHTML=html;
+}
+
+function initLandingClubGrid(){
+  const clubs=[
+    {code:'FCB',name:'Barcelona'},{code:'RMA',name:'Real Madrid'},{code:'MCI',name:'Man City'},
+    {code:'LIV',name:'Liverpool'},{code:'JUV',name:'Juventus'},{code:'PSG',name:'PSG'},
+    {code:'BVB',name:'Dortmund'},{code:'MUN',name:'Man Utd'},{code:'ARS',name:'Arsenal'},
+    {code:'CHE',name:'Chelsea'},{code:'BAY',name:'Bayern'},{code:'INT',name:'Inter'},
+  ];
+  const el=document.getElementById('lp-club-grid');
+  if(!el)return;
+  el.innerHTML=clubs.map(c=>`<div class="lp-club-tile" onclick="openAuthModal('register')"><div class="lp-club-badge">${c.code}</div><div class="lp-club-name">${c.name}</div></div>`).join('');
+}
+
+function initLandingCommunityGrid(){
+  const configs=[
+    {body:'#a6192e',stripe:'#161512',collar:'#f7f5f2',pattern:'stripes',club:'AC Milan',season:'2023/24',nick:'@kolekcjoner_pl'},
+    {body:'#1c2b4a',stripe:'#e8a798',collar:'#f7f5f2',pattern:'chevron',club:'Inter Mediolan',season:'2021/22',nick:'@shirtvault'},
+    {body:'#f7f5f2',stripe:'#a6192e',collar:'#161512',pattern:'halves',club:'AS Roma',season:'2019/20',nick:'@retrokit'},
+    {body:'#161512',stripe:'#b5442e',collar:'#e8a798',pattern:'stripes',club:'Juventus',season:'2020/21',nick:'@ultras_archive'},
+    {body:'#2563eb',stripe:'#f7f5f2',collar:'#161512',pattern:'chevron',club:'Chelsea',season:'2022/23',nick:'@bluecollector'},
+  ];
+  const el=document.getElementById('lp-community-grid');
+  if(!el)return;
+  el.innerHTML=configs.map(c=>`
+    <div class="lp-community-card" onclick="openAuthModal('register')">
+      <div class="lp-community-card-jersey">${drawJersey(c.body,c.stripe,c.collar,c.pattern)}</div>
+      <div class="lp-community-card-label">${c.club} ${c.season}<div class="lp-community-card-nick">${c.nick}</div></div>
+    </div>`).join('');
+}
+
+function initLandingSeoFooter(){
+  const clubs=['Manchester United','Liverpool','Arsenal','Chelsea','Manchester City','Real Madrid','Barcelona','AC Milan','Inter Mediolan','Juventus','Bayern Monachium','PSG','Ajax','Borussia Dortmund','Napoli','Roma','Atletico Madryt','Tottenham'];
+  const el=document.getElementById('lp-seo-clubs');
+  if(!el)return;
+  el.innerHTML=clubs.map((c,i)=>`<span onclick="openAuthModal('register')">${c}</span>${i<clubs.length-1?'<span class="lp-footer-seo-sep">·</span>':''}`).join('');
+}
+
 // Close modal on backdrop click
 document.addEventListener('click',e=>{
   const modal=document.getElementById('auth-modal');
@@ -2441,6 +2672,10 @@ document.addEventListener('keydown',e=>{
 // Init brand marquee and jersey graphics
 initLandingMarquee();
 initLandingJerseys();
+initLandingTrustBar();
+initLandingClubGrid();
+initLandingCommunityGrid();
+initLandingSeoFooter();
 
 async function initAfterLogin(user){
   currentUser=user;
