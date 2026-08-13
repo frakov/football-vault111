@@ -507,7 +507,34 @@ body.admin-mode [data-ck]:focus{outline:2px solid #ffffff;outline-offset:2px}
 /* MARKETPLACE PUBLIC */
 .mkt-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:all .2s;cursor:inherit}
 .mkt-card:hover{border-color:rgba(20,33,61,.4);transform:translateY(-3px);box-shadow:0 10px 28px rgba(20,20,15,.1)}
-.mkt-seller{font-family:'JetBrains Mono',monospace;font-size:8px;color:#14213d;letter-spacing:.1em;text-transform:uppercase}
+.mkt-seller{font-family:'JetBrains Mono',monospace;font-size:8px;color:#14213d;letter-spacing:.1em;text-transform:uppercase;min-width:0;overflow:hidden}
+.mkt-seller span,.mkt-seller{text-overflow:ellipsis;white-space:nowrap;overflow:hidden}
+/* MARKETPLACE LAYOUT — sidebar filters + main grid */
+.mkt-layout{display:grid;grid-template-columns:220px 1fr;gap:20px;align-items:start}
+.mkt-sidebar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;position:sticky;top:0}
+.mkt-fgroup{padding:14px;border-bottom:1px solid var(--border)}
+.mkt-fgroup:last-child{border-bottom:none}
+.mkt-fgroup-title{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);margin-bottom:10px}
+.mkt-chip-row{display:flex;flex-wrap:wrap;gap:6px}
+.mkt-chip{font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:600;padding:5px 10px;border-radius:var(--r2);border:1px solid var(--border);background:var(--bg);color:var(--t2);cursor:pointer;transition:all .13s}
+.mkt-chip:hover{border-color:rgba(20,33,61,.35)}
+.mkt-chip.active{background:var(--a);border-color:var(--a);color:#fff}
+.mkt-club-row{display:flex;align-items:center;justify-content:space-between;padding:5px 0;font-size:11.5px;color:var(--t2);cursor:pointer;transition:color .13s}
+.mkt-club-row:hover{color:var(--t1)}
+.mkt-club-row.active{color:var(--a);font-weight:700}
+.mkt-club-row span:last-child{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--t3)}
+.mkt-price-row{display:flex;align-items:center;gap:8px}
+.mkt-price-row input{width:100%;background:var(--bg)!important;border:1px solid var(--border)!important;border-radius:var(--r2);padding:6px 8px;font-size:11px;color:var(--t1)!important}
+.mkt-clear-btn{width:100%;text-align:center;font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:9px;color:var(--t2);cursor:pointer;transition:color .13s}
+.mkt-clear-btn:hover{color:var(--red)}
+.mkt-sort-tabs{display:flex;gap:4px}
+.mkt-sort-tab{font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:7px 13px;border-radius:var(--r2);border:1px solid var(--border);background:var(--bg2);color:var(--t2);cursor:pointer;transition:all .13s}
+.mkt-sort-tab.active{background:var(--a);border-color:var(--a);color:#fff}
+.mkt-count{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--t2)}
+.mkt-badge{position:absolute;top:8px;left:8px;font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;border-radius:var(--r2);background:var(--a);color:#fff}
+.mkt-featured-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:18px}
+.mkt-featured-strip .mkt-card{border-color:rgba(20,33,61,.4);box-shadow:0 4px 16px rgba(20,33,61,.1)}
+@media(max-width:860px){.mkt-layout{grid-template-columns:1fr}.mkt-sidebar{position:static}}
 /* PROFILE */
 .profile-avatar{width:64px;height:64px;border-radius:50%;background:var(--a);display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;font-weight:800;font-size:24px;color:var(--on-a);flex-shrink:0;box-shadow:0 2px 8px rgba(20,20,15,.2)}
 /* ANIMATIONS */
@@ -1177,7 +1204,7 @@ pl:{
   mkt_title:'Publiczny Marketplace',mkt_sub:'Koszulki wystawione przez kolekcjonerów',
   mkt_empty:'Nikt jeszcze nic nie wystawił — bądź pierwszy!',
   mkt_list:'Wystaw na Marketplace',mkt_remove:'Zdejmij z Marketplace',
-  mkt_contact:'Kontakt z Sprzedającym',mkt_seller:'Sprzedający',
+  mkt_contact:'Kontakt',mkt_seller:'Sprzedający',
   profile_title:'Mój Profil',profile_name:'Nazwa Profilu',profile_bio:'Opis / Bio',
   profile_save:'Zapisz Profil',profile_public:'Widoczność na Marketplace',
   profile_shared:'Profil jest publiczny',profile_private:'Profil jest prywatny',
@@ -1208,7 +1235,7 @@ en:{
   mkt_title:'Public Marketplace',mkt_sub:'Jerseys listed by collectors',
   mkt_empty:'Nobody listed anything yet — be the first!',
   mkt_list:'List on Marketplace',mkt_remove:'Remove from Marketplace',
-  mkt_contact:'Contact Seller',mkt_seller:'Seller',
+  mkt_contact:'Contact',mkt_seller:'Seller',
   profile_title:'My Profile',profile_name:'Profile Name',profile_bio:'Description / Bio',
   profile_save:'Save Profile',profile_public:'Marketplace Visibility',
   profile_shared:'Profile is public',profile_private:'Profile is private',
@@ -1718,27 +1745,52 @@ function bMarket(){
     <div class="tab" id="mkt-tab-profiles" onclick="switchMktTab('profiles')">${icon('users',13,"display:inline-block;vertical-align:-2px;margin-right:4px")}${db.lang==='pl'?'Profile':'Profiles'}</div>
   </div>
   <div id="mkt-section-listings">
-    <div class="card mb12 s2" style="padding:10px 14px">
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-        <div class="field field-search" style="flex:1;min-width:140px;padding:5px 10px">${icon('search',12)}<input type="text" id="mkt-search" placeholder="${db.lang==='pl'?'Klub, sezon, nick...':'Club, season, nick...'}" oninput="filterMarket()" style="font-size:11px"></div>
-        <select class="form-select" id="mkt-filter-size" style="width:auto;padding:5px 10px;font-size:11px" onchange="filterMarket()">
-          <option value="">${db.lang==='pl'?'Rozmiar':'Size'}</option>${SIZES.map(s=>`<option>${s}</option>`).join('')}
-        </select>
-        <select class="form-select" id="mkt-filter-kind" style="width:auto;padding:5px 10px;font-size:11px" onchange="filterMarket()">
-          <option value="">${db.lang==='pl'?'Rodzaj':'Kit'}</option>
-          <option value="Domowa">${db.lang==='pl'?'Domowa':'Home'}</option>
-          <option value="Wyjazdowa">${db.lang==='pl'?'Wyjazdowa':'Away'}</option>
-          <option value="Trzecia">${db.lang==='pl'?'Trzecia':'Third'}</option>
-          <option value="Specjalna">${db.lang==='pl'?'Specjalna':'Special'}</option>
-        </select>
-        <select class="form-select" id="mkt-sort" style="width:auto;padding:5px 10px;font-size:11px" onchange="filterMarket()">
-          <option value="new">${db.lang==='pl'?'Najnowsze':'Newest'}</option>
-          <option value="cheap">${db.lang==='pl'?'Najtańsze':'Cheapest'}</option>
-          <option value="expensive">${db.lang==='pl'?'Najdroższe':'Most expensive'}</option>
-        </select>
+    <div class="mkt-layout">
+      <div class="mkt-sidebar">
+        <div class="mkt-fgroup">
+          <div class="field field-search" style="padding:6px 10px">${icon('search',12)}<input type="text" id="mkt-search" placeholder="${db.lang==='pl'?'Klub, sezon, nick...':'Club, season, nick...'}" oninput="filterMarket()" style="font-size:11px"></div>
+        </div>
+        <div class="mkt-fgroup">
+          <div class="mkt-fgroup-title">${db.lang==='pl'?'Klub':'Club'}</div>
+          <div id="mkt-club-list" style="max-height:180px;overflow-y:auto"></div>
+        </div>
+        <div class="mkt-fgroup">
+          <div class="mkt-fgroup-title">${db.lang==='pl'?'Rodzaj':'Kit type'}</div>
+          <div class="mkt-chip-row" id="mkt-kind-chips">
+            ${['Domowa','Wyjazdowa','Trzecia','Specjalna'].map(k=>`<div class="mkt-chip" data-kind="${k}" onclick="setMktChip('kind','${k}')">${db.lang==='pl'?k:kindLabel(k)}</div>`).join('')}
+          </div>
+        </div>
+        <div class="mkt-fgroup">
+          <div class="mkt-fgroup-title">${db.lang==='pl'?'Rozmiar':'Size'}</div>
+          <div class="mkt-chip-row" id="mkt-size-chips">
+            ${SIZES.map(s=>`<div class="mkt-chip" data-size="${s}" onclick="setMktChip('size','${s}')">${s}</div>`).join('')}
+          </div>
+        </div>
+        <div class="mkt-fgroup">
+          <div class="mkt-fgroup-title">${db.lang==='pl'?'Zakres cen (PLN)':'Price range (PLN)'}</div>
+          <div class="mkt-price-row">
+            <input type="number" id="mkt-price-min" placeholder="${db.lang==='pl'?'Od':'Min'}" oninput="filterMarket()">
+            <span style="color:var(--t3)">–</span>
+            <input type="number" id="mkt-price-max" placeholder="${db.lang==='pl'?'Do':'Max'}" oninput="filterMarket()">
+          </div>
+        </div>
+        <div class="mkt-fgroup" style="padding:8px 14px">
+          <div class="mkt-clear-btn" onclick="clearMktFilters()">${db.lang==='pl'?'Wyczyść filtry':'Clear filters'}</div>
+        </div>
+      </div>
+      <div>
+        <div class="fx-b mb12">
+          <span class="mkt-count" id="mkt-count">—</span>
+          <div class="mkt-sort-tabs" id="mkt-sort-tabs">
+            <div class="mkt-sort-tab active" data-sort="new" onclick="setMktSort('new')">${db.lang==='pl'?'Najnowsze':'Newest'}</div>
+            <div class="mkt-sort-tab" data-sort="cheap" onclick="setMktSort('cheap')">${db.lang==='pl'?'Cena ↑':'Price ↑'}</div>
+            <div class="mkt-sort-tab" data-sort="expensive" onclick="setMktSort('expensive')">${db.lang==='pl'?'Cena ↓':'Price ↓'}</div>
+          </div>
+        </div>
+        <div id="mkt-featured"></div>
+        <div id="mkt-grid" class="g3 s2"><div class="empty-state"><div class="empty-icon loading-pulse"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg></div></div></div>
       </div>
     </div>
-    <div id="mkt-grid" class="g3 s2"><div class="empty-state"><div class="empty-icon loading-pulse"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg></div></div></div>
   </div>
   <div id="mkt-section-wishlist" style="display:none"></div>
   <div id="mkt-section-profiles" style="display:none"></div>`;
@@ -1757,17 +1809,66 @@ function switchMktTab(tab){
 }
 
 function filterMarket(){
-  const q=(document.getElementById('mkt-search')?.value||'').toLowerCase();
-  const size=document.getElementById('mkt-filter-size')?.value||'';
-  const kind=document.getElementById('mkt-filter-kind')?.value||'';
-  const sort=document.getElementById('mkt-sort')?.value||'new';
+  _mktFilters.q=(document.getElementById('mkt-search')?.value||'').toLowerCase();
+  const pmin=parseFloat(document.getElementById('mkt-price-min')?.value);
+  const pmax=parseFloat(document.getElementById('mkt-price-max')?.value);
+  _mktFilters.priceMin=isNaN(pmin)?null:pmin;
+  _mktFilters.priceMax=isNaN(pmax)?null:pmax;
   let items=[..._mktAllItems];
-  if(q)items=items.filter(i=>(i.club||'').toLowerCase().includes(q)||(i.season||'').toLowerCase().includes(q)||(i.seller_nick||'').toLowerCase().includes(q));
-  if(size)items=items.filter(i=>i.size===size);
-  if(kind)items=items.filter(i=>i.kind===kind);
-  if(sort==='cheap')items.sort((a,b)=>(a.price_pln||0)-(b.price_pln||0));
-  else if(sort==='expensive')items.sort((a,b)=>(b.price_pln||0)-(a.price_pln||0));
+  const f=_mktFilters;
+  if(f.q)items=items.filter(i=>(i.club||'').toLowerCase().includes(f.q)||(i.season||'').toLowerCase().includes(f.q)||(i.seller_nick||'').toLowerCase().includes(f.q));
+  if(f.club)items=items.filter(i=>i.club===f.club);
+  if(f.kind)items=items.filter(i=>i.kind===f.kind);
+  if(f.size)items=items.filter(i=>i.size===f.size);
+  if(f.priceMin!=null)items=items.filter(i=>(i.price_pln||0)>=f.priceMin);
+  if(f.priceMax!=null)items=items.filter(i=>(i.price_pln||0)<=f.priceMax);
+  if(f.sort==='cheap')items.sort((a,b)=>(a.price_pln||0)-(b.price_pln||0));
+  else if(f.sort==='expensive')items.sort((a,b)=>(b.price_pln||0)-(a.price_pln||0));
+  else items.sort((a,b)=>new Date(b.listed_at||0)-new Date(a.listed_at||0));
   renderMarketItems(items);
+  const cEl=document.getElementById('mkt-count');
+  if(cEl)cEl.textContent=`${items.length} ${db.lang==='pl'?'dostępnych ogłoszeń':'listings available'}`;
+}
+let _mktFilters={q:'',club:'',kind:'',size:'',priceMin:null,priceMax:null,sort:'new'};
+function setMktChip(type,val){
+  _mktFilters[type]=(_mktFilters[type]===val)?'':val;
+  document.querySelectorAll(`#mkt-${type}-chips .mkt-chip`).forEach(c=>{
+    c.classList.toggle('active',c.dataset[type]===_mktFilters[type]&&_mktFilters[type]!=='');
+  });
+  filterMarket();
+}
+function setMktClub(club){
+  _mktFilters.club=(_mktFilters.club===club)?'':club;
+  document.querySelectorAll('.mkt-club-row').forEach(r=>{
+    r.classList.toggle('active',r.dataset.club===_mktFilters.club&&_mktFilters.club!=='');
+  });
+  filterMarket();
+}
+function setMktSort(s){
+  _mktFilters.sort=s;
+  document.querySelectorAll('#mkt-sort-tabs .mkt-sort-tab').forEach(t=>t.classList.toggle('active',t.dataset.sort===s));
+  filterMarket();
+}
+function clearMktFilters(){
+  _mktFilters={q:'',club:'',kind:'',size:'',priceMin:null,priceMax:null,sort:'new'};
+  const s=document.getElementById('mkt-search');if(s)s.value='';
+  const pmin=document.getElementById('mkt-price-min');if(pmin)pmin.value='';
+  const pmax=document.getElementById('mkt-price-max');if(pmax)pmax.value='';
+  document.querySelectorAll('.mkt-chip,.mkt-club-row').forEach(c=>c.classList.remove('active'));
+  document.querySelectorAll('#mkt-sort-tabs .mkt-sort-tab').forEach(t=>t.classList.toggle('active',t.dataset.sort==='new'));
+  filterMarket();
+}
+function buildMktSidebarClubs(items){
+  const counts={};
+  items.forEach(i=>{if(i.club)counts[i.club]=(counts[i.club]||0)+1;});
+  const clubs=Object.keys(counts).sort((a,b)=>counts[b]-counts[a]).slice(0,15);
+  const el=document.getElementById('mkt-club-list');if(!el)return;
+  if(!clubs.length){el.innerHTML=`<div style="font-size:10px;color:var(--t3)">—</div>`;return;}
+  el.innerHTML=clubs.map(c=>`<div class="mkt-club-row ${_mktFilters.club===c?'active':''}" data-club="${c}" onclick="setMktClub('${c.replace(/'/g,"\\'")}')"><span>${c}</span><span>${counts[c]}</span></div>`).join('');
+}
+function isMktRecent(dateStr){
+  if(!dateStr)return false;
+  return (Date.now()-new Date(dateStr).getTime())<1000*60*60*24*3;
 }
 
 async function loadPublicWishlists(){
@@ -1861,24 +1962,21 @@ async function loadMarketplace(){
   try{
     const items=await sbLoadMarket();
     _mktAllItems=items;
-    renderMarketItems(items);
+    buildMktSidebarClubs(items);
+    filterMarket();
   }catch(e){
     grid.innerHTML=`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">${icon('alertTriangle',44)}</div><div class="empty-text">${db.lang==='pl'?'BŁĄD ŁADOWANIA':'LOAD ERROR'}</div></div></div>`;
   }
 }
 
-function renderMarketItems(items){
-  const grid=document.getElementById('mkt-grid');if(!grid)return;
-  const valid=items.filter(i=>i&&i.club);
-  if(!valid.length){grid.innerHTML=`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">${icon('cart',44)}</div><div class="empty-text">${T('mkt_empty')}</div></div></div>`;return;}
-  grid.innerHTML=valid.map(i=>{
-    const mv=parseFloat(i.price_pln||i.mv)||0;
-    const isOwn=i.seller_nick===(db.profile?.nick||'')||i.user_id===currentUser?.id;
-    return `<div class="mkt-card">
+function mktCardHtml(i){
+  const mv=parseFloat(i.price_pln||i.mv)||0;
+  const isOwn=i.seller_nick===(db.profile?.nick||'')||i.user_id===currentUser?.id;
+  return `<div class="mkt-card">
       <div class="shirt-photo" style="background:var(--bg3)">
         ${i.photo?`<img src="${i.photo}" alt="" style="width:100%;height:100%;object-fit:cover">`:`<div class="shirt-photo-placeholder"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg></div>`}
         <div style="position:absolute;top:8px;right:8px"><span class="sh-status public">Marketplace</span></div>
-        ${isOwn?`<div style="position:absolute;top:8px;left:8px;background:rgba(var(--a-rgb),.8);border-radius:6px;padding:2px 8px;font-family:'JetBrains Mono',monospace;font-size:8px;color:#fff">TWOJE</div>`:''}
+        ${isOwn?`<div style="position:absolute;top:8px;left:8px;background:rgba(var(--a-rgb),.8);border-radius:6px;padding:2px 8px;font-family:'JetBrains Mono',monospace;font-size:8px;color:#fff">TWOJE</div>`:isMktRecent(i.listed_at)?`<div class="mkt-badge">${db.lang==='pl'?'NOWE':'NEW'}</div>`:''}
       </div>
       <div class="shirt-card-body">
         <div class="shirt-card-club">${i.club||'—'}</div>
@@ -1899,7 +1997,24 @@ function renderMarketItems(items){
         ${i.notes?`<div style="font-size:10px;color:var(--t2);margin-top:8px;padding-top:8px;border-top:1px solid rgba(20,33,61,.08)">${i.notes}</div>`:''}
       </div>
     </div>`;
-  }).join('');
+}
+function renderMarketItems(items){
+  const grid=document.getElementById('mkt-grid');if(!grid)return;
+  const featEl=document.getElementById('mkt-featured');
+  const valid=items.filter(i=>i&&i.club);
+  if(!valid.length){
+    grid.innerHTML=`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">${icon('cart',44)}</div><div class="empty-text">${T('mkt_empty')}</div></div></div>`;
+    if(featEl)featEl.innerHTML='';
+    return;
+  }
+  if(featEl){
+    const featured=[...valid].sort((a,b)=>(b.price_pln||0)-(a.price_pln||0)).slice(0,3);
+    featEl.innerHTML=valid.length>=6?`
+      <div class="mkt-fgroup-title" style="margin-bottom:10px">★ ${db.lang==='pl'?'Wyróżnione':'Featured'}</div>
+      <div class="mkt-featured-strip">${featured.map(mktCardHtml).join('')}</div>
+      <div class="div" style="margin:18px 0"></div>`:'';
+  }
+  grid.innerHTML=valid.map(mktCardHtml).join('');
 }
 
 async function contactSeller(userId,nick){
@@ -2555,8 +2670,8 @@ function initLandingJerseys(){
   const heroConfigs=[
     {body:'#a6192e',stripe:'#14213d',collar:'#ffffff',pattern:'stripes'},
     {body:'#ffffff',stripe:'#a6192e',collar:'#14213d',pattern:'halves'},
-    {body:'#1c2b4a',stripe:'#8c9bc3',collar:'#ffffff',pattern:'chevron'},
-    {body:'#14213d',stripe:'#14213d',collar:'#8c9bc3',pattern:'stripes'},
+    {body:'#0a0f1c',stripe:'#8c9bc3',collar:'#ffffff',pattern:'chevron'},
+    {body:'#8c9bc3',stripe:'#14213d',collar:'#14213d',pattern:'stripes'},
   ];
   const heroEl=document.getElementById('lp-hero-jerseys');
   if(heroEl){
