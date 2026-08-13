@@ -141,14 +141,17 @@ body.admin-mode [data-ck]:focus{outline:2px solid #ffffff;outline-offset:2px}
 .lp-club-tile:hover .lp-club-badge{background:#14213d;color:#ffffff;border-color:#14213d}
 .lp-club-name{font-size:11px;font-weight:600;color:rgba(20,33,61,.7);text-align:center;padding:0 6px}
 
-/* PRODUCT-STYLE FEATURE GRID */
-.lp-feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(20,33,61,.1);border:1px solid rgba(20,33,61,.1)}
-.lp-feature-card{background:#ffffff;padding:40px 32px;transition:background .2s;position:relative}
-.lp-feature-card:hover{background:#fff}
-.lp-feature-num{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;color:rgba(20,33,61,.3);margin-bottom:28px}
-.lp-feature-icon{width:40px;height:40px;color:#14213d;margin-bottom:20px}
-.lp-feature-title{font-family:'Inter',sans-serif;font-weight:800;font-size:22px;letter-spacing:.02em;color:#14213d;margin-bottom:10px}
-.lp-feature-desc{font-size:13.5px;color:rgba(20,33,61,.55);line-height:1.7}
+/* FEATURED + EDITORIAL LIST (replaces uniform 6-card grid) */
+.lp-feature-featured{display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:start;padding:44px 0 40px;border-bottom:1px solid rgba(20,33,61,.12)}
+.lp-feature-featured-icon{width:64px;height:64px;border-radius:50%;background:#14213d;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lp-feature-featured-title{font-family:'Inter',sans-serif;font-weight:900;font-size:clamp(26px,2.6vw,38px);letter-spacing:-.01em;color:#14213d;margin:10px 0 12px;line-height:1.05}
+.lp-feature-featured-desc{font-size:15px;color:rgba(20,33,61,.6);line-height:1.7;max-width:560px}
+.lp-feature-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:36px 32px;padding-top:36px}
+.lp-feature-row{position:relative}
+.lp-feature-num{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;color:rgba(20,33,61,.3);margin-bottom:14px}
+.lp-feature-icon{width:26px;height:26px;color:#14213d;margin-bottom:14px}
+.lp-feature-title{font-family:'Inter',sans-serif;font-weight:800;font-size:17px;letter-spacing:.01em;color:#14213d;margin-bottom:8px}
+.lp-feature-desc{font-size:13px;color:rgba(20,33,61,.55);line-height:1.65}
 
 /* EDITORIAL SPLIT SECTION */
 .lp-split{display:grid;grid-template-columns:.9fr 1.1fr;gap:0;background:#14213d}
@@ -512,10 +515,11 @@ body.admin-mode [data-ck]:focus{outline:2px solid #ffffff;outline-offset:2px}
 .tab{flex:1;text-align:center;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--t2);padding:7px 0;border-radius:2px;transition:all .14s;cursor:inherit}
 .tab.active{background:var(--bg2);color:var(--a);box-shadow:0 1px 3px rgba(20,20,15,.1)}
 /* EMPTY */
-.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:12px;text-align:center}
-.empty-icon{opacity:.18;color:var(--t2);display:flex;align-items:center;justify-content:center}
-.empty-icon svg{width:44px;height:44px}
-.empty-text{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--t3)}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:52px 24px;gap:14px;text-align:center;border:1.5px dashed var(--border);border-radius:var(--r);background:var(--bg)}
+.empty-icon{width:76px;height:76px;border-radius:50%;background:rgba(var(--a-rgb),.08);color:var(--a);opacity:1;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.empty-icon svg{width:32px;height:32px}
+.empty-icon.loading-pulse{background:var(--bg3);color:var(--t3)}
+.empty-text{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--t2);font-weight:700;max-width:280px;line-height:1.6}
 /* VALUE HISTORY */
 .vh-row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(var(--a-rgb),.05);font-size:12px}
 .vh-row:last-child{border-bottom:none}
@@ -749,40 +753,42 @@ select option{background:var(--bg2);color:var(--t1)}
       </div>
       <p class="lp-section-desc" data-ck="features.desc">Od pierwszej koszulki po zaawansowaną licytację — każda funkcja Football Vault powstała z myślą o realnych potrzebach kolekcjonera.</p>
     </div>
-    <div class="lp-feature-grid">
-      <div class="lp-feature-card">
+    <div class="lp-feature-featured">
+      <div class="lp-feature-featured-icon"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg></div>
+      <div>
+        <div class="lp-feature-num">02 / FLAGOWA</div>
+        <div class="lp-feature-featured-title" data-ck="feature2.title">Marketplace bez prowizji</div>
+        <div class="lp-feature-featured-desc" data-ck="feature2.desc">Wystawiaj koszulki dla wszystkich kolekcjonerów na platformie. Filtruj po klubie, rozmiarze, stanie i cenie. Zero opłat od transakcji.</div>
+      </div>
+    </div>
+    <div class="lp-feature-list">
+      <div class="lp-feature-row">
+        <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg></div>
         <div class="lp-feature-num">01</div>
-        <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg></div>
         <div class="lp-feature-title" data-ck="feature1.title">Zarządzanie kolekcją</div>
         <div class="lp-feature-desc" data-ck="feature1.desc">Klub, sezon, marka, stan, personalizacja, style code, zdjęcia. Pełna kartoteka każdej koszulki wraz z historią wartości rynkowej.</div>
       </div>
-      <div class="lp-feature-card">
-        <div class="lp-feature-num">02</div>
-        <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 001.97-1.67L23 6H6"/></svg></div>
-        <div class="lp-feature-title" data-ck="feature2.title">Marketplace bez prowizji</div>
-        <div class="lp-feature-desc" data-ck="feature2.desc">Wystawiaj koszulki dla wszystkich kolekcjonerów na platformie. Filtruj po klubie, rozmiarze, stanie i cenie. Zero opłat od transakcji.</div>
-      </div>
-      <div class="lp-feature-card">
+      <div class="lp-feature-row">
+        <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M14.5 10.5l-8 8a2.12 2.12 0 01-3-3l8-8"/><path d="M15.5 5.5l3 3"/><path d="M20 9l-9 9"/><path d="M7 4l3 3"/></svg></div>
         <div class="lp-feature-num">03</div>
-        <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M14.5 10.5l-8 8a2.12 2.12 0 01-3-3l8-8"/><path d="M15.5 5.5l3 3"/><path d="M20 9l-9 9"/><path d="M7 4l3 3"/></svg></div>
         <div class="lp-feature-title" data-ck="feature3.title">Licytacje na żywo</div>
         <div class="lp-feature-desc" data-ck="feature3.desc">Odliczanie w czasie rzeczywistym, minimalne podbicia i automatyczne przedłużenie w ostatnich sekundach walki o koszulkę.</div>
       </div>
-      <div class="lp-feature-card">
+      <div class="lp-feature-row">
+        <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
         <div class="lp-feature-num">04</div>
-        <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
         <div class="lp-feature-title" data-ck="feature4.title">Weryfikacja autentyczności</div>
         <div class="lp-feature-desc" data-ck="feature4.desc">Zgłoś koszulkę do weryfikacji i zdobądź odznakę potwierdzoną, widoczną dla każdego kupującego na marketplace.</div>
       </div>
-      <div class="lp-feature-card">
+      <div class="lp-feature-row">
+        <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
         <div class="lp-feature-num">05</div>
-        <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
         <div class="lp-feature-title" data-ck="feature5.title">Wishlist z dopasowaniem</div>
         <div class="lp-feature-desc" data-ck="feature5.desc">Dodaj koszulkę której szukasz. System automatycznie powiadomi Cię gdy pojawi się pasujące ogłoszenie na marketplace.</div>
       </div>
-      <div class="lp-feature-card">
+      <div class="lp-feature-row">
+        <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
         <div class="lp-feature-num">06</div>
-        <div class="lp-feature-icon"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
         <div class="lp-feature-title" data-ck="feature6.title">Czat i negocjacje</div>
         <div class="lp-feature-desc" data-ck="feature6.desc">Rozmawiaj bezpośrednio ze sprzedającymi, wysyłaj zdjęcia i finalizuj transakcje bez opuszczania platformy.</div>
       </div>
@@ -1588,7 +1594,7 @@ function bDash(){
   </div>
   <div class="s4">
     <div class="fx-b mb12"><div class="clabel" style="margin:0">${db.lang==='pl'?'Ostatnio Dodane':'Recently Added'}</div><button class="btn btn-p" onclick="openApp('collection')">+ ${T('add_shirt')}</button></div>
-    ${recent.length?`<div class="vault-shelf">${recent.map(s=>shirtCardMini(s)).join('')}</div>`:`<div class="empty-state"><div class="empty-icon">${icon('shirt',44)}</div><div class="empty-text">${T('empty_col')}</div></div>`}
+    ${recent.length?`<div class="vault-shelf">${recent.map(s=>shirtCardMini(s)).join('')}</div>`:`<div class="empty-state"><div class="empty-icon">${icon('shirt',44)}</div><div class="empty-text">${T('empty_col')}</div><button class="btn btn-p" style="margin-top:4px" onclick="openAddShirt()">+ ${T('add_shirt')}</button></div>`}
   </div>
   <div class="s4" style="margin-top:18px">
     <div class="clabel mb12">${db.lang==='pl'?'Aktywność':'Activity'}</div>
@@ -1699,7 +1705,7 @@ function renderGrid(ret=false){
   else if(sF.sort==='club')list.sort((a,b)=>(a.club||'').localeCompare(b.club||''));
   else if(sF.sort==='oldest')list.reverse();
   // domyślnie: najnowsze pierwsze (kolejność z db.shirts, bo unshift dodaje na początek)
-  const html=list.length?list.map(s=>shirtCardMini(s)).join(''):`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">${icon('search',44)}</div><div class="empty-text">${T('empty_col')}</div></div></div>`;
+  const html=list.length?list.map(s=>shirtCardMini(s)).join(''):`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">${icon('search',44)}</div><div class="empty-text">${T('empty_col')}</div><button class="btn btn-p" style="margin-top:4px" onclick="openAddShirt()">+ ${T('add_shirt')}</button></div></div>`;
   if(ret)return html;
   const el=document.getElementById('col-grid');if(el)el.innerHTML=html;
 }
@@ -1938,10 +1944,10 @@ function renderPublicWishlistCards(items){
   return items.map(w=>{
     const nick=w._nick||'?';
     const isOwn=w.user_id===currentUser?.id;
-    return `<div class="card" style="border-color:rgba(236,72,153,.15)">
+    return `<div class="card" style="border-color:rgba(20,33,61,.15)">
       <div class="fx-b mb8">
         <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:18px;color:var(--t1)">${w.club||db.lang==='pl'?'Dowolny klub':'Any club'}</div>
-        <span style="color:#ec4899;display:inline-flex">${icon('heart',18)}</span>
+        <span style="color:#14213d;display:inline-flex">${icon('heart',18)}</span>
       </div>
       <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px">
         ${w.season?`<div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--t2)">${icon('calendar',11,"display:inline-block;vertical-align:-2px;margin-right:4px")}${w.season}</div>`:''}
@@ -1954,7 +1960,7 @@ function renderPublicWishlistCards(items){
       <div class="fx-b">
         <div class="fx-c gap6" style="cursor:pointer" onclick="viewProfile('${nick}')">
           <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--a) 0%,color-mix(in srgb,var(--a) 50%,#000) 100%);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--on-a,#fff)">${nick[0].toUpperCase()}</div>
-          <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#f472b6">${nick}</span>
+          <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#14213d">${nick}</span>
         </div>
         ${!isOwn?`<button class="btn btn-g" style="padding:4px 10px;font-size:10px" onclick="contactSeller('${w.user_id}','${nick}')">${icon('messageCircle',12,"display:inline-block;vertical-align:-2px;margin-right:5px")}Napisz</button>`:`<span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t3)">TWOJA</span>`}
       </div>
@@ -2027,7 +2033,7 @@ function renderMarketItems(items){
   const featEl=document.getElementById('mkt-featured');
   const valid=items.filter(i=>i&&i.club);
   if(!valid.length){
-    grid.innerHTML=`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">${icon('cart',44)}</div><div class="empty-text">${T('mkt_empty')}</div></div></div>`;
+    grid.innerHTML=`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">${icon('cart',44)}</div><div class="empty-text">${T('mkt_empty')}</div><button class="btn btn-p" style="margin-top:4px" onclick="openApp('collection')">${db.lang==='pl'?'Wystaw swoją koszulkę':'List your jersey'}</button></div></div>`;
     if(featEl)featEl.innerHTML='';
     return;
   }
@@ -3070,7 +3076,7 @@ async function renderNotifPanel(){
   if(!notifs.length){el.innerHTML=`<div style="padding:30px;text-align:center;font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t3);letter-spacing:.1em">BRAK POWIADOMIEŃ</div>`;return;}
   el.innerHTML=notifs.map(n=>{
     const iconMap={bid:'zap',outbid:'alertTriangle',won:'trophy',msg:'messageCircle',wishlist:'heart',verified:'checkCircle',watcher:'eye',sale:'tag2',cancelled:'ban'};
-    const colorMap={bid:'#f59e0b',outbid:'#f43f5e',won:'#f59e0b',msg:'#3b82f6',wishlist:'#ec4899',verified:'var(--a)',watcher:'#14213d',sale:'#8b5cf6',cancelled:'#f43f5e'};
+    const colorMap={bid:'#f59e0b',outbid:'#f43f5e',won:'#f59e0b',msg:'#3b82f6',wishlist:'#14213d',verified:'var(--a)',watcher:'#14213d',sale:'#8b5cf6',cancelled:'#f43f5e'};
     const nType=iconMap[n.type]?n.type:'default';
     const iconName=iconMap[n.type]||'bellRing';
     const iconColor=colorMap[n.type]||'var(--a)';
@@ -3383,8 +3389,8 @@ async function checkWishlistMatches(listing){
 function bWishlist(){
   return `
   <div class="fx-b mb12 s1">
-    <div><div class="ph-sub" style="border-color:rgba(236,72,153,.3);background:rgba(236,72,153,.08);color:#f472b6"><span style="width:5px;height:5px;border-radius:50%;background:#f472b6;animation:pulse 3s ease-in-out infinite"></span><span>WISHLIST</span></div><div class="ph-title">SZUKANE</div></div>
-    <button class="btn btn-p" onclick="openAddWishlistItem()" style="background:linear-gradient(135deg,#ec4899,#9d174d)">+ Dodaj</button>
+    <div><div class="ph-sub" style="border-color:rgba(20,33,61,.3);background:rgba(20,33,61,.08);color:#14213d"><span style="width:5px;height:5px;border-radius:50%;background:#14213d;animation:pulse 3s ease-in-out infinite"></span><span>WISHLIST</span></div><div class="ph-title">SZUKANE</div></div>
+    <button class="btn btn-p" onclick="openAddWishlistItem()" style="background:linear-gradient(135deg,#14213d,#0a0f1c)">+ Dodaj</button>
   </div>
   <div id="wishlist-grid" class="g3 s2"><div class="empty-state"><div class="empty-icon loading-pulse"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg></div></div></div>
   <div class="s3" id="wishlist-matches" style="margin-top:20px"></div>`;
@@ -3396,7 +3402,7 @@ async function initWishlistView(){
   if(!grid)return;
   if(!items.length){grid.innerHTML=`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">${icon('heart',44)}</div><div class="empty-text">WISHLIST JEST PUSTA — DODAJ KOSZULKĘ KTÓREJ SZUKASZ</div></div></div>`;return;}
   grid.innerHTML=items.map(w=>`
-  <div class="card" style="border-color:rgba(236,72,153,.15)">
+  <div class="card" style="border-color:rgba(20,33,61,.15)">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
       <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:18px;letter-spacing:.05em;color:var(--t1)">${w.club||'Dowolny klub'}</div>
       <div class="fx-c gap4">
@@ -3411,9 +3417,9 @@ async function initWishlistView(){
       ${w.kind?`<div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--t2)">${icon('shirt',11,"display:inline-block;vertical-align:-2px;margin-right:4px")} ${kindLabel(w.kind)}</div>`:''}
       ${w.notes?`<div style="font-size:10px;color:var(--t2);margin-top:4px">${w.notes}</div>`:''}
     </div>
-    <div style="display:flex;align-items:center;gap:6px;padding-top:8px;border-top:1px solid rgba(236,72,153,.08)">
-      <div style="width:6px;height:6px;border-radius:50%;background:#ec4899;box-shadow:0 0 6px rgba(236,72,153,.6)"></div>
-      <span style="font-size:8px;font-family:'JetBrains Mono',monospace;color:rgba(236,72,153,.7);letter-spacing:.1em">${w.public?'PUBLICZNA':'PRYWATNA'}</span>
+    <div style="display:flex;align-items:center;gap:6px;padding-top:8px;border-top:1px solid rgba(20,33,61,.08)">
+      <div style="width:6px;height:6px;border-radius:50%;background:#14213d;box-shadow:0 0 6px rgba(20,33,61,.6)"></div>
+      <span style="font-size:8px;font-family:'JetBrains Mono',monospace;color:rgba(20,33,61,.7);letter-spacing:.1em">${w.public?'PUBLICZNA':'PRYWATNA'}</span>
     </div>
   </div>`).join('');
   // Check marketplace matches
@@ -3426,17 +3432,17 @@ async function initWishlistView(){
   }));
   const matchEl=document.getElementById('wishlist-matches');
   if(matchEl&&matches.length){
-    matchEl.innerHTML=`<div class="fx-b mb12"><div class="clabel" style="color:#ec4899">DOPASOWANIA NA MARKETPLACE (${matches.length})</div></div>
+    matchEl.innerHTML=`<div class="fx-b mb12"><div class="clabel" style="color:#14213d">DOPASOWANIA NA MARKETPLACE (${matches.length})</div></div>
     <div class="g3">${matches.map(l=>`
-    <div class="mkt-card" style="border-color:rgba(236,72,153,.2);background:rgba(236,72,153,.04)">
+    <div class="mkt-card" style="border-color:rgba(20,33,61,.2);background:rgba(20,33,61,.04)">
       <div class="shirt-photo">${l.photo?`<img src="${l.photo}" style="width:100%;height:100%;object-fit:cover">`:`<div class="shirt-photo-placeholder"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg></div>`}
-        <div style="position:absolute;top:8px;left:8px;background:rgba(236,72,153,.9);border-radius:6px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:8px;color:#fff;display:flex;align-items:center;gap:4px">${icon('heart',10)}MATCH</div>
+        <div style="position:absolute;top:8px;left:8px;background:rgba(20,33,61,.9);border-radius:6px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:8px;color:#fff;display:flex;align-items:center;gap:4px">${icon('heart',10)}MATCH</div>
       </div>
       <div class="shirt-card-body">
         <div class="shirt-card-club">${l.club||'—'}</div>
         <div class="shirt-card-season">${[l.season,l.kind,l.size].filter(Boolean).join(' · ')}</div>
-        <div class="shirt-card-price" style="color:#ec4899">${l.price_pln?l.price_pln+' PLN':'—'}</div>
-        <button class="btn w100" style="margin-top:8px;background:rgba(236,72,153,.15);border:1px solid rgba(236,72,153,.3);color:#f472b6;font-size:10px;padding:6px" onclick="openApp('market')">Zobacz na Marketplace →</button>
+        <div class="shirt-card-price" style="color:#14213d">${l.price_pln?l.price_pln+' PLN':'—'}</div>
+        <button class="btn w100" style="margin-top:8px;background:rgba(20,33,61,.15);border:1px solid rgba(20,33,61,.3);color:#14213d;font-size:10px;padding:6px" onclick="openApp('market')">Zobacz na Marketplace →</button>
       </div>
     </div>`).join('')}</div>`;
   }
@@ -3499,7 +3505,7 @@ function buildWishlistForm(item){
   <div class="fx-c gap8" style="justify-content:flex-end">
     ${item?`<button class="btn btn-d" onclick="removeFromWishlist('${item.id}');closeModal();if(isOpen('wishlist'))initWishlistView()">${icon('trash',12,"display:inline-block;vertical-align:-2px;margin-right:5px")}${T('delete')}</button>`:''}
     <button class="btn btn-g" onclick="closeModal()">${T('cancel')}</button>
-    <button class="btn btn-p" style="background:linear-gradient(135deg,#ec4899,#9d174d)" onclick="saveWishlistItem()">${item?(db.lang==='pl'?'Zapisz zmiany':'Save changes'):(db.lang==='pl'?'Dodaj do Wishlisty':'Add to Wishlist')}</button>
+    <button class="btn btn-p" style="background:linear-gradient(135deg,#14213d,#0a0f1c)" onclick="saveWishlistItem()">${item?(db.lang==='pl'?'Zapisz zmiany':'Save changes'):(db.lang==='pl'?'Dodaj do Wishlisty':'Add to Wishlist')}</button>
   </div>`;
 }
 
