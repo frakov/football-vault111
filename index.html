@@ -82,9 +82,8 @@ textarea{resize:none}
 
 /* HERO RIGHT — jersey showcase grid */
 .lp-hero-right{position:relative;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,.06)}
-.lp-jersey-tile{position:relative;overflow:hidden;background:#1a2947;display:flex;align-items:center;justify-content:center;transition:transform .5s cubic-bezier(.16,1,.3,1)}
+.lp-jersey-tile{position:relative;overflow:hidden;background:#1a2947;display:flex;align-items:center;justify-content:center;transition:transform .5s cubic-bezier(.16,1,.3,1);aspect-ratio:1}
 .lp-jersey-tile:hover{transform:scale(1.03)}
-.lp-jersey-tile:nth-child(1){grid-row:1/3}
 .cf-jersey{position:relative;width:78%;max-width:170px;aspect-ratio:.82;filter:drop-shadow(0 16px 32px rgba(0,0,0,.5))}
 .lp-split-media .cf-jersey{max-width:300px}
 .cf-jersey-body{position:absolute;inset:0;clip-path:polygon(22% 0%,78% 0%,100% 14%,88% 24%,82% 20%,82% 100%,18% 100%,18% 20%,12% 24%,0% 14%)}
@@ -367,6 +366,24 @@ body.admin-mode [data-ck]:focus{outline:2px solid #ffffff;outline-offset:2px}
 .g2{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
 .g12{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
 .c8{grid-column:span 8}.c4{grid-column:span 4}
+/* VAULT HERO LEDGER — dashboard signature block */
+.vault-hero-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:30px 34px;position:relative;overflow:hidden}
+.vault-hero-card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;background:var(--a)}
+.vault-hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t2)}
+.vault-hero-num{font-family:'Inter',sans-serif;font-weight:900;font-size:clamp(38px,4.6vw,64px);letter-spacing:-.01em;color:var(--t1);line-height:1;margin:8px 0 10px}
+.vault-hero-sub{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t2)}
+.vault-hero-sub b{color:var(--a);font-weight:700}
+.vault-ledger-strip{display:flex;flex-wrap:wrap;margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}
+.vault-ledger-item{flex:1;min-width:120px;padding:0 22px;border-left:1px solid var(--border)}
+.vault-ledger-item:first-child{border-left:none;padding-left:0}
+.vault-ledger-num{display:block;font-family:'Inter',sans-serif;font-weight:800;font-size:21px;color:var(--t1);line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vault-ledger-lbl{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--t2);margin-top:4px}
+@media(max-width:720px){.vault-ledger-item{border-left:none;border-top:1px solid var(--border);padding:12px 0 0;margin-top:12px;flex:1 1 45%}}
+/* SHELF — horizontal filmstrip for recently added */
+.vault-shelf{display:flex;gap:14px;overflow-x:auto;padding-bottom:10px;scroll-snap-type:x proximity;margin:0 -2px;padding-left:2px;padding-right:2px}
+.vault-shelf::-webkit-scrollbar{height:6px}
+.vault-shelf .shirt-card{flex:0 0 208px;scroll-snap-align:start}
+.lot-tag{position:absolute;top:8px;left:8px;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;letter-spacing:.06em;color:#fff;background:rgba(15,22,32,.55);backdrop-filter:blur(3px);border-radius:var(--r2);padding:3px 7px}
 .mb8{margin-bottom:8px}.mb12{margin-bottom:12px}.mb18{margin-bottom:18px}.mb24{margin-bottom:24px}
 .field{background:var(--bg2);border:1px solid var(--border)!important;border-radius:var(--r2);padding:9px 12px;transition:border-color .15s,box-shadow .15s}
 .field-search{display:flex;align-items:center;gap:8px;color:var(--t3)}
@@ -1538,11 +1555,16 @@ function bDash(){
   return `
   <div class="ph-sub s1"><span class="dot"></span><span>${db.lang==='pl'?'Przegląd Kolekcji':'Collection Overview'}</span></div>
   <div class="ph-title s1">FOOTBALL <span style="color:var(--border)">VAULT</span></div>
-  <div class="g4 mb18 s2">
-    <div class="card hl"><div class="clabel">${T('total_val')}</div><div class="cval a">${fmt(toDisp(mPLN))}</div><div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t2);margin-top:4px">${db.lang==='pl'?'wartość rynkowa':'market value'}</div></div>
-    <div class="card"><div class="clabel">${db.lang==='pl'?'Koszulek':'Jerseys'}</div><div class="cval">${ss.length}</div><div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t2);margin-top:4px">${forsale} ${db.lang==='pl'?'na sprzedaż':'for sale'} · ${listed} ${db.lang==='pl'?'wystawionych':'listed'}</div></div>
-    <div class="card"><div class="clabel">${T('invested')}</div><div class="cval">${fmt(toDisp(bPLN))}</div><div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:${profPLN>=0?'var(--a)':'var(--red)'};margin-top:4px">${profPLN>=0?'+':''}${fmt(toDisp(profPLN))} ${T('profit')}</div></div>
-    <div class="card"><div class="clabel">${T('top_club')}</div><div style="font-size:13px;font-weight:700;color:var(--a);margin-top:4px;line-height:1.4">${topClub?topClub[0]:'—'}</div>${topClub?`<div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t2);margin-top:3px">${topClub[1]} ${db.lang==='pl'?'szt.':'jerseys'}</div>`:''}</div>
+  <div class="vault-hero-card mb18 s2">
+    <div class="vault-hero-eyebrow">${db.lang==='pl'?'Wartość rynkowa kolekcji':'Collection market value'}</div>
+    <div class="vault-hero-num">${fmt(toDisp(mPLN))}</div>
+    <div class="vault-hero-sub">${db.lang==='pl'?'zainwestowano':'invested'} ${fmt(toDisp(bPLN))} · <b>${profPLN>=0?'+':''}${fmt(toDisp(profPLN))} ${T('profit')}</b></div>
+    <div class="vault-ledger-strip">
+      <div class="vault-ledger-item"><span class="vault-ledger-num">${ss.length}</span><span class="vault-ledger-lbl">${db.lang==='pl'?'Koszulek':'Jerseys'}</span></div>
+      <div class="vault-ledger-item"><span class="vault-ledger-num">${forsale}</span><span class="vault-ledger-lbl">${db.lang==='pl'?'Na sprzedaż':'For sale'}</span></div>
+      <div class="vault-ledger-item"><span class="vault-ledger-num">${listed}</span><span class="vault-ledger-lbl">${db.lang==='pl'?'Wystawionych':'Listed'}</span></div>
+      <div class="vault-ledger-item"><span class="vault-ledger-num">${topClub?topClub[0]:'—'}</span><span class="vault-ledger-lbl">${T('top_club')}</span></div>
+    </div>
   </div>
   <div class="g12 s3 mb18">
     <div class="card c8">
@@ -1566,7 +1588,7 @@ function bDash(){
   </div>
   <div class="s4">
     <div class="fx-b mb12"><div class="clabel" style="margin:0">${db.lang==='pl'?'Ostatnio Dodane':'Recently Added'}</div><button class="btn btn-p" onclick="openApp('collection')">+ ${T('add_shirt')}</button></div>
-    ${recent.length?`<div class="g3">${recent.map(s=>shirtCardMini(s)).join('')}</div>`:`<div class="empty-state"><div class="empty-icon">${icon('shirt',44)}</div><div class="empty-text">${T('empty_col')}</div></div>`}
+    ${recent.length?`<div class="vault-shelf">${recent.map(s=>shirtCardMini(s)).join('')}</div>`:`<div class="empty-state"><div class="empty-icon">${icon('shirt',44)}</div><div class="empty-text">${T('empty_col')}</div></div>`}
   </div>
   <div class="s4" style="margin-top:18px">
     <div class="clabel mb12">${db.lang==='pl'?'Aktywność':'Activity'}</div>
@@ -1615,8 +1637,10 @@ function buildChart(hist){
 
 function shirtCardMini(s){
   const mv=toPLN(s.marketValue||s.buyPrice),bp=toPLN(s.buyPrice);
+  const lotIdx=(db.shirts||[]).indexOf(s)+1;
   return `<div class="shirt-card" onclick="openEditShirt('${s.id}')">
     <div class="shirt-photo">${s.photos&&s.photos[0]?`<img src="${s.photos[0]}" alt="">`:`<div class="shirt-photo-placeholder"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg></div>`}
+      ${lotIdx>0?`<div class="lot-tag">№ ${String(lotIdx).padStart(3,'0')}</div>`:''}
       <div style="position:absolute;top:8px;right:8px"><span class="sh-status ${s.status}">${statusLabel(s.status)}</span></div>
       ${s.condition?`<div style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,.7);border-radius:6px;padding:2px 8px;font-family:'JetBrains Mono',monospace;font-size:9px;color:${condColor(s.condition)}">${s.condition}/10</div>`:''}
     </div>
