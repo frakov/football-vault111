@@ -138,7 +138,7 @@ body.admin-mode [data-ck]:focus{outline:2px solid #ffffff;outline-offset:2px}
 #admin-bar .admin-exit{background:transparent;border:1px solid rgba(244,244,239,.3)!important;color:#ffffff}
 #admin-bar .admin-exit:hover{background:rgba(244,244,239,.08)}
 .lp-club-tile:hover{background:#eef0f3}
-.lp-club-badge{width:46px;height:46px;border-radius:50%;background:#eef0f3;border:1px solid rgba(20,33,61,.1);display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;font-weight:800;font-size:12px;letter-spacing:.02em;color:#14213d}
+.lp-club-badge{width:68px;height:68px;border-radius:14px;background:#eef0f3;border:1px solid rgba(20,33,61,.1);display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;font-weight:800;font-size:15px;letter-spacing:.02em;color:#14213d;overflow:hidden;padding:10px}
 .lp-club-tile:hover .lp-club-badge{background:#14213d;color:#ffffff;border-color:#14213d}
 .lp-club-name{font-size:11px;font-weight:600;color:rgba(20,33,61,.7);text-align:center;padding:0 6px}
 
@@ -504,6 +504,12 @@ body.admin-mode [data-ck]:focus{outline:2px solid #ffffff;outline-offset:2px}
 #lightbox img{max-width:90vw;max-height:90vh;object-fit:contain;border-radius:8px}
 /* FORM */
 .form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.report-reason-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:var(--r2);cursor:pointer;transition:all .13s;font-size:13px;color:var(--t1)}
+.report-reason-row:hover{border-color:rgba(20,33,61,.3);background:var(--bg)}
+.report-reason-row.active{border-color:var(--a);background:rgba(var(--a-rgb),.06)}
+.report-reason-dot{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;position:relative}
+.report-reason-row.active .report-reason-dot{border-color:var(--a)}
+.report-reason-row.active .report-reason-dot::after{content:'';position:absolute;inset:2.5px;border-radius:50%;background:var(--a)}
 .form-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t2)}
 .form-input{background:var(--bg)!important;border:1px solid var(--border)!important;border-radius:var(--r2);padding:9px 12px;font-size:13px;font-weight:500;color:var(--t1)!important;width:100%;transition:border-color .15s;outline:none!important}
 .form-input:focus{border-color:rgba(var(--a-rgb),.4)!important;box-shadow:0 0 0 3px rgba(var(--a-rgb),.07)!important}
@@ -1088,6 +1094,7 @@ async function sbLoadData(){
     size:r.size, condition:r.condition, personalization:r.personalization, patches:r.patches,
     styleCode:r.style_code, buyPrice:r.buy_price, marketValue:r.market_value, notes:r.notes,
     status:r.status, photos:r.photos||[], valueHistory:r.value_history||[], marketListed:r.market_listed||false,
+    acceptsOffers:r.accepts_offers!==false, minOffer:r.min_offer||null,
     created:r.created_at?new Date(r.created_at).toLocaleDateString('pl-PL'):''
   }));
   // Load collection history
@@ -1114,7 +1121,7 @@ async function sbSaveShirt(shirt){
     personalization:shirt.personalization, patches:shirt.patches, style_code:shirt.styleCode,
     buy_price:shirt.buyPrice, market_value:shirt.marketValue, notes:shirt.notes,
     status:shirt.status, photos:shirt.photos||[], value_history:shirt.valueHistory||[],
-    market_listed:shirt.marketListed||false
+    market_listed:shirt.marketListed||false, accepts_offers:shirt.acceptsOffers!==false, min_offer:shirt.minOffer||null
   };
   // UUID = istniejacy rekord w Supabase, brak/liczba = nowy rekord
   const isUUID = shirt.id && typeof shirt.id === 'string' && shirt.id.includes('-');
@@ -1164,6 +1171,7 @@ async function sbListOnMarket(shirt){
     condition:shirt.condition, personalization:shirt.personalization,
     price_pln:toPLN(shirt.marketValue||shirt.buyPrice), notes:shirt.notes,
     photo:shirt.photos&&shirt.photos[0]?shirt.photos[0]:null,
+    accepts_offers:shirt.acceptsOffers!==false, min_offer:shirt.minOffer||null,
     listed_at:new Date().toISOString()
   },{onConflict:'id'});
   if(error){toast('Błąd marketplace: '+error.message);return false;}
@@ -2003,7 +2011,7 @@ async function loadMarketplace(){
 function mktCardHtml(i){
   const mv=parseFloat(i.price_pln||i.mv)||0;
   const isOwn=i.seller_nick===(db.profile?.nick||'')||i.user_id===currentUser?.id;
-  return `<div class="mkt-card">
+  return `<div class="mkt-card" onclick="openListingDetail('${i.id}')">
       <div class="shirt-photo" style="background:var(--bg3)">
         ${i.photo?`<img src="${i.photo}" alt="" style="width:100%;height:100%;object-fit:cover">`:`<div class="shirt-photo-placeholder"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg></div>`}
         <div style="position:absolute;top:8px;right:8px"><span class="sh-status public">Marketplace</span></div>
@@ -2019,11 +2027,11 @@ function mktCardHtml(i){
         </div>
         <div class="div" style="margin:8px 0"></div>
         <div class="fx-b">
-          <div class="mkt-seller fx-c gap6" style="cursor:pointer" onclick="viewProfile('${i.seller_nick||''}')">
+          <div class="mkt-seller fx-c gap6" style="cursor:pointer" onclick="event.stopPropagation();viewProfile('${i.seller_nick||''}')">
             <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--a) 0%,color-mix(in srgb,var(--a) 50%,#000) 100%);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--on-a,#fff);font-family:'Inter',sans-serif;font-weight:800">${(i.seller_nick||'?')[0].toUpperCase()}</div>
             ${i.seller_nick||'—'}
           </div>
-          ${isOwn?`<button class="btn btn-d" style="padding:4px 10px;font-size:10px" onclick="removeListing('${i.id}')">${icon('x',11,"display:inline-block;vertical-align:-1px;margin-right:4px")} ${T('mkt_remove')}</button>`:`<button class="btn btn-mkt" style="padding:4px 10px;font-size:10px" onclick="contactSeller('${i.user_id||''}','${i.seller_nick||''}')">${icon('messageCircle',12,"display:inline-block;vertical-align:-2px;margin-right:5px")} ${T('mkt_contact')}</button>`}
+          ${isOwn?`<button class="btn btn-d" style="padding:4px 10px;font-size:10px" onclick="event.stopPropagation();removeListing('${i.id}')">${icon('x',11,"display:inline-block;vertical-align:-1px;margin-right:4px")} ${T('mkt_remove')}</button>`:`<button class="btn btn-mkt" style="padding:4px 10px;font-size:10px" onclick="event.stopPropagation();contactSeller('${i.user_id||''}','${i.seller_nick||''}')">${icon('messageCircle',12,"display:inline-block;vertical-align:-2px;margin-right:5px")} ${T('mkt_contact')}</button>`}
         </div>
         ${i.notes?`<div style="font-size:10px;color:var(--t2);margin-top:8px;padding-top:8px;border-top:1px solid rgba(20,33,61,.08)">${i.notes}</div>`:''}
       </div>
@@ -2046,6 +2054,154 @@ function renderMarketItems(items){
       <div class="div" style="margin:18px 0"></div>`:'';
   }
   grid.innerHTML=valid.map(mktCardHtml).join('');
+}
+
+function agoLabel(dateStr){
+  if(!dateStr)return '';
+  const diff=Date.now()-new Date(dateStr).getTime();
+  const min=Math.floor(diff/60000),h=Math.floor(diff/3600000),d=Math.floor(diff/86400000),w=Math.floor(d/7);
+  if(min<60)return db.lang==='pl'?`${min||1} min temu`:`${min||1} min ago`;
+  if(h<24)return db.lang==='pl'?`${h} godz. temu`:`${h}h ago`;
+  if(d<7)return db.lang==='pl'?`${d} dni temu`:`${d}d ago`;
+  if(w<5)return db.lang==='pl'?`${w} tyg. temu`:`${w}w ago`;
+  return new Date(dateStr).toLocaleDateString('pl-PL');
+}
+
+function openListingDetail(id){
+  const l=_mktAllItems.find(x=>String(x.id)===String(id));
+  if(!l)return;
+  const isOwn=l.seller_nick===(db.profile?.nick||'')||l.user_id===currentUser?.id;
+  const mv=parseFloat(l.price_pln)||0;
+  const flagIcon=`<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-2px;margin-right:5px"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>`;
+  document.getElementById('modal-title').textContent=l.club||(db.lang==='pl'?'Koszulka':'Jersey');
+  document.getElementById('modal-body').innerHTML=`
+    <div class="g12 s2">
+    <div class="c8" style="grid-column:span 6">
+      <div class="shirt-photo" style="border-radius:var(--r2);aspect-ratio:1;position:relative">
+        ${l.photo?`<img src="${l.photo}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:var(--r2)">`:`<div class="shirt-photo-placeholder"><svg viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg></div>`}
+      </div>
+    </div>
+    <div class="c4" style="grid-column:span 6">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t2);letter-spacing:.04em;margin-bottom:8px">${[l.season,l.kind,l.size].filter(Boolean).join(' · ')}</div>
+      <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:30px;color:#14213d;margin-bottom:4px">${mv?mv.toFixed(2)+' PLN':'—'}</div>
+      ${l.condition?`<div style="font-size:11px;color:${condColor(l.condition)};font-family:'JetBrains Mono',monospace;margin-bottom:14px">${db.lang==='pl'?'Stan':'Condition'}: ${l.condition}/10</div>`:'<div style="margin-bottom:14px"></div>'}
+      ${!isOwn?`
+      <button class="btn btn-mkt w100 mb8" onclick="contactSeller('${l.user_id||''}','${l.seller_nick||''}')">${icon('messageCircle',13,"display:inline-block;vertical-align:-2px;margin-right:6px")}${T('mkt_contact')}</button>
+      ${l.accepts_offers!==false?`<button class="btn btn-g w100 mb8" onclick="openMakeOffer('${l.id}')">${icon('tag',13,"display:inline-block;vertical-align:-2px;margin-right:6px")}${db.lang==='pl'?'Zaproponuj ofertę':'Make an offer'}${l.min_offer?` (min. ${parseFloat(l.min_offer).toFixed(0)} PLN)`:''}</button>`:`<div style="font-size:9.5px;color:var(--t3);font-family:'JetBrains Mono',monospace;letter-spacing:.06em;margin-bottom:8px">${db.lang==='pl'?'SPRZEDAJĄCY NIE AKCEPTUJE OFERT':'SELLER DOES NOT ACCEPT OFFERS'}</div>`}
+      `:''}
+      <div class="div" style="margin:14px 0"></div>
+      <div class="mkt-seller fx-c gap8" style="cursor:pointer;margin-bottom:10px" onclick="closeModal();viewProfile('${l.seller_nick||''}')">
+        <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--a) 0%,color-mix(in srgb,var(--a) 50%,#000) 100%);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;font-family:'Inter',sans-serif;font-weight:800">${(l.seller_nick||'?')[0].toUpperCase()}</div>
+        <span style="font-size:12px;font-weight:600;color:var(--t1)">${l.seller_nick||'—'}</span>
+      </div>
+      <div style="font-size:10px;color:var(--t3);font-family:'JetBrains Mono',monospace;display:flex;gap:14px">
+        <span>${(l.views||0)+1} ${db.lang==='pl'?'wyświetleń':'views'}</span>
+        <span>${db.lang==='pl'?'Wystawiono':'Listed'} ${agoLabel(l.listed_at)}</span>
+      </div>
+      ${l.notes?`<div style="font-size:12px;color:var(--t2);line-height:1.6;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">${l.notes}</div>`:''}
+      <div class="div" style="margin:14px 0"></div>
+      <div class="fx-c gap8" style="flex-wrap:wrap">
+        ${isOwn?`<button class="btn btn-d" onclick="closeModal();removeListing('${l.id}')">${icon('trash',12,"display:inline-block;vertical-align:-2px;margin-right:5px")}${T('mkt_remove')}</button>`:''}
+        ${!isOwn?`<button class="btn btn-g" style="opacity:.75" onclick="reportListing('${l.id}')">${flagIcon}${db.lang==='pl'?'Zgłoś ogłoszenie':'Report listing'}</button>`:''}
+        ${adminMode?`<button class="btn btn-d" onclick="adminRemoveListing('${l.id}')">${icon('trash',12,"display:inline-block;vertical-align:-2px;margin-right:5px")}${db.lang==='pl'?'Usuń (admin)':'Delete (admin)'}</button>`:''}
+      </div>
+    </div>
+    </div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+  incrementListingViews(l.id);
+}
+
+async function incrementListingViews(id){
+  try{
+    const l=_mktAllItems.find(x=>String(x.id)===String(id));
+    const newViews=(l?.views||0)+1;
+    if(l)l.views=newViews;
+    await sb.from('market_listings').update({views:newViews}).eq('id',id);
+  }catch(e){}
+}
+
+function openMakeOffer(id){
+  const l=_mktAllItems.find(x=>String(x.id)===String(id));
+  if(!l)return;
+  if(!currentUser){toast(db.lang==='pl'?'Zaloguj się, aby złożyć ofertę':'Log in to make an offer');return;}
+  if(l.user_id===currentUser.id){toast(db.lang==='pl'?'To Twoje ogłoszenie':'This is your listing');return;}
+  document.getElementById('modal-title').textContent=db.lang==='pl'?'Zaproponuj ofertę':'Make an offer';
+  document.getElementById('modal-body').innerHTML=`
+    <div style="font-size:13px;color:var(--t2);margin-bottom:14px">${l.club} ${l.season||''} — ${db.lang==='pl'?'cena wyjściowa':'asking price'} <b style="color:#14213d">${parseFloat(l.price_pln||0).toFixed(2)} PLN</b></div>
+    ${l.min_offer?`<div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:12px">${db.lang==='pl'?'Minimalna oferta akceptowana przez sprzedającego':'Minimum offer accepted by seller'}: ${parseFloat(l.min_offer).toFixed(0)} PLN</div>`:''}
+    <div class="form-group"><div class="form-label">${db.lang==='pl'?'Twoja oferta (PLN)':'Your offer (PLN)'}</div><input class="form-input" type="text" inputmode="decimal" id="offer-amount" placeholder="0"></div>
+    <div class="form-group"><div class="form-label">${db.lang==='pl'?'Wiadomość (opcjonalnie)':'Message (optional)'}</div><textarea class="form-input" id="offer-msg" rows="2" placeholder="${db.lang==='pl'?'np. Mogę odebrać osobiście':'e.g. I can pick up in person'}"></textarea></div>
+    <div class="fx-c gap8" style="justify-content:flex-end;margin-top:14px">
+      <button class="btn btn-g" onclick="openListingDetail('${id}')">${T('cancel')}</button>
+      <button class="btn btn-p" onclick="submitOffer('${id}')">${db.lang==='pl'?'Wyślij ofertę':'Send offer'}</button>
+    </div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+async function submitOffer(id){
+  const l=_mktAllItems.find(x=>String(x.id)===String(id));
+  if(!l)return;
+  const amount=parseFloat(document.getElementById('offer-amount')?.value);
+  if(!amount||amount<=0){toast(db.lang==='pl'?'Podaj kwotę oferty':'Enter an offer amount');return;}
+  if(l.min_offer&&amount<parseFloat(l.min_offer)){toast(db.lang==='pl'?`Minimalna oferta to ${l.min_offer} PLN`:`Minimum offer is ${l.min_offer} PLN`);return;}
+  const msg=(document.getElementById('offer-msg')?.value||'').trim();
+  const convId=await getOrCreateConv(l.user_id);
+  if(!convId){toast(db.lang==='pl'?'Błąd wysyłania oferty':'Error sending offer');return;}
+  const text=`💰 ${db.lang==='pl'?'Oferta':'Offer'}: ${amount.toFixed(2)} PLN ${db.lang==='pl'?'za':'for'} ${l.club} ${l.season||''}${msg?`\n"${msg}"`:''}`;
+  await sendMessage(convId,text);
+  closeModal();
+  toast(db.lang==='pl'?'Oferta wysłana!':'Offer sent!');
+  activeConvId=convId;openApp('chat');
+  setTimeout(()=>initChatView().then(()=>selectConv(convId,l.seller_nick||'Sprzedający')),200);
+}
+
+function reportListing(id){
+  if(!currentUser){toast(db.lang==='pl'?'Zaloguj się, aby zgłosić':'Log in to report');return;}
+  const reasons=db.lang==='pl'
+    ?['Podejrzenie oszustwa','Nieprawidłowy opis / zdjęcie','Zakazana treść','Duplikat ogłoszenia','Inne']
+    :['Suspected scam','Wrong description / photo','Prohibited content','Duplicate listing','Other'];
+  document.getElementById('modal-title').textContent=db.lang==='pl'?'Zgłoś ogłoszenie':'Report listing';
+  document.getElementById('modal-body').innerHTML=`
+    <div class="form-group"><div class="form-label">${db.lang==='pl'?'Powód zgłoszenia':'Reason for report'}</div>
+      <div id="report-reasons" style="display:flex;flex-direction:column;gap:6px">
+        ${reasons.map((r,i)=>`<div class="report-reason-row" data-idx="${i}" onclick="pickReportReason(${i})"><span class="report-reason-dot"></span>${r}</div>`).join('')}
+      </div>
+    </div>
+    <div class="form-group"><div class="form-label">${db.lang==='pl'?'Dodatkowe informacje (opcjonalnie)':'Additional details (optional)'}</div>
+      <textarea class="form-input" id="report-details" rows="2" placeholder="${db.lang==='pl'?'Opisz krótko problem...':'Briefly describe the issue...'}"></textarea>
+    </div>
+    <div class="fx-c gap8" style="justify-content:flex-end;margin-top:14px">
+      <button class="btn btn-g" onclick="closeModal()">${T('cancel')}</button>
+      <button class="btn btn-p" id="report-submit-btn" onclick="submitReport('${id}')" disabled style="opacity:.5">${db.lang==='pl'?'Wyślij zgłoszenie':'Send report'}</button>
+    </div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+  window._reportReasons=reasons;
+  window._reportPicked=null;
+}
+function pickReportReason(idx){
+  window._reportPicked=idx;
+  document.querySelectorAll('.report-reason-row').forEach(el=>el.classList.toggle('active',parseInt(el.dataset.idx)===idx));
+  const btn=document.getElementById('report-submit-btn');
+  if(btn){btn.disabled=false;btn.style.opacity='1';}
+}
+function submitReport(id){
+  if(window._reportPicked==null)return;
+  const reason=window._reportReasons[window._reportPicked];
+  const details=(document.getElementById('report-details')?.value||'').trim();
+  const full=details?`${reason} — ${details}`:reason;
+  sb.from('listing_reports').insert({listing_id:id,reporter_id:currentUser.id,reason:full}).then(({error})=>{
+    if(error){toast(db.lang==='pl'?'Błąd zgłoszenia':'Report failed');return;}
+    closeModal();
+    toast(db.lang==='pl'?'Zgłoszenie wysłane, dziękujemy':'Report sent, thank you');
+  });
+}
+
+async function adminRemoveListing(id){
+  if(!adminMode)return;
+  if(!confirm(db.lang==='pl'?'Usunąć to ogłoszenie jako moderator?':'Delete this listing as moderator?'))return;
+  const {error}=await sb.from('market_listings').delete().eq('id',id);
+  if(error){toast('Błąd: '+error.message);return;}
+  closeModal();toast(db.lang==='pl'?'Usunięto ogłoszenie':'Listing removed');loadMarketplace();
 }
 
 async function contactSeller(userId,nick){
@@ -2314,6 +2470,13 @@ function buildShirtForm(s){
       <div class="form-group"><div class="form-label">${T('f_mv')}</div><input class="form-input" type="text" inputmode="decimal" id="f-mv" value="${v.marketValue||''}" placeholder="0">
         ${v.valueHistory&&v.valueHistory.length?`<div style="margin-top:8px"><div class="form-label" style="margin-bottom:4px">${T('val_hist')}</div><div style="max-height:70px;overflow-y:auto">${v.valueHistory.map(h=>`<div class="vh-row"><span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--t2)">${h.date}</span><span style="font-family:'Inter',sans-serif;font-weight:800;font-size:14px;color:var(--a)">${h.value.toFixed(0)} PLN</span></div>`).join('')}</div></div>`:''}
       </div>
+      <div class="form-group"><div class="form-label">${db.lang==='pl'?'Akceptuję oferty na marketplace':'Accept offers on marketplace'}</div>
+        <select class="form-select" id="f-offers" onchange="document.getElementById('f-minoffer-wrap').style.display=this.value==='no'?'none':'block'">
+          <option value="yes" ${v.acceptsOffers!==false?'selected':''}>${db.lang==='pl'?'Tak — kupujący mogą negocjować':'Yes — buyers can negotiate'}</option>
+          <option value="no" ${v.acceptsOffers===false?'selected':''}>${db.lang==='pl'?'Nie — tylko cena stała':'No — fixed price only'}</option>
+        </select>
+      </div>
+      <div class="form-group" id="f-minoffer-wrap" style="display:${v.acceptsOffers===false?'none':'block'}"><div class="form-label">${db.lang==='pl'?'Minimalna akceptowana oferta (opcjonalnie)':'Minimum accepted offer (optional)'}</div><input class="form-input" type="text" inputmode="decimal" id="f-minoffer" value="${v.minOffer||''}" placeholder="0"></div>
       <div class="form-group"><div class="form-label">${T('f_notes')}</div><textarea class="form-input" id="f-notes" rows="3" placeholder="${db.lang==='pl'?'Uwagi, wady, historia...':'Notes, flaws, history...'}">${v.notes||''}</textarea></div>
     </div>
   </div>
@@ -2366,12 +2529,14 @@ async function saveShirt(){
   const size=sizeSel==='__other'?(document.getElementById('f-size-t')?.value||'').trim()||'M':sizeSel;
   const buyPrice=parseFloat(document.getElementById('f-buy')?.value)||0;
   const marketValue=parseFloat(document.getElementById('f-mv')?.value)||0;
+  const acceptsOffers=document.getElementById('f-offers')?.value!=='no';
+  const minOffer=parseFloat(document.getElementById('f-minoffer')?.value)||null;
 
   // Build shirt object
   const shirt={club,brand,season:document.getElementById('f-season')?.value||'',kind,shirtType,size,
     condition:document.getElementById('f-cond')?.value||'',personalization:document.getElementById('f-pers')?.value||'',
     patches:document.getElementById('f-patches')?.value||'unknown',styleCode:document.getElementById('f-code')?.value||'',
-    buyPrice,marketValue,notes:document.getElementById('f-notes')?.value||'',
+    buyPrice,marketValue,acceptsOffers,minOffer,notes:document.getElementById('f-notes')?.value||'',
     status:document.getElementById('f-status')?.value||'collection',photos:[...editPhotos]};
 
   if(!db.shirts)db.shirts=[];
@@ -2772,7 +2937,7 @@ function initLandingClubGrid(){
   if(!el)return;
   el.innerHTML=LP_CLUBS.map((c,i)=>{
     const tileClick=adminMode?'':`onclick="openAuthModal('register')"`;
-    const badgeInner=c.logoUrl?`<img src="${c.logoUrl}" alt="${c.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:c.code;
+    const badgeInner=c.logoUrl?`<img src="${c.logoUrl}" alt="${c.name}" style="max-width:100%;max-height:100%;object-fit:contain">`:c.code;
     const uploadBtn=adminMode?`<button class="club-logo-upload" onclick="event.stopPropagation();uploadClubLogo(${i})" title="Dodaj grafikę">+</button>`:'';
     return `<div class="lp-club-tile" ${tileClick}><div class="lp-club-badge">${badgeInner}</div><div class="lp-club-name">${c.name}</div>${uploadBtn}</div>`;
   }).join('');
