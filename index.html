@@ -49,13 +49,13 @@ textarea{resize:none}
 .lp-utility span{color:#8c9bc3}
 
 /* NAV — light, deliberately contrasting against the dark hero below it */
-.lp-nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:72px;background:#ffffff;box-shadow:0 1px 0 rgba(20,33,61,.1),0 4px 20px rgba(20,33,61,.06)}
+.lp-nav{position:sticky;top:0;z-index:100;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 40px;height:72px;background:#ffffff;box-shadow:0 1px 0 rgba(20,33,61,.1),0 4px 20px rgba(20,33,61,.06)}
 .lp-logo{font-family:'Inter',sans-serif;font-weight:800;font-size:23px;letter-spacing:.08em;color:#14213d}
 .lp-logo span{color:#14213d}
 .lp-nav-links{display:flex;align-items:center;gap:32px}
 .lp-nav-link{font-size:13.5px;font-weight:700;color:#14213d;cursor:pointer;transition:opacity .15s;letter-spacing:.04em;text-transform:uppercase;border:none;background:none;opacity:.8}
 .lp-nav-link:hover{opacity:1}
-.lp-nav-cta{display:flex;align-items:center;gap:14px}
+.lp-nav-cta{display:flex;align-items:center;gap:14px;justify-self:end}
 .lp-btn-ghost{font-size:12.5px;font-weight:600;color:#14213d;border:none;background:none;cursor:pointer;letter-spacing:.03em;text-transform:uppercase;opacity:.7;transition:opacity .15s}
 .lp-btn-ghost:hover{opacity:1;text-decoration:underline;text-underline-offset:3px}
 .lp-btn-primary{font-size:12.5px;font-weight:700;color:#ffffff;background:#14213d;border:none;border-radius:2px;padding:12px 26px;cursor:pointer;transition:all .18s;letter-spacing:.05em;text-transform:uppercase}
@@ -75,8 +75,8 @@ textarea{resize:none}
 .lp-hero-sub{font-size:15px;color:rgba(255,255,255,.6);line-height:1.55;max-width:430px;margin-bottom:18px;font-weight:400}
 .lp-hero-sub strong{color:#ffffff;font-weight:600}
 .lp-hero-cta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
-.lp-sell-link{display:inline-flex;align-items:center;gap:8px;background:none;border:none;color:#8c9bc3;font-size:12.5px;font-weight:600;cursor:pointer;padding:2px 0;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(140,155,195,.4)}
-.lp-sell-link:hover{text-decoration-color:#8c9bc3}
+.lp-nav-sell-btn{display:inline-flex;align-items:center;gap:7px;background:none;border:1px solid rgba(20,33,61,.25);color:#14213d;font-size:12.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;cursor:pointer;padding:12px 16px;border-radius:2px;transition:all .15s;margin-right:6px}
+.lp-nav-sell-btn:hover{background:rgba(20,33,61,.06);border-color:rgba(20,33,61,.4)}
 .lp-btn-hero{font-size:13px;font-weight:700;color:#14213d;background:#ffffff;border:none;border-radius:2px;padding:13px 28px;cursor:pointer;transition:all .18s;letter-spacing:.05em;text-transform:uppercase}
 .lp-btn-hero:hover{background:#8c9bc3;transform:translateY(-1px)}
 .lp-btn-hero-ghost{font-size:13px;font-weight:600;color:#ffffff;background:none;border:1px solid rgba(255,255,255,.3);border-radius:2px;padding:12px 24px;cursor:pointer;transition:all .18s}
@@ -497,7 +497,7 @@ body.admin-mode [data-ck]:focus{outline:2px solid #ffffff;outline-offset:2px}
 .toast::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0;background:var(--a);box-shadow:0 0 6px rgba(var(--a-rgb),.8)}
 @keyframes ti{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 /* MODAL */
-#modal-overlay{position:fixed;inset:0;z-index:8000;background:rgba(20,20,15,.55);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center}
+#modal-overlay{position:fixed;inset:0;z-index:21000;background:rgba(20,20,15,.55);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center}
 #modal-overlay.open{display:flex}
 #modal-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);width:min(740px,96vw);max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(20,20,15,.25);animation:winIn .2s var(--e2) both}
 .modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px 14px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg2);z-index:1}
@@ -696,6 +696,10 @@ select option{background:var(--bg2);color:var(--t1)}
       <button class="lp-nav-link" onclick="document.getElementById('landing').scrollTo({top:document.getElementById('lp-community').offsetTop-76,behavior:'smooth'})">Społeczność</button>
     </div>
     <div class="lp-nav-cta">
+      <button class="lp-nav-sell-btn" onclick="openSellLeadForm()">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg>
+        Sprzedaj koszulkę
+      </button>
       <button class="lp-btn-ghost" onclick="openAuthModal('login')">Zaloguj się</button>
       <button class="lp-btn-primary" onclick="openAuthModal('register')">Załóż konto</button>
     </div>
@@ -720,12 +724,6 @@ select option{background:var(--bg2);color:var(--t1)}
       <div class="lp-hero-cta">
         <button class="lp-btn-hero" data-ck="hero.cta_primary" onclick="openAuthModal('register')">Zacznij za darmo</button>
         <button class="lp-btn-hero-ghost" data-ck="hero.cta_secondary" onclick="openAuthModal('login')">Mam już konto</button>
-      </div>
-      <div style="margin-bottom:24px">
-        <button class="lp-sell-link" onclick="openSellLeadForm()">
-          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg>
-          Chcesz sprzedać koszulkę bez zakładania konta? Kliknij tutaj →
-        </button>
       </div>
       <div class="lp-pills" style="margin-bottom:44px">
         <button class="lp-pill active">Kolekcja</button>
