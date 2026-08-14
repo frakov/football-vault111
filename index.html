@@ -125,10 +125,9 @@ textarea{resize:none}
 .lp-section-desc{font-size:15px;color:rgba(20,33,61,.55);line-height:1.75;max-width:440px}
 
 /* CLUB GRID — "Popular Leagues & Teams" style */
-.lp-club-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:rgba(20,33,61,.08);border:1px solid rgba(20,33,61,.08)}
-.lp-club-tile{position:relative;background:#fff;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:background .15s;cursor:pointer}
-.club-logo-upload{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:#14213d;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;z-index:2}
-.club-logo-upload:hover{filter:brightness(1.3)}
+.lp-club-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.lp-club-tile{display:flex;align-items:center;gap:12px;padding:15px 18px;background:#fff;border:1px solid rgba(20,33,61,.12);border-radius:10px;cursor:pointer;transition:all .15s}
+.lp-club-tile:hover{border-color:rgba(20,33,61,.35);box-shadow:0 3px 12px rgba(20,33,61,.07)}
 .jersey-photo-upload{position:absolute;bottom:10px;right:10px;width:28px;height:28px;border-radius:50%;background:#14213d;color:#fff;border:2px solid #fff;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;z-index:2;box-shadow:0 2px 8px rgba(0,0,0,.3)}
 .jersey-photo-upload:hover{filter:brightness(1.3)}
 /* ADMIN MODE */
@@ -142,10 +141,9 @@ body.admin-mode [data-ck]:focus{outline:2px solid #ffffff;outline-offset:2px}
 #admin-bar .admin-save:hover{filter:brightness(1.1)}
 #admin-bar .admin-exit{background:transparent;border:1px solid rgba(244,244,239,.3)!important;color:#ffffff}
 #admin-bar .admin-exit:hover{background:rgba(244,244,239,.08)}
-.lp-club-tile:hover{background:#eef0f3}
-.lp-club-badge{width:68px;height:68px;border-radius:14px;background:#eef0f3;border:1px solid rgba(20,33,61,.1);display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;font-weight:800;font-size:15px;letter-spacing:.02em;color:#14213d;overflow:hidden;padding:10px}
-.lp-club-tile:hover .lp-club-badge{background:#14213d;color:#ffffff;border-color:#14213d}
-.lp-club-name{font-size:11px;font-weight:600;color:rgba(20,33,61,.7);text-align:center;padding:0 6px}
+.lp-club-colors{display:flex;gap:4px;flex-shrink:0}
+.lp-club-chip{width:20px;height:20px;border-radius:6px}
+.lp-club-name{font-size:13px;font-weight:700;color:#14213d}
 
 /* FEATURED + EDITORIAL LIST (replaces uniform 6-card grid) */
 .lp-feature-featured{display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:start;padding:44px 0 40px;border-bottom:1px solid rgba(20,33,61,.12)}
@@ -3103,35 +3101,18 @@ function initLandingTrustBar(){
 }
 
 let LP_CLUBS=[
-  {code:'FCB',name:'Barcelona'},{code:'RMA',name:'Real Madrid'},{code:'MCI',name:'Man City'},
-  {code:'LIV',name:'Liverpool'},{code:'JUV',name:'Juventus'},{code:'PSG',name:'PSG'},
-  {code:'BVB',name:'Dortmund'},{code:'MUN',name:'Man Utd'},{code:'ARS',name:'Arsenal'},
-  {code:'CHE',name:'Chelsea'},{code:'BAY',name:'Bayern'},{code:'INT',name:'Inter'},
+  {name:'Barcelona',colors:['#a50044','#004d98']},{name:'Real Madrid',colors:['#ffffff','#febe10']},{name:'Man City',colors:['#6cabdd','#ffffff']},
+  {name:'Liverpool',colors:['#c8102e','#f6eb61']},{name:'Juventus',colors:['#000000','#ffffff']},{name:'PSG',colors:['#004170','#da291c']},
+  {name:'Dortmund',colors:['#fde100','#000000']},{name:'Man Utd',colors:['#da291c','#fbe122']},{name:'Arsenal',colors:['#ef0107','#ffffff']},
+  {name:'Chelsea',colors:['#034694','#ffffff']},{name:'Bayern',colors:['#dc052d','#0066b2']},{name:'Inter',colors:['#0068a8','#000000']},
 ];
 function initLandingClubGrid(){
   const el=document.getElementById('lp-club-grid');
   if(!el)return;
-  el.innerHTML=LP_CLUBS.map((c,i)=>{
-    const tileClick=adminMode?'':`onclick="openAuthModal('register')"`;
-    const badgeInner=c.logoUrl?`<img src="${c.logoUrl}" alt="${c.name}" style="max-width:100%;max-height:100%;object-fit:contain">`:c.code;
-    const uploadBtn=adminMode?`<button class="club-logo-upload" onclick="event.stopPropagation();uploadClubLogo(${i})" title="Dodaj grafikę">+</button>`:'';
-    return `<div class="lp-club-tile" ${tileClick}><div class="lp-club-badge">${badgeInner}</div><div class="lp-club-name">${c.name}</div>${uploadBtn}</div>`;
+  el.innerHTML=LP_CLUBS.map(c=>{
+    const chip=col=>`<span class="lp-club-chip" style="background:${col};${col.toLowerCase()==='#ffffff'?'border:1px solid rgba(20,33,61,.2)':''}"></span>`;
+    return `<div class="lp-club-tile" onclick="openAuthModal('register')"><div class="lp-club-colors">${chip(c.colors[0])}${chip(c.colors[1])}</div><div class="lp-club-name">${c.name}</div></div>`;
   }).join('');
-}
-async function uploadClubLogo(i){
-  const input=document.createElement('input');
-  input.type='file';input.accept='image/*';
-  input.onchange=async()=>{
-    const file=input.files[0];if(!file)return;
-    const ext=(file.name.split('.').pop()||'png').toLowerCase();
-    const path=`site/clubs/${LP_CLUBS[i].code}-${Date.now()}.${ext}`;
-    const {error}=await sb.storage.from('shirt-photos').upload(path,file,{upsert:true});
-    if(error){alert('Błąd uploadu: '+error.message);return;}
-    const {data:{publicUrl}}=sb.storage.from('shirt-photos').getPublicUrl(path);
-    LP_CLUBS[i].logoUrl=publicUrl;
-    initLandingClubGrid();
-  };
-  input.click();
 }
 
 async function initLandingCommunityGrid(){
@@ -3323,9 +3304,6 @@ async function loadSiteContent(){
       const k=el.getAttribute('data-ck');
       if(map[k]!=null&&map[k]!=='')el.innerHTML=map[k];
     });
-    if(map['clubs']){
-      try{const parsed=JSON.parse(map['clubs']);if(Array.isArray(parsed)&&parsed.length){LP_CLUBS=parsed;initLandingClubGrid();}}catch(e){}
-    }
     if(map['hero_jerseys']){
       try{const parsed=JSON.parse(map['hero_jerseys']);if(Array.isArray(parsed)){LP_HERO_PHOTOS=parsed;}}catch(e){}
     }
