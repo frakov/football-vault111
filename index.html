@@ -3268,24 +3268,16 @@ loadSiteContent();
 // ══════════════════════════════════════════════════════
 // ADMIN CONTENT EDITOR (hidden — trigger via #admin in URL)
 // ══════════════════════════════════════════════════════
-const ADMIN_HASH='d622058c7a818485055ecc0062438d4c65e695084fa4481b30db3d1528a8cff3';
-
-async function sha256Hex(str){
-  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-
-async function checkAdminHash(){
+async function checkAdminAccess(){
   if(location.hash!=='#admin')return;
+  if(!currentUser)return; // jeszcze nie wiadomo czy ktoś jest zalogowany — sprawdzimy ponownie zaraz po zalogowaniu
   history.replaceState(null,'',location.pathname+location.search);
-  const pw=prompt('Hasło admina:');
-  if(pw==null)return;
-  const h=await sha256Hex(pw);
-  if(h===ADMIN_HASH)enterAdminMode();
-  else toast('Złe hasło.');
+  const {data}=await sb.from('profiles').select('is_admin').eq('user_id',currentUser.id).maybeSingle();
+  if(data?.is_admin)enterAdminMode();
+  else toast(db.lang==='pl'?'Brak uprawnień administratora':'No admin privileges');
 }
-window.addEventListener('hashchange',checkAdminHash);
-checkAdminHash();
+window.addEventListener('hashchange',checkAdminAccess);
+checkAdminAccess();
 
 // Block normal onclick actions on editable elements while in admin mode
 document.addEventListener('click',e=>{
@@ -3298,6 +3290,11 @@ function enterAdminMode(){
   adminMode=true;
   document.body.classList.add('admin-mode');
   document.querySelectorAll('[data-ck]').forEach(el=>{el.contentEditable='true';el.spellcheck=false;});
+  // Edycja dotyczy landing page — pokaż ją, nawet jeśli admin jest zalogowany (co chowa ją domyślnie)
+  const landing=document.getElementById('landing');
+  if(landing)landing.classList.remove('hidden');
+  const shell=document.getElementById('app-shell');
+  if(shell)shell.classList.add('hidden');
   initLandingClubGrid();
   initLandingJerseys();
   showAdminBar();
@@ -3307,6 +3304,16 @@ function exitAdminMode(){
   adminMode=false;
   document.body.classList.remove('admin-mode');
   document.querySelectorAll('[data-ck]').forEach(el=>{el.contentEditable='false';});
+  // Wróć tam, gdzie admin faktycznie powinien być: do aplikacji jeśli jest zalogowany, inaczej na landing
+  const landing=document.getElementById('landing');
+  const shell=document.getElementById('app-shell');
+  if(currentUser){
+    if(landing)landing.classList.add('hidden');
+    if(shell)shell.classList.remove('hidden');
+  } else {
+    if(landing)landing.classList.remove('hidden');
+    if(shell)shell.classList.add('hidden');
+  }
   initLandingClubGrid();
   initLandingJerseys();
   const bar=document.getElementById('admin-bar');
@@ -3431,6 +3438,7 @@ async function initAfterLogin(user){
     const{data}=await sb.from('notifications').select('id').eq('user_id',currentUser.id).eq('read',false);
     unreadNotifs=(data||[]).length;
     updateNotifBadge();
+    checkAdminAccess();
   },0);
 }
 
@@ -3472,6 +3480,8 @@ sb.auth.onAuthStateChange((event, session) => {
     }
   } else if(event==='SIGNED_OUT'){
     doLogout();
+  } else if(!currentUser&&location.hash==='#admin'){
+    toast(db.lang==='pl'?'Zaloguj się na konto z uprawnieniami administratora':'Log in with an administrator account');
   }
 });
 
