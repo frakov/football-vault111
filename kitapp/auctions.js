@@ -362,6 +362,10 @@ function openCreateAuction(){
     </div>
   </div>
   <div class="div"></div>
+  <label style="display:flex;align-items:flex-start;gap:9px;font-size:12px;line-height:1.5;color:var(--t2);margin-bottom:14px;cursor:pointer">
+    <input type="checkbox" id="auc-terms" style="width:auto;margin-top:2px;flex-shrink:0;accent-color:var(--a)">
+    <span>${db.lang==='pl'?'Akceptuję':'I accept the'} <a href="regulamin.html" target="_blank" style="color:var(--t1);font-weight:600">${db.lang==='pl'?'Regulamin':'Terms of Service'}</a> ${db.lang==='pl'?'— rozumiem, że każda złożona oferta jest wiążąca, a ja jako sprzedający jestem zobowiązany/a do sfinalizowania sprzedaży ze zwycięzcą licytacji.':'— I understand every bid is binding, and as the seller I am obligated to finalize the sale with the winning bidder.'}</span>
+  </label>
   <div class="fx-c gap8" style="justify-content:flex-end">
     <button class="btn btn-g" onclick="closeModal()">${T('cancel')}</button>
     <button class="btn" style="background:rgba(239,68,68,.9);color:#fff;box-shadow:0 2px 16px rgba(239,68,68,.4)" onclick="submitCreateAuction()"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#fff;margin-right:6px;vertical-align:0px;animation:pulse 1s ease-in-out infinite;box-shadow:0 0 4px rgba(255,255,255,.6)"></span>${db.lang==='pl'?'Uruchom Licytację':'Start Auction'}</button>
@@ -370,6 +374,7 @@ function openCreateAuction(){
 }
 
 async function submitCreateAuction(){
+  if(!document.getElementById('auc-terms')?.checked){toast(db.lang==='pl'?'Musisz zaakceptować Regulamin, aby uruchomić licytację.':'You must accept the Terms of Service to start an auction.');return;}
   const shirtId=document.getElementById('auc-shirt')?.value;
   if(!shirtId){toast(db.lang==='pl'?'Wybierz koszulkę!':'Choose a jersey!');return;}
   const startPrice=parseFloat(document.getElementById('auc-start')?.value);

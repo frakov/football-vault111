@@ -23,12 +23,12 @@ async function sbLoadData(){
     db.lang=settings.lang||'pl';
     db.currency=settings.currency||'PLN';
     db.fx=settings.fx||DEF.fx;
-    db.theme=settings.theme||'#14213d';
-    db.themeRgb=settings.theme_rgb||'20,33,61';
+    db.theme=settings.theme||'#AEE1F9';
+    db.themeRgb=settings.theme_rgb||'174,225,249';
     db.bgPreset=settings.bg_preset||'dark';
     // Reset legacy green theme for existing users
     if(db.theme==='#10b981'||db.theme==='#06b6d4'&&db.bgPreset==='pitch'){
-      db.theme='#14213d';db.themeRgb='20,33,61';db.bgPreset='dark';db.bgCustom=null;
+      db.theme='#AEE1F9';db.themeRgb='174,225,249';db.bgPreset='dark';db.bgCustom=null;
     }
     if(db.bgPreset==='pitch'&&!db.bgCustom){db.bgPreset='dark';}
     if(db.bgCustom&&(db.bgCustom.includes('2510')||db.bgCustom==='#0a0a0f')){db.bgCustom=null;}
@@ -134,7 +134,7 @@ const T=k=>(TR[db?.lang||'pl']||TR.pl)[k]||k;
 // DATABASE (in-memory, synced to Supabase)
 // ══════════════════════════════════════════════════════
 const DEF={lang:'pl',currency:'PLN',fx:{scanlines:false,sound:false},
-  theme:'#14213d',themeRgb:'20,33,61',bgPreset:'dark',bgCustom:null,
+  theme:'#AEE1F9',themeRgb:'174,225,249',bgPreset:'dark',bgCustom:null,
   rates:{EUR:4.30,GBP:5.10,USD:4.00},shirts:[],collectionHistory:[],
   profile:{name:'',bio:'',public:false,nick:''}};
 
@@ -145,7 +145,7 @@ function loadLocalCache(){
     if(raw){
       const d=JSON.parse(raw);
       // Reset legacy green theme
-      if(d.theme==='#10b981'){d.theme='#14213d';d.themeRgb='20,33,61';}
+      if(d.theme==='#10b981'){d.theme='#AEE1F9';d.themeRgb='174,225,249';}
       if(d.bgPreset==='pitch')d.bgPreset='dark';
       if(d.bgCustom&&(d.bgCustom==='#0a0a0f'||d.bgCustom==='#08090c'))d.bgCustom=null;
       return d;
@@ -241,8 +241,8 @@ setInterval(()=>{const d=new Date(),h=d.getHours().toString().padStart(2,'0'),m=
 // ══════════════════════════════════════════════════════
 function applyTheme(){
   const r=document.documentElement.style;
-  r.setProperty('--a','#14213d');
-  r.setProperty('--a-rgb','20,33,61');
+  r.setProperty('--a','#AEE1F9');
+  r.setProperty('--a-rgb','174,225,249');
   r.setProperty('--on-a','#fff');
 }
 function setLang(l){db.lang=l;qsave();toast(l==='pl'?'Polski':'English');rerenderOpen();if(settingsOpen)renderSP();}
@@ -504,7 +504,7 @@ async function renderNotifPanel(){
   if(!notifs.length){el.innerHTML=`<div style="padding:30px;text-align:center;font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t3);letter-spacing:.1em">BRAK POWIADOMIEŃ</div>`;return;}
   el.innerHTML=notifs.map(n=>{
     const iconMap={bid:'zap',outbid:'alertTriangle',won:'trophy',msg:'messageCircle',wishlist:'heart',verified:'checkCircle',watcher:'eye',sale:'tag2',cancelled:'ban'};
-    const colorMap={bid:'#f59e0b',outbid:'#f43f5e',won:'#f59e0b',msg:'#3b82f6',wishlist:'#14213d',verified:'var(--a)',watcher:'#14213d',sale:'#8b5cf6',cancelled:'#f43f5e'};
+    const colorMap={bid:'#f59e0b',outbid:'#f43f5e',won:'#f59e0b',msg:'#3b82f6',wishlist:'#AEE1F9',verified:'var(--a)',watcher:'#AEE1F9',sale:'#8b5cf6',cancelled:'#f43f5e'};
     const nType=iconMap[n.type]?n.type:'default';
     const iconName=iconMap[n.type]||'bellRing';
     const iconColor=colorMap[n.type]||'var(--a)';

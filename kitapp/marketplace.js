@@ -34,13 +34,33 @@ async function sbLoadMarket(){
 let _mktAllItems=[];
 let _mktTab='listings';
 
+function openQuickListForm(){
+  const available=(db.shirts||[]).filter(s=>!s.marketListed&&s.status!=='sold');
+  if(!available.length){
+    toast(db.lang==='pl'?'Brak koszulek do wystawienia — dodaj najpierw koszulkę do kolekcji, albo wszystkie są już wystawione.':'No jerseys to list — add one to your collection first, or everything is already listed.');
+    return;
+  }
+  if(!db.profile?.nick){toast(db.lang==='pl'?'Ustaw nick w Profilu!':'Set a nickname in Profile!');return;}
+  document.getElementById('modal-title').textContent=db.lang==='pl'?'Wystaw koszulkę z kolekcji':'List a jersey from your collection';
+  document.getElementById('modal-body').innerHTML=`
+    <div class="form-group">
+      <div class="form-label">${db.lang==='pl'?'Wybierz koszulkę':'Choose a jersey'}</div>
+      <select class="form-select" id="ql-shirt">${available.map(s=>`<option value="${s.id}">${s.club||'?'} ${s.season||''} ${kindLabel(s.kind)||''}</option>`).join('')}</select>
+    </div>
+    <div class="fx-c gap8" style="justify-content:flex-end">
+      <button class="btn btn-g" onclick="closeModal()">${T('cancel')}</button>
+      <button class="btn btn-mkt" onclick="confirmListOnMkt(document.getElementById('ql-shirt').value)">${db.lang==='pl'?'Dalej':'Next'}</button>
+    </div>`;
+  document.getElementById('modal-overlay').classList.add('open');
+}
 function bMarket(){
   return `
   <div class="fx-b mb12 s1">
-    <div><div class="ph-sub" style="border-color:rgba(20,33,61,.3);background:rgba(20,33,61,.08);color:#14213d"><span style="width:5px;height:5px;border-radius:50%;background:#14213d;animation:pulse 3s ease-in-out infinite"></span><span>${T('nav_market')}</span></div><div class="ph-title">${T('mkt_title').toUpperCase()}</div></div>
+    <div><div class="ph-sub" style="border-color:rgba(174,225,249,.3);background:rgba(174,225,249,.08);color:#AEE1F9"><span style="width:5px;height:5px;border-radius:50%;background:#AEE1F9;animation:pulse 3s ease-in-out infinite"></span><span>${T('nav_market')}</span></div><div class="ph-title">${T('mkt_title').toUpperCase()}</div></div>
     <div class="fx-c gap8">
       <button class="btn btn-g" onclick="loadMarketplace()">↻ ${db.lang==='pl'?'Odśwież':'Refresh'}</button>
-      <button class="btn btn-mkt" onclick="openApp('profile')">${db.lang==='pl'?'Mój Profil':'My Profile'}</button>
+      <button class="btn btn-mkt" onclick="openQuickListForm()">+ ${db.lang==='pl'?'Wystaw koszulkę':'List a jersey'}</button>
+      <button class="btn btn-g" onclick="openApp('profile')">${db.lang==='pl'?'Mój Profil':'My Profile'}</button>
     </div>
   </div>
   <div class="tabs mb12">
@@ -218,10 +238,10 @@ function renderPublicWishlistCards(items){
   return items.map(w=>{
     const nick=w._nick||'?';
     const isOwn=w.user_id===currentUser?.id;
-    return `<div class="card" style="border-color:rgba(20,33,61,.15)">
+    return `<div class="card" style="border-color:rgba(174,225,249,.15)">
       <div class="fx-b mb8">
         <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:18px;color:var(--t1)">${w.club||db.lang==='pl'?'Dowolny klub':'Any club'}</div>
-        <span style="color:#14213d;display:inline-flex">${icon('heart',18)}</span>
+        <span style="color:#AEE1F9;display:inline-flex">${icon('heart',18)}</span>
       </div>
       <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px">
         ${w.season?`<div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--t2)">${icon('calendar',11,"display:inline-block;vertical-align:-2px;margin-right:4px")}${w.season}</div>`:''}
@@ -234,7 +254,7 @@ function renderPublicWishlistCards(items){
       <div class="fx-b">
         <div class="fx-c gap6" style="cursor:pointer" onclick="viewProfile('${nick}')">
           <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,var(--a) 0%,color-mix(in srgb,var(--a) 50%,#000) 100%);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--on-a,#fff)">${nick[0].toUpperCase()}</div>
-          <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#14213d">${nick}</span>
+          <span style="font-size:10px;font-family:'JetBrains Mono',monospace;color:#AEE1F9">${nick}</span>
         </div>
         ${!isOwn?`<button class="btn btn-g" style="padding:4px 10px;font-size:10px" onclick="contactSeller('${w.user_id}','${nick}')">${icon('messageCircle',12,"display:inline-block;vertical-align:-2px;margin-right:5px")}Napisz</button>`:`<span style="font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--t3)">TWOJA</span>`}
       </div>
@@ -254,7 +274,7 @@ async function loadPublicProfilesSection(){
       <div style="flex:1;min-width:0">
         <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:16px;letter-spacing:.04em">${p.nick||'—'}</div>
         ${p.bio?`<div style="font-size:10px;color:var(--t2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.bio}</div>`:''}
-        <div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:#14213d;margin-top:3px">${p.shirt_count||0} ${db.lang==='pl'?'koszulek':'jerseys'}</div>
+        <div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:#AEE1F9;margin-top:3px">${p.shirt_count||0} ${db.lang==='pl'?'koszulek':'jerseys'}</div>
       </div>
       <button class="btn btn-g" style="padding:4px 10px;font-size:10px;flex-shrink:0" onclick="event.stopPropagation();contactSeller('${p.user_id}','${p.nick||''}')">${icon('messageCircle',13)}</button>
     </div>`).join('')}</div>`;
@@ -288,7 +308,7 @@ function mktCardHtml(i){
         <div class="shirt-card-season">${[i.season,i.kind,i.size].filter(Boolean).join(' · ')}</div>
         ${i.personalization?`<div style="font-size:10px;color:var(--t2);margin-bottom:4px;font-family:'JetBrains Mono',monospace">${i.personalization}</div>`:''}
         <div class="fx-b mb8">
-          <div class="shirt-card-price" style="color:#14213d">${mv?mv.toFixed(2)+' PLN':'—'}</div>
+          <div class="shirt-card-price" style="color:#AEE1F9">${mv?mv.toFixed(2)+' PLN':'—'}</div>
           ${i.condition?`<div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:${condColor(i.condition)}">${i.condition}/10</div>`:''}
         </div>
         <div class="div" style="margin:8px 0"></div>
@@ -299,7 +319,7 @@ function mktCardHtml(i){
           </div>
           ${isOwn?`<button class="btn btn-d" style="padding:4px 10px;font-size:10px" onclick="event.stopPropagation();removeListing('${i.id}')">${icon('x',11,"display:inline-block;vertical-align:-1px;margin-right:4px")} ${T('mkt_remove')}</button>`:`<button class="btn btn-mkt" style="padding:4px 10px;font-size:10px" onclick="event.stopPropagation();contactSeller('${i.user_id||''}','${i.seller_nick||''}')">${icon('messageCircle',12,"display:inline-block;vertical-align:-2px;margin-right:5px")} ${T('mkt_contact')}</button>`}
         </div>
-        ${i.notes?`<div style="font-size:10px;color:var(--t2);margin-top:8px;padding-top:8px;border-top:1px solid rgba(20,33,61,.08)">${i.notes}</div>`:''}
+        ${i.notes?`<div style="font-size:10px;color:var(--t2);margin-top:8px;padding-top:8px;border-top:1px solid rgba(174,225,249,.08)">${i.notes}</div>`:''}
       </div>
     </div>`;
 }
@@ -426,7 +446,7 @@ function openListingDetail(id){
       <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--t2);letter-spacing:.04em;margin-bottom:8px">${[l.season,l.kind,l.size].filter(Boolean).join(' · ')}</div>
       ${l.legit_status==='approved'?`<div style="margin-bottom:8px">${legitStatusBadge('approved')}</div>`:''}
       <div class="fx-b" style="margin-bottom:4px">
-        <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:30px;color:#14213d">${mv?mv.toFixed(2)+' PLN':'—'}</div>
+        <div style="font-family:'Inter',sans-serif;font-weight:900;font-size:30px;color:#AEE1F9">${mv?mv.toFixed(2)+' PLN':'—'}</div>
         ${likeButtonHtml(l.id,'lg')}
       </div>
       ${l.condition?`<div style="font-size:11px;color:${condColor(l.condition)};font-family:'JetBrains Mono',monospace;margin-bottom:14px">${db.lang==='pl'?'Stan':'Condition'}: ${l.condition}/10</div>`:'<div style="margin-bottom:14px"></div>'}
@@ -476,7 +496,7 @@ function openMakeOffer(id){
   if(l.user_id===currentUser.id){toast(db.lang==='pl'?'To Twoje ogłoszenie':'This is your listing');return;}
   document.getElementById('modal-title').textContent=db.lang==='pl'?'Zaproponuj ofertę':'Make an offer';
   document.getElementById('modal-body').innerHTML=`
-    <div style="font-size:13px;color:var(--t2);margin-bottom:14px">${l.club} ${l.season||''} — ${db.lang==='pl'?'cena wyjściowa':'asking price'} <b style="color:#14213d">${parseFloat(l.price_pln||0).toFixed(2)} PLN</b></div>
+    <div style="font-size:13px;color:var(--t2);margin-bottom:14px">${l.club} ${l.season||''} — ${db.lang==='pl'?'cena wyjściowa':'asking price'} <b style="color:#AEE1F9">${parseFloat(l.price_pln||0).toFixed(2)} PLN</b></div>
     ${l.min_offer?`<div style="font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;margin-bottom:12px">${db.lang==='pl'?'Minimalna oferta akceptowana przez sprzedającego':'Minimum offer accepted by seller'}: ${parseFloat(l.min_offer).toFixed(0)} PLN</div>`:''}
     <div class="form-group"><div class="form-label">${db.lang==='pl'?'Twoja oferta (PLN)':'Your offer (PLN)'}</div><input class="form-input" type="text" inputmode="decimal" id="offer-amount" placeholder="0"></div>
     <div class="form-group"><div class="form-label">${db.lang==='pl'?'Wiadomość (opcjonalnie)':'Message (optional)'}</div><textarea class="form-input" id="offer-msg" rows="2" placeholder="${db.lang==='pl'?'np. Mogę odebrać osobiście':'e.g. I can pick up in person'}"></textarea></div>
@@ -590,14 +610,14 @@ function openProfileView(p){
     <div class="profile-avatar">${(p.nick||'?')[0].toUpperCase()}</div>
     <div><div style="font-family:'Inter',sans-serif;font-weight:800;font-size:24px;letter-spacing:.06em">${p.nick||'—'}${p.is_verified?`<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:2px;margin-left:6px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>`:''}</div>
       ${p.bio?`<div style="font-size:13px;color:var(--t2);margin-top:4px">${p.bio}</div>`:''}
-      <div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:#14213d;margin-top:6px">${(p.shirt_count||0)} ${db.lang==='pl'?'koszulek w kolekcji':'jerseys in collection'}</div>
+      <div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:#AEE1F9;margin-top:6px">${(p.shirt_count||0)} ${db.lang==='pl'?'koszulek w kolekcji':'jerseys in collection'}</div>
       ${adminMode?`<button class="btn ${p.is_verified?'btn-d':'btn-p'}" style="padding:5px 12px;font-size:10px;margin-top:10px" onclick="toggleUserVerified('${p.nick}','${p.user_id}')">${p.is_verified?(db.lang==='pl'?'Cofnij weryfikację':'Remove verification'):(db.lang==='pl'?'Zweryfikuj użytkownika':'Verify user')}</button>`:''}
     </div>
   </div>
   ${shirts.length?`
   <div class="clabel">${T('profile_collection')}</div>
   <div class="g3" id="profile-shirt-grid">${shirts.map(s=>`
-    <div class="mkt-card" style="background:rgba(20,33,61,.04);border-color:rgba(20,33,61,.12)">
+    <div class="mkt-card" style="background:rgba(174,225,249,.04);border-color:rgba(174,225,249,.12)">
       <div class="shirt-photo" style="position:relative">${s.photo?`<img src="${s.photo}" alt="" style="width:100%;height:100%;object-fit:cover">`:`<div class="shirt-photo-placeholder"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg></div>`}
         ${s.id?`<div style="position:absolute;bottom:8px;right:8px">${likeButtonHtml(s.id)}</div>`:''}
       </div>

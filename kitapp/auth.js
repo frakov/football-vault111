@@ -27,10 +27,12 @@ async function doRegister(){
   const lastName=document.getElementById('reg-lastname').value.trim();
   const email=document.getElementById('reg-email').value.trim();
   const pass=document.getElementById('reg-pass').value;
+  const termsAccepted=document.getElementById('reg-terms')?.checked;
   setAuthErr('reg-err','');setAuthOk('reg-ok','');
   if(!firstName||!lastName||!email||!pass){setAuthErr('reg-err','Wypełnij wszystkie pola.');return;}
   if(pass.length<6){setAuthErr('reg-err','Hasło musi mieć min. 6 znaków.');return;}
-  const {error}=await sb.auth.signUp({email,password:pass,options:{data:{full_name:`${firstName} ${lastName}`}}});
+  if(!termsAccepted){setAuthErr('reg-err','Musisz zaakceptować Regulamin i Politykę Prywatności, aby założyć konto.');return;}
+  const {error}=await sb.auth.signUp({email,password:pass,options:{data:{full_name:`${firstName} ${lastName}`,terms_accepted_at:new Date().toISOString()}}});
   if(error)setAuthErr('reg-err',error.message);
   else setAuthOk('reg-ok','Konto utworzone! Sprawdź email i potwierdź rejestrację.');
 }
@@ -112,7 +114,7 @@ function bProfile(){
           <div>
             <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:22px;letter-spacing:.06em">${p.nick||'—'}</div>
             ${p.bio?`<div style="font-size:12px;color:var(--t2);margin-top:3px">${p.bio}</div>`:''}
-            <div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:#14213d;margin-top:6px">${(db.shirts||[]).length} ${db.lang==='pl'?'koszulek':'jerseys'}</div>
+            <div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:#AEE1F9;margin-top:6px">${(db.shirts||[]).length} ${db.lang==='pl'?'koszulek':'jerseys'}</div>
             <span class="sh-status ${p.public?'public':'collection'}" style="margin-top:8px;display:inline-block">${p.public?T('profile_shared'):T('profile_private')}</span>
           </div>
         </div>

@@ -277,6 +277,13 @@
           <div class="lp-footer-link" onclick="openAuthModal('reset')" data-en="Reset password">Reset hasła</div>
           <div class="lp-footer-link" onclick="openAuthModal('register')" data-en="Register">Rejestracja</div>
         </div>
+        <div>
+          <div class="lp-footer-col-title" data-en="Legal">Prawne</div>
+          <div class="lp-footer-link" onclick="window.open('regulamin.html','_blank')" data-en="Terms of Service">Regulamin</div>
+          <div class="lp-footer-link" onclick="window.open('polityka-prywatnosci.html','_blank')" data-en="Privacy Policy">Polityka Prywatności</div>
+          <div class="lp-footer-link" onclick="window.open('polityka-cookies.html','_blank')" data-en="Cookie Policy">Polityka Cookies</div>
+          <div class="lp-footer-link" onclick="window.open('zasady-legitcheck.html','_blank')" data-en="LegitCheck Rules">Zasady LegitCheck</div>
+        </div>
       </div>
     </div>
 
@@ -319,6 +326,10 @@
       <div style="font-size:10px;color:var(--t2);margin:-6px 0 12px;line-height:1.4">Imię i nazwisko nie są widoczne publicznie — służą wyłącznie do weryfikacji tożsamości sprzedających.</div>
       <div class="auth-field"><label for="reg-email">Email</label><input type="email" id="reg-email" placeholder="twoj@email.com" autocomplete="email"></div>
       <div class="auth-field"><label for="reg-pass">Hasło (min. 6 znaków)</label><input type="password" id="reg-pass" placeholder="••••••••" autocomplete="new-password"></div>
+      <label style="display:flex;align-items:flex-start;gap:9px;font-size:11.5px;line-height:1.5;color:var(--t2);margin:6px 0 14px;cursor:pointer">
+        <input type="checkbox" id="reg-terms" style="width:auto;margin-top:2px;flex-shrink:0;accent-color:var(--a)">
+        <span>Oświadczam, że ukończyłem/am 18 lat oraz akceptuję <a href="regulamin.html" target="_blank" style="color:var(--t1);font-weight:600">Regulamin</a> i <a href="polityka-prywatnosci.html" target="_blank" style="color:var(--t1);font-weight:600">Politykę Prywatności</a> KitBase.</span>
+      </label>
       <button class="auth-btn" onclick="doRegister()">Utwórz konto →</button>
       <div class="auth-err" id="reg-err"></div>
       <div class="auth-ok" id="reg-ok"></div>

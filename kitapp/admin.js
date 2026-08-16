@@ -35,10 +35,10 @@ let LP_HERO_PHOTOS=[null,null,null,null];
 let LP_SPLIT_PHOTO=null;
 function initLandingJerseys(){
   const heroConfigs=[
-    {body:'#a6192e',stripe:'#14213d',collar:'#ffffff',pattern:'stripes'},
-    {body:'#ffffff',stripe:'#a6192e',collar:'#14213d',pattern:'halves'},
-    {body:'#0a0f1c',stripe:'#8c9bc3',collar:'#ffffff',pattern:'chevron'},
-    {body:'#8c9bc3',stripe:'#14213d',collar:'#14213d',pattern:'stripes'},
+    {body:'#a6192e',stripe:'#AEE1F9',collar:'#ffffff',pattern:'stripes'},
+    {body:'#ffffff',stripe:'#a6192e',collar:'#AEE1F9',pattern:'halves'},
+    {body:'#5FB8E0',stripe:'#7BC8E8',collar:'#ffffff',pattern:'chevron'},
+    {body:'#7BC8E8',stripe:'#AEE1F9',collar:'#AEE1F9',pattern:'stripes'},
   ];
   const heroEl=document.getElementById('lp-hero-jerseys');
   if(heroEl){
@@ -50,7 +50,7 @@ function initLandingJerseys(){
   }
   const splitEl=document.getElementById('lp-split-jersey');
   if(splitEl){
-    const inner=LP_SPLIT_PHOTO?`<img src="${LP_SPLIT_PHOTO}" alt="" style="width:100%;height:100%;object-fit:cover">`:drawJersey('#a6192e','#14213d','#ffffff','stripes');
+    const inner=LP_SPLIT_PHOTO?`<img src="${LP_SPLIT_PHOTO}" alt="" style="width:100%;height:100%;object-fit:cover">`:drawJersey('#a6192e','#AEE1F9','#ffffff','stripes');
     const uploadBtn=adminMode?`<button class="jersey-photo-upload" onclick="event.stopPropagation();uploadSplitJersey()" title="Dodaj zdjęcie">+</button>`:'';
     splitEl.innerHTML=inner+uploadBtn;
   }
@@ -114,7 +114,7 @@ function initLandingClubGrid(){
   const el=document.getElementById('lp-club-grid');
   if(!el)return;
   el.innerHTML=LP_CLUBS.map(c=>{
-    const chip=col=>`<span class="lp-club-chip" style="background:${col};${col.toLowerCase()==='#ffffff'?'border:1px solid rgba(20,33,61,.2)':''}"></span>`;
+    const chip=col=>`<span class="lp-club-chip" style="background:${col};${col.toLowerCase()==='#ffffff'?'border:1px solid rgba(174,225,249,.2)':''}"></span>`;
     return `<div class="lp-club-tile" onclick="openAuthModal('register')"><div class="lp-club-colors">${chip(c.colors[0])}${chip(c.colors[1])}</div><div class="lp-club-name">${c.name}</div></div>`;
   }).join('');
 }
