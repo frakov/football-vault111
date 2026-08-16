@@ -104,11 +104,11 @@ async function deleteMessage(msgId,convId){
 function bChat(){
   return `
   <div class="fx-b mb12 s1">
-    <div><div class="ph-sub" style="border-color:rgba(174,225,249,.3);background:rgba(174,225,249,.08);color:#AEE1F9"><span style="width:5px;height:5px;border-radius:50%;background:#AEE1F9;animation:pulse 3s ease-in-out infinite"></span><span>WIADOMOŚCI</span></div><div class="ph-title">CZAT</div></div>
+    <div><div class="ph-sub" style="border-color:rgba(20,33,61,.3);background:rgba(20,33,61,.08);color:#14213d"><span style="width:5px;height:5px;border-radius:50%;background:#14213d;animation:pulse 3s ease-in-out infinite"></span><span>WIADOMOŚCI</span></div><div class="ph-title">CZAT</div></div>
   </div>
-  <div style="display:grid;grid-template-columns:260px 1fr;gap:0;height:calc(100% - 90px);border:1px solid rgba(174,225,249,.12);border-radius:14px;overflow:hidden">
-    <div style="border-right:1px solid rgba(174,225,249,.1);display:flex;flex-direction:column">
-      <div style="padding:12px;border-bottom:1px solid rgba(174,225,249,.08);flex-shrink:0">
+  <div style="display:grid;grid-template-columns:260px 1fr;gap:0;height:calc(100% - 90px);border:1px solid rgba(20,33,61,.12);border-radius:14px;overflow:hidden">
+    <div style="border-right:1px solid rgba(20,33,61,.1);display:flex;flex-direction:column">
+      <div style="padding:12px;border-bottom:1px solid rgba(20,33,61,.08);flex-shrink:0">
         <div class="field field-search" style="padding:6px 12px">${icon('search',12)}<input type="text" placeholder="Szukaj..." style="font-size:11px"></div>
       </div>
       <div id="conv-list-inner" style="flex:1;overflow-y:auto;padding:8px">
@@ -117,7 +117,7 @@ function bChat(){
     </div>
     <div style="display:flex;flex-direction:column;min-height:0">
       <!-- NAGŁÓWEK — statyczny -->
-      <div style="padding:10px 16px;border-bottom:1px solid rgba(174,225,249,.08);display:flex;align-items:center;gap:10px;flex-shrink:0">
+      <div style="padding:10px 16px;border-bottom:1px solid rgba(20,33,61,.08);display:flex;align-items:center;gap:10px;flex-shrink:0">
         <div id="chat-avatar-main" class="chat-avatar" style="width:32px;height:32px;font-size:14px">?</div>
         <div id="chat-header-nick" style="font-weight:700;font-size:13px;flex:1">—</div>
         <button class="xbtn" id="chat-del-conv-btn" style="display:none" onclick="deleteCurrentConv()" title="${db.lang==='pl'?'Usuń konwersację':'Delete conversation'}">${icon('trash',13)}</button>
@@ -127,10 +127,10 @@ function bChat(){
         <div class="empty-state"><div class="empty-icon">${icon('messageCircle',44)}</div><div class="empty-text">WYBIERZ KONWERSACJĘ</div></div>
       </div>
       <!-- INPUT — statyczny, NIGDY nie jest podmieniane -->
-      <div style="padding:10px 12px;border-top:1px solid rgba(174,225,249,.15);display:flex;gap:8px;align-items:center;flex-shrink:0;background:var(--bg2)">
+      <div style="padding:10px 12px;border-top:1px solid rgba(20,33,61,.15);display:flex;gap:8px;align-items:center;flex-shrink:0;background:var(--bg2)">
         <label for="chat-img-upload" style="cursor:pointer;color:var(--t2);font-size:18px;flex-shrink:0">${icon('paperclip',17)}</label>
         <input type="file" id="chat-img-upload" accept="image/*" style="display:none" onchange="sendChatImageActive(this)">
-        <input type="text" id="chat-input-main" placeholder="Napisz wiadomość..." style="flex:1;background:rgba(174,225,249,.08)!important;border:1px solid rgba(174,225,249,.25)!important;border-radius:10px!important;padding:9px 14px!important;font-size:13px!important;color:var(--t1)!important;outline:none!important;width:auto!important" onkeydown="if(event.key==='Enter'){event.preventDefault();sendChatMsgActive()}">
+        <input type="text" id="chat-input-main" placeholder="Napisz wiadomość..." style="flex:1;background:rgba(20,33,61,.08)!important;border:1px solid rgba(20,33,61,.25)!important;border-radius:10px!important;padding:9px 14px!important;font-size:13px!important;color:var(--t1)!important;outline:none!important;width:auto!important" onkeydown="if(event.key==='Enter'){event.preventDefault();sendChatMsgActive()}">
         <button class="btn btn-p" style="padding:8px 16px;flex-shrink:0" onclick="sendChatMsgActive()">Wyślij</button>
       </div>
     </div>

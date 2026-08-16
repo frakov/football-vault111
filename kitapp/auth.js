@@ -114,7 +114,7 @@ function bProfile(){
           <div>
             <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:22px;letter-spacing:.06em">${p.nick||'—'}</div>
             ${p.bio?`<div style="font-size:12px;color:var(--t2);margin-top:3px">${p.bio}</div>`:''}
-            <div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:#AEE1F9;margin-top:6px">${(db.shirts||[]).length} ${db.lang==='pl'?'koszulek':'jerseys'}</div>
+            <div style="font-size:9px;font-family:'JetBrains Mono',monospace;color:#14213d;margin-top:6px">${(db.shirts||[]).length} ${db.lang==='pl'?'koszulek':'jerseys'}</div>
             <span class="sh-status ${p.public?'public':'collection'}" style="margin-top:8px;display:inline-block">${p.public?T('profile_shared'):T('profile_private')}</span>
           </div>
         </div>

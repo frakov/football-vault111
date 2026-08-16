@@ -606,8 +606,8 @@ function buildPackModal(s){
     </div>
   </div>
   <div id="pack-mkt" style="display:none">
-    <div class="card mb14" style="border-color:rgba(174,225,249,.2);background:rgba(174,225,249,.05)">
-      <div style="font-size:12px;font-weight:600;color:#AEE1F9;margin-bottom:6px">${db.lang==='pl'?'Wyświetl koszulkę na publicznym Marketplace':'List jersey on the public Marketplace'}</div>
+    <div class="card mb14" style="border-color:rgba(20,33,61,.2);background:rgba(20,33,61,.05)">
+      <div style="font-size:12px;font-weight:600;color:#14213d;margin-bottom:6px">${db.lang==='pl'?'Wyświetl koszulkę na publicznym Marketplace':'List jersey on the public Marketplace'}</div>
       <div style="font-size:11px;color:var(--t2);line-height:1.6">${db.lang==='pl'?'Wszyscy zalogowani użytkownicy zobaczą Twoje ogłoszenie.':'All logged-in users will see your listing.'}</div>
     </div>
     ${!db.profile?.nick?`<div class="card mb14" style="border-color:rgba(var(--gold-rgb),.2);background:rgba(var(--gold-rgb),.05)"><div style="font-size:11px;color:var(--gold);display:flex;align-items:center;gap:6px">${icon('alertTriangle',13)}${db.lang==='pl'?'Ustaw nick w zakładce Profil przed wystawieniem.':'Set a nickname in the Profile tab before listing.'}</div></div>`:``}
@@ -616,7 +616,7 @@ function buildPackModal(s){
       <div>
         <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:20px;letter-spacing:.05em;margin-bottom:6px">${s.club||'—'}</div>
         <div style="font-size:11px;color:var(--t2);margin-bottom:4px">${[s.season,kindLabel(s.kind),s.size].filter(Boolean).join(' · ')}</div>
-        <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:24px;color:#AEE1F9;margin-bottom:12px">${toPLN(s.marketValue||s.buyPrice)?toPLN(s.marketValue||s.buyPrice).toFixed(2)+' PLN':'—'}</div>
+        <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:24px;color:#14213d;margin-bottom:12px">${toPLN(s.marketValue||s.buyPrice)?toPLN(s.marketValue||s.buyPrice).toFixed(2)+' PLN':'—'}</div>
         ${s.marketListed?`<button class="btn btn-d w100" onclick="removeFromMkt('${s.id}');closeModal()">${icon('x',11,"display:inline-block;vertical-align:-1px;margin-right:4px")} ${T('mkt_remove')}</button>`:`<button class="btn btn-mkt w100" onclick="confirmListOnMkt('${s.id}')" ${!db.profile?.nick?'disabled style="opacity:.5"':''}>${T('mkt_list')}</button>`}
       </div>
     </div>
@@ -710,7 +710,7 @@ async function listOnMkt(id){
 function exportPDF(mode){
   let ss=db.shirts||[];if(mode==='forsale')ss=ss.filter(s=>s.status==='forsale'||s.status==='listed');
   const cur=db.currency||'PLN';const sym=CURR_SYM[cur]||cur;
-  const accentColor='#AEE1F9';
+  const accentColor='#14213d';
   const tB=ss.reduce((a,s)=>a+toDisp(toPLN(s.buyPrice)),0);
   const tV=ss.reduce((a,s)=>a+toDisp(toPLN(s.marketValue||s.buyPrice)),0);
   const prof=tV-tB;const now=new Date().toLocaleDateString('pl-PL');
@@ -726,7 +726,7 @@ h1{font-size:26px;font-weight:900}h1 span{color:${accentColor}}
 .sc{padding:12px 14px;border-radius:10px;background:#f8f9fa;border:1px solid #e9ecef}
 .sl{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#888;margin-bottom:4px}
 .sv{font-size:18px;font-weight:800}.sv.g{color:${accentColor}}.sv.r{color:#c0392b}
-table{width:100%;border-collapse:collapse}thead tr{background:#AEE1F9;color:#fff}
+table{width:100%;border-collapse:collapse}thead tr{background:#14213d;color:#fff}
 th{padding:8px 10px;text-align:left;font-size:8px;letter-spacing:.12em;text-transform:uppercase}
 td{padding:7px 10px;border-bottom:1px solid #f0f0f0;font-size:11px}tr:hover td{background:#f8faf9}
 </style></head><body>
@@ -805,8 +805,8 @@ async function checkWishlistMatches(listing){
 function bWishlist(){
   return `
   <div class="fx-b mb12 s1">
-    <div><div class="ph-sub" style="border-color:rgba(174,225,249,.3);background:rgba(174,225,249,.08);color:#AEE1F9"><span style="width:5px;height:5px;border-radius:50%;background:#AEE1F9;animation:pulse 3s ease-in-out infinite"></span><span>WISHLIST</span></div><div class="ph-title">SZUKANE</div></div>
-    <button class="btn btn-p" onclick="openAddWishlistItem()" style="background:linear-gradient(135deg,#AEE1F9,#5FB8E0)">+ Dodaj</button>
+    <div><div class="ph-sub" style="border-color:rgba(20,33,61,.3);background:rgba(20,33,61,.08);color:#14213d"><span style="width:5px;height:5px;border-radius:50%;background:#14213d;animation:pulse 3s ease-in-out infinite"></span><span>WISHLIST</span></div><div class="ph-title">SZUKANE</div></div>
+    <button class="btn btn-p" onclick="openAddWishlistItem()" style="background:linear-gradient(135deg,#14213d,#0a0f1c)">+ Dodaj</button>
   </div>
   <div id="wishlist-grid" class="g3 s2"><div class="empty-state"><div class="empty-icon loading-pulse"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15.5 14"/></svg></div></div></div>
   <div class="s3" id="wishlist-matches" style="margin-top:20px"></div>`;
@@ -818,7 +818,7 @@ async function initWishlistView(){
   if(!grid)return;
   if(!items.length){grid.innerHTML=`<div style="grid-column:span 3"><div class="empty-state"><div class="empty-icon">${icon('heart',44)}</div><div class="empty-text">WISHLIST JEST PUSTA — DODAJ KOSZULKĘ KTÓREJ SZUKASZ</div></div></div>`;return;}
   grid.innerHTML=items.map(w=>`
-  <div class="card" style="border-color:rgba(174,225,249,.15)">
+  <div class="card" style="border-color:rgba(20,33,61,.15)">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
       <div style="font-family:'Inter',sans-serif;font-weight:800;font-size:18px;letter-spacing:.05em;color:var(--t1)">${w.club||'Dowolny klub'}</div>
       <div class="fx-c gap4">
@@ -833,9 +833,9 @@ async function initWishlistView(){
       ${w.kind?`<div style="font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--t2)">${icon('shirt',11,"display:inline-block;vertical-align:-2px;margin-right:4px")} ${kindLabel(w.kind)}</div>`:''}
       ${w.notes?`<div style="font-size:10px;color:var(--t2);margin-top:4px">${w.notes}</div>`:''}
     </div>
-    <div style="display:flex;align-items:center;gap:6px;padding-top:8px;border-top:1px solid rgba(174,225,249,.08)">
-      <div style="width:6px;height:6px;border-radius:50%;background:#AEE1F9;box-shadow:0 0 6px rgba(174,225,249,.6)"></div>
-      <span style="font-size:8px;font-family:'JetBrains Mono',monospace;color:rgba(174,225,249,.7);letter-spacing:.1em">${w.public?'PUBLICZNA':'PRYWATNA'}</span>
+    <div style="display:flex;align-items:center;gap:6px;padding-top:8px;border-top:1px solid rgba(20,33,61,.08)">
+      <div style="width:6px;height:6px;border-radius:50%;background:#14213d;box-shadow:0 0 6px rgba(20,33,61,.6)"></div>
+      <span style="font-size:8px;font-family:'JetBrains Mono',monospace;color:rgba(20,33,61,.7);letter-spacing:.1em">${w.public?'PUBLICZNA':'PRYWATNA'}</span>
     </div>
   </div>`).join('');
   // Check marketplace matches
@@ -848,17 +848,17 @@ async function initWishlistView(){
   }));
   const matchEl=document.getElementById('wishlist-matches');
   if(matchEl&&matches.length){
-    matchEl.innerHTML=`<div class="fx-b mb12"><div class="clabel" style="color:#AEE1F9">DOPASOWANIA NA MARKETPLACE (${matches.length})</div></div>
+    matchEl.innerHTML=`<div class="fx-b mb12"><div class="clabel" style="color:#14213d">DOPASOWANIA NA MARKETPLACE (${matches.length})</div></div>
     <div class="g3">${matches.map(l=>`
-    <div class="mkt-card" style="border-color:rgba(174,225,249,.2);background:rgba(174,225,249,.04)">
+    <div class="mkt-card" style="border-color:rgba(20,33,61,.2);background:rgba(20,33,61,.04)">
       <div class="shirt-photo">${l.photo?`<img src="${l.photo}" style="width:100%;height:100%;object-fit:cover">`:`<div class="shirt-photo-placeholder"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.57a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.57a2 2 0 00-1.34-2.23z"/></svg></div>`}
-        <div style="position:absolute;top:8px;left:8px;background:rgba(174,225,249,.9);border-radius:6px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:8px;color:#fff;display:flex;align-items:center;gap:4px">${icon('heart',10)}MATCH</div>
+        <div style="position:absolute;top:8px;left:8px;background:rgba(20,33,61,.9);border-radius:6px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:8px;color:#fff;display:flex;align-items:center;gap:4px">${icon('heart',10)}MATCH</div>
       </div>
       <div class="shirt-card-body">
         <div class="shirt-card-club">${l.club||'—'}</div>
         <div class="shirt-card-season">${[l.season,l.kind,l.size].filter(Boolean).join(' · ')}</div>
-        <div class="shirt-card-price" style="color:#AEE1F9">${l.price_pln?l.price_pln+' PLN':'—'}</div>
-        <button class="btn w100" style="margin-top:8px;background:rgba(174,225,249,.15);border:1px solid rgba(174,225,249,.3);color:#AEE1F9;font-size:10px;padding:6px" onclick="openApp('market')">Zobacz na Marketplace →</button>
+        <div class="shirt-card-price" style="color:#14213d">${l.price_pln?l.price_pln+' PLN':'—'}</div>
+        <button class="btn w100" style="margin-top:8px;background:rgba(20,33,61,.15);border:1px solid rgba(20,33,61,.3);color:#14213d;font-size:10px;padding:6px" onclick="openApp('market')">Zobacz na Marketplace →</button>
       </div>
     </div>`).join('')}</div>`;
   }
@@ -889,7 +889,7 @@ async function initLegitCheckView(){
   grid.innerHTML=data.map(req=>{
     const s=(db.shirts||[]).find(x=>String(x.id)===String(req.shirt_id));
     const photo=s&&s.photos&&s.photos[0];
-    return `<div class="card" style="border-color:rgba(174,225,249,.15);padding:0;overflow:hidden">
+    return `<div class="card" style="border-color:rgba(20,33,61,.15);padding:0;overflow:hidden">
       <div class="shirt-photo" style="border-radius:0">${photo?`<img src="${photo}" alt="">`:`<div class="shirt-photo-placeholder">${icon('shirt',40)}</div>`}
         <div style="position:absolute;top:8px;right:8px">${legitStatusBadge(req.status)}</div>
       </div>
@@ -950,7 +950,7 @@ async function openLegitChecksPanel(){
   list.innerHTML=data.map(req=>{
     const s=(db.shirts||[]).find(x=>String(x.id)===String(req.shirt_id));
     const photo=s&&s.photos&&s.photos[0];
-    return `<div class="report-card" style="display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid rgba(174,225,249,.12);border-radius:10px;margin-bottom:10px">
+    return `<div class="report-card" style="display:flex;gap:12px;align-items:flex-start;padding:12px;border:1px solid rgba(20,33,61,.12);border-radius:10px;margin-bottom:10px">
       <div style="width:64px;height:64px;border-radius:8px;overflow:hidden;flex-shrink:0;background:var(--bg3)">${photo?`<img src="${photo}" style="width:100%;height:100%;object-fit:cover">`:''}</div>
       <div style="flex:1;min-width:0">
         <div style="font-weight:700;font-size:13px">${s?s.club:'—'} <span style="font-weight:400;color:var(--t2);font-size:11px">${s?[s.season,kindLabel(s.kind)].filter(Boolean).join(' · '):''}</span></div>
@@ -1019,7 +1019,7 @@ function buildWishlistForm(item){
   <div class="fx-c gap8" style="justify-content:flex-end">
     ${item?`<button class="btn btn-d" onclick="removeFromWishlist('${item.id}');closeModal();if(isOpen('wishlist'))initWishlistView()">${icon('trash',12,"display:inline-block;vertical-align:-2px;margin-right:5px")}${T('delete')}</button>`:''}
     <button class="btn btn-g" onclick="closeModal()">${T('cancel')}</button>
-    <button class="btn btn-p" style="background:linear-gradient(135deg,#AEE1F9,#5FB8E0)" onclick="saveWishlistItem()">${item?(db.lang==='pl'?'Zapisz zmiany':'Save changes'):(db.lang==='pl'?'Dodaj do Wishlisty':'Add to Wishlist')}</button>
+    <button class="btn btn-p" style="background:linear-gradient(135deg,#14213d,#0a0f1c)" onclick="saveWishlistItem()">${item?(db.lang==='pl'?'Zapisz zmiany':'Save changes'):(db.lang==='pl'?'Dodaj do Wishlisty':'Add to Wishlist')}</button>
   </div>`;
 }
 
