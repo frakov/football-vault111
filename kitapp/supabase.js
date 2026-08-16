@@ -337,10 +337,16 @@ function switchSection(id){
   const inner=document.getElementById('content-inner');
   if(inner)inner.innerHTML=buildContent(id);
   renderSidebarNav();
+  renderBottomNav();
   if(isMobile())closeMobileSidebar();
   const panel=document.getElementById('content-panel');
   if(panel)panel.scrollTop=0;
   if(_postOpen[id])_postOpen[id]();
+}
+function renderBottomNav(){
+  document.querySelectorAll('.bn-item[data-section]').forEach(el=>{
+    el.classList.toggle('active',el.getAttribute('data-section')===activeSection);
+  });
 }
 // Zachowana nazwa dla wstecznej kompatybilności wywołań w kodzie
 function openApp(id){switchSection(id);}

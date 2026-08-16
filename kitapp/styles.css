@@ -625,9 +625,10 @@ select option{background:var(--bg2);color:var(--t1)}
 /* ══════════════════════════════════════════════════════
    MOBILE RESPONSIVE
    ══════════════════════════════════════════════════════ */
+#bottom-nav{display:none}
 @media (pointer: coarse), (max-width: 900px){
   html,body{overflow:auto;font-size:14px}
-  #sidebar-mobile-toggle{display:flex!important}
+  #sidebar-mobile-toggle{display:none!important}
 
   /* TOPBAR — kompaktowy */
   #topbar{padding:0 12px;gap:10px;height:56px}
@@ -635,17 +636,29 @@ select option{background:var(--bg2);color:var(--t1)}
   .tb-value-chip{display:none}
   .tb-user-chip .tb-user-email{display:none}
 
-  /* SIDEBAR — chowany, wysuwany jako panel */
+  /* SIDEBAR — chowany, wysuwany jako panel (otwierany z dolnego paska "Więcej") */
   #sidebar{position:fixed;top:56px;left:0;bottom:0;z-index:400;width:240px;transform:translateX(-100%);transition:transform .2s var(--e2);box-shadow:8px 0 30px rgba(20,20,15,.15)}
   #sidebar.mobile-open{transform:translateX(0)}
   #sidebar-scrim{display:none;position:fixed;inset:56px 0 0 0;background:rgba(20,20,15,.4);z-index:399}
   #sidebar-scrim.show{display:block}
 
-  #app-body{position:relative}
-  .content-inner{padding:20px 16px 60px}
+  #app-body{position:relative;padding-bottom:64px}
+  .content-inner{padding:16px 12px 24px}
 
-  /* GRIDY — jedna kolumna */
-  .g4,.g3,.g2{grid-template-columns:1fr;gap:10px}
+  /* DOLNY PASEK NAWIGACJI — styl Vinted/eBay */
+  #bottom-nav{display:flex;position:fixed;left:0;right:0;bottom:0;height:60px;background:#fff;border-top:1px solid var(--border);z-index:450;padding:0 4px;box-shadow:0 -2px 12px rgba(15,20,30,.06)}
+  .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--t3);cursor:pointer;position:relative;padding:6px 0}
+  .bn-item svg{width:20px;height:20px}
+  .bn-item span{font-size:8.5px;font-family:'JetBrains Mono',monospace;letter-spacing:.02em;text-transform:uppercase}
+  .bn-item.active{color:var(--a)}
+  .bn-add{flex:0 0 56px}
+  .bn-add-btn{width:44px;height:44px;border-radius:50%;background:var(--a);color:var(--on-a);display:flex;align-items:center;justify-content:center;margin-top:-20px;box-shadow:0 4px 14px rgba(var(--a-rgb),.45);border:3px solid #fff}
+  .bn-add-btn svg{width:22px;height:22px}
+  .bn-badge{position:absolute;top:2px;right:calc(50% - 18px);min-width:14px;height:14px;border-radius:8px;background:var(--red);color:#fff;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 3px}
+
+  /* GRIDY — dwie kolumny, styl marketplace app */
+  .g4,.g3,.g2{grid-template-columns:repeat(2,1fr);gap:8px}
+  .g4 .btn,.g3 .btn,.g2 .btn{font-size:9px!important;padding:6px 2px!important;white-space:normal;line-height:1.3}
   .g12{grid-template-columns:1fr;gap:10px}
   .c8,.c4{grid-column:1/-1}
 
